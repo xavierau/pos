@@ -1,0 +1,14 @@
+/node_modules
+/public/storage
+/storage/*.key
+/storage/framework/sessions
+/vendor
+.env
+.env.backup
+composer.lock
+.phpunit.result.cache
+docker-compose.override.yml
+Homestead.json
+Homestead.yaml
+npm-debug.log
+yarn-error.log
