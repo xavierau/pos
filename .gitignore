@@ -3,6 +3,7 @@
 /storage/*.key
 /storage/framework/sessions
 /vendor
+/.idea
 .env
 .env.backup
 composer.lock
