@@ -243,7 +243,7 @@
                                   <br>
                                   <span class="badge badge-success">{{detail.name}}</span>
                                   <i v-if="currentUserPermissions && currentUserPermissions.includes('edit_product_sale')"
-                                    @click="Modal_Updat_Detail(detail)" class="i-Edit text-success cursor-pointer"></i>
+                                    @click="modal_update_detail(detail)" class="i-Edit text-success cursor-pointer"></i>
                                 </td>
                                 <td>{{currentUser.currency}} {{formatNumber(detail.Total_price, 2)}}</td>
                                 <td>
@@ -383,7 +383,7 @@
             <!-- Update Detail Product -->
             <validation-observer ref="Update_Detail">
               <b-modal hide-footer size="lg" id="form_Update_Detail" :title="detail.name">
-                <b-form @submit.prevent="submit_Update_Detail">
+                <b-form @submit.prevent="submitUpdateDetail">
                   <b-row>
                     <!-- Unit Price -->
                     <b-col lg="6" md="6" sm="12">
@@ -889,7 +889,7 @@
         <!-- Modal Add Payment-->
         <validation-observer ref="Add_payment">
           <b-modal hide-footer size="lg" id="Add_Payment" :title="$t('AddPayment')">
-            <b-form @submit.prevent="Submit_Payment">
+            <b-form @submit.prevent="submitPayment">
               <h1 class="text-center mt-3 mb-3">{{client_name}}</h1>
               <b-row>
                 <b-col md="6">
@@ -1767,7 +1767,7 @@ export default {
     },
 
     //---Submit Validation Update Detail
-    submit_Update_Detail() {
+    submitUpdateDetail() {
       this.$refs.Update_Detail.validate().then(success => {
         if (!success) {
           return;
@@ -1777,8 +1777,8 @@ export default {
       });
     },
 
-    //------ Validate Form Submit_Payment
-    Submit_Payment() {
+    //------ Validate Form submitPayment
+    submitPayment() {
       // Start the progress bar.
       NProgress.start();
       NProgress.set(0.1);
@@ -1941,7 +1941,7 @@ export default {
           this.load_product = true;
         }, 300);
         if(this.product.is_imei){
-          this.Modal_Updat_Detail(this.product);
+          this.modal_update_detail(this.product);
         }
       }
     },
@@ -1958,7 +1958,7 @@ export default {
         .then(({ data }) => (this.units = data));
     },
     //------ Show Modal Update Detail Product
-    Modal_Updat_Detail(detail) {
+    modal_update_detail(detail) {
       this.detail = {};
       this.get_units(detail.product_id);
       this.detail.detail_id = detail.detail_id;
@@ -2054,7 +2054,7 @@ export default {
           this.$forceUpdate();
         }
       }
-      this.CaclulTotal();
+      this.calculateTotal();
        setTimeout(() => {
         this.$bvModal.hide("form_Update_Detail");
       }, 1000);
@@ -2260,7 +2260,7 @@ export default {
       return `${value[0]}.${formated}`;
     },
     //---------------------------------Get Product Details ------------------------\\
-    Get_Product_Details(product_id, variant_id) {
+    getProductDetails(product_id, variant_id) {
        axios.get("/show_product_data/" + product_id +"/"+ variant_id).then(response => {
         this.product.discount           = 0;
         this.product.DiscountNet        = 0;
@@ -2283,13 +2283,13 @@ export default {
         this.product.imei_number        = '';
 
         this.add_product(response.data.code);
-        this.CaclulTotal();
+        this.calculateTotal();
         // Complete the animation of theprogress bar.
         NProgress.done();
       });
     },
     //----------- Calcul Total
-    CaclulTotal() {
+    calculateTotal() {
       this.total = 0;
       for (var i = 0; i < this.details.length; i++) {
         var tax = this.details[i].taxe * this.details[i].quantity;
@@ -2327,7 +2327,7 @@ export default {
         }
       }
       this.$forceUpdate();
-      this.CaclulTotal();
+      this.calculateTotal();
     },
     //----------------------------------- Increment QTY with barcode scanner ------------------------------\\
     increment_qty_scanner(code) {
@@ -2340,7 +2340,7 @@ export default {
           }
         }
       }
-      this.CaclulTotal();
+      this.calculateTotal();
       this.$forceUpdate();
 
       NProgress.done();
@@ -2359,7 +2359,7 @@ export default {
           }
         }
       }
-      this.CaclulTotal();
+      this.calculateTotal();
       this.$forceUpdate();
     },
     //----------------------------------- decrement QTY ------------------------------\\
@@ -2373,7 +2373,7 @@ export default {
           }
         }
       }
-      this.CaclulTotal();
+      this.calculateTotal();
       this.$forceUpdate();
     },
 
@@ -2383,9 +2383,9 @@ export default {
         this.sale.tax_rate = 0;
       } else if(this.sale.tax_rate == ''){
          this.sale.tax_rate = 0;
-        this.CaclulTotal();
+        this.calculateTotal();
       }else {
-        this.CaclulTotal();
+        this.calculateTotal();
       }
     },
     //---------- keyup Discount
@@ -2394,9 +2394,9 @@ export default {
         this.sale.discount = 0;
       } else if(this.sale.discount == ''){
          this.sale.discount = 0;
-        this.CaclulTotal();
+        this.calculateTotal();
       }else {
-        this.CaclulTotal();
+        this.calculateTotal();
       }
     },
     //---------- keyup Shipping
@@ -2405,9 +2405,9 @@ export default {
         this.sale.shipping = 0;
       } else if(this.sale.shipping == ''){
          this.sale.shipping = 0;
-        this.CaclulTotal();
+        this.calculateTotal();
       }else {
-        this.CaclulTotal();
+        this.calculateTotal();
       }
     },
     //---------- keyup paid Amount
@@ -2444,7 +2444,7 @@ export default {
       for (var i = 0; i < this.details.length; i++) {
         if (id === this.details[i].detail_id) {
           this.details.splice(i, 1);
-          this.CaclulTotal();
+          this.calculateTotal();
         }
       }
     },
@@ -2507,7 +2507,7 @@ export default {
             }
           }
           this.product.product_variant_id = result.product_variant_id;
-          this.Get_Product_Details(result.id, result.product_variant_id);
+          this.getProductDetails(result.id, result.product_variant_id);
 
           this.search_input= '';
           this.$refs.product_autocomplete.value = "";
@@ -2578,7 +2578,7 @@ export default {
               this.product.quantity = 1;
             }
           }
-          this.Get_Product_Details(id, product.product_variant_id);
+          this.getProductDetails(id, product.product_variant_id);
           NProgress.done();
           this.search_input= '';
           this.$refs.product_autocomplete.value = "";

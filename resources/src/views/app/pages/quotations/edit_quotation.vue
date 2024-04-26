@@ -155,7 +155,7 @@
                           <td>{{currentUser.currency}} {{detail.subtotal.toFixed(2)}}</td>
                            <td v-show="detail.no_unit !== 0 || detail.product_type == 'is_service'">
                             <i v-if="currentUserPermissions && currentUserPermissions.includes('edit_product_quotation')"
-                            @click="Modal_Updat_Detail(detail)" class="i-Edit text-25 text-success cursor-pointer"></i>
+                            @click="modal_update_detail(detail)" class="i-Edit text-25 text-success cursor-pointer"></i>
                             <i @click="delete_Product_Detail(detail.detail_id)" class="i-Close-Window text-25 text-danger cursor-pointer"></i>
                           </td>
                         </tr>
@@ -316,7 +316,7 @@
     <!-- Modal Update Detail Product -->
     <validation-observer ref="Update_Detail_quote">
       <b-modal hide-footer size="lg" id="form_Update_Detail" :title="detail.name">
-        <b-form @submit.prevent="submit_Update_Detail">
+        <b-form @submit.prevent="submitUpdateDetail">
           <b-row>
             <!-- Unit Price -->
            <b-col lg="6" md="6" sm="12">
@@ -542,7 +542,7 @@ export default {
       });
     },
     //---Submit Validation Update Detail
-    submit_Update_Detail() {
+    submitUpdateDetail() {
       this.$refs.Update_Detail_quote.validate().then(success => {
         if (!success) {
           return;
@@ -567,7 +567,7 @@ export default {
     },
 
     //------ Show Modal Update Detail Product
-    Modal_Updat_Detail(detail) {
+    modal_update_detail(detail) {
       NProgress.start();
       NProgress.set(0.1);
       this.detail = {};
@@ -720,7 +720,7 @@ export default {
             }
           }
         this.product.product_variant_id = result.product_variant_id;
-        this.Get_Product_Details(result.id, result.product_variant_id);
+        this.getProductDetails(result.id, result.product_variant_id);
       }
 
       this.search_input= '';
@@ -763,7 +763,7 @@ export default {
       this.details.push(this.product);
 
       if(this.product.is_imei){
-        this.Modal_Updat_Detail(this.product);
+        this.modal_update_detail(this.product);
       }
     },
 
@@ -1015,7 +1015,7 @@ export default {
 
     //---------------------------------Get Product Details ------------------------\\
 
-    Get_Product_Details(product_id, variant_id) {
+    getProductDetails(product_id, variant_id) {
       axios.get("/show_product_data/" + product_id +"/"+ variant_id).then(response => {
         this.product.del = 0;
         this.product.id = 0;

@@ -25,14 +25,7 @@
                         </router-link>
                     </li>
                     <li
-                        v-show="currentUserPermissions
-            && (currentUserPermissions.includes('products_add')
-            || currentUserPermissions.includes('products_view')
-            || currentUserPermissions.includes('barcode_view')
-             || currentUserPermissions.includes('brand')
-             || currentUserPermissions.includes('unit')
-             || currentUserPermissions.includes('count_stock')
-             || currentUserPermissions.includes('category'))"
+                        v-show="hasPermission(['products_add','products_view','barcode_view','brand','unit','count_stock','category',])"
                         @mouseenter="toggleSubMenu"
                         class="nav-item"
                         :class="{ active: selectedParentMenu == 'products' }"
@@ -46,9 +39,7 @@
                         <div class="triangle"></div>
                     </li>
                     <li
-                        v-show="currentUserPermissions
-              && (currentUserPermissions.includes('adjustment_view')
-              || currentUserPermissions.includes('adjustment_add'))"
+                        v-show="hasPermission(['adjustment_view','adjustment_add'])"
                         @mouseenter="toggleSubMenu"
                         class="nav-item"
                         :class="{ active: selectedParentMenu == 'adjustments' }"
@@ -64,8 +55,7 @@
 
 
                     <li
-                        v-show="currentUserPermissions && (currentUserPermissions.includes('Quotations_view')
-                      || currentUserPermissions.includes('Quotations_add'))"
+                        v-show="hasPermission(['Quotations_view','Quotations_add'])"
                         @mouseenter="toggleSubMenu"
                         class="nav-item"
                         :class="{ active: selectedParentMenu == 'quotations' }"
@@ -139,16 +129,15 @@
                     </li>
 
                     <li
-                        v-show="currentUserPermissions && (currentUserPermissions.includes('company')
-                     || currentUserPermissions.includes('department')
-                     || currentUserPermissions.includes('designation')
-                     || currentUserPermissions.includes('office_shift')
-                     || currentUserPermissions.includes('view_employee')
-                     || currentUserPermissions.includes('attendance')
-                     || currentUserPermissions.includes('leave')
-                     || currentUserPermissions.includes('holiday')
-                     || currentUserPermissions.includes('payroll')
-                     )"
+                        v-show="hasPermission(['company',
+                     'department',
+                     'designation',
+                     'office_shift',
+                     'view_employee',
+                     'attendance',
+                     'leave',
+                     'holiday',
+                     'payroll',])"
 
                         @mouseenter="toggleSubMenu"
                         :class="{ active: selectedParentMenu == 'hrm' }"
@@ -164,8 +153,7 @@
                     </li>
 
                     <li
-                        v-show="currentUserPermissions && (currentUserPermissions.includes('transfer_view')
-                     || currentUserPermissions.includes('transfer_add'))"
+                        v-show="hasPermission(['transfer_view','transfer_add'])"
                         @mouseenter="toggleSubMenu"
                         class="nav-item"
                         :class="{ active: selectedParentMenu == 'transfers' }"
@@ -179,13 +167,7 @@
                         <div class="triangle"></div>
                     </li>
                     <li
-                        v-show="currentUserPermissions && (currentUserPermissions.includes('expense_view')
-              || currentUserPermissions.includes('expense_add')
-              || currentUserPermissions.includes('deposit_view')
-              || currentUserPermissions.includes('deposit_add')
-              || currentUserPermissions.includes('account')
-              || currentUserPermissions.includes('transfer_money')
-              )"
+                        v-show="hasPermission(['expense_view','expense_add','deposit_view','deposit_add','account','transfer_money',])"
                         @mouseenter="toggleSubMenu"
                         class="nav-item"
                         :class="{ active: selectedParentMenu == 'accounting' }"
@@ -201,9 +183,7 @@
 
 
                     <li
-                        v-show="currentUserPermissions && (currentUserPermissions.includes('Customers_view')
-                        ||currentUserPermissions.includes('Suppliers_view')
-                        ||currentUserPermissions.includes('users_view'))"
+                        v-show="hasPermission(['Customers_view','Suppliers_view','users_view'])"
                         @mouseenter="toggleSubMenu"
                         :class="{ active: selectedParentMenu == 'People' }"
                         class="nav-item"
@@ -220,8 +200,8 @@
 
                     <!-- //import component Modules -->
 
-                    <li v-for="ComponentModule in getallmodules"
-                        v-show="currentUserPermissions && currentUserPermissions.includes(ComponentModule.permission)"
+                    <li v-for="ComponentModule in getAllModules"
+                        v-show="hasPermission(ComponentModule.permission)"
                         @mouseenter="toggleSubMenu"
                         class="nav-item">
                         <a class="nav-item-hold nav-item-module" target="_blank" :href="ComponentModule.url">
@@ -235,17 +215,17 @@
 
 
                     <li
-                        v-show="currentUserPermissions && (currentUserPermissions.includes('setting_system')
-                        || currentUserPermissions.includes('sms_settings')
-                        || currentUserPermissions.includes('notification_template')
-                        || currentUserPermissions.includes('pos_settings')
-                        || currentUserPermissions.includes('module_settings')
-                        || currentUserPermissions.includes('payment_gateway')
-                        || currentUserPermissions.includes('mail_settings')
-                        || currentUserPermissions.includes('warehouse')
-                        || currentUserPermissions.includes('backup')
-                        || currentUserPermissions.includes('currency')
-                        || currentUserPermissions.includes('permissions_view'))"
+                        v-show="hasPermission(['setting_system',
+                        'sms_settings',
+                        'notification_template',
+                        'pos_settings',
+                        'module_settings',
+                        'payment_gateway',
+                        'mail_settings',
+                        'warehouse',
+                        'backup',
+                        'currency',
+                        'permissions_view',])"
                         @mouseenter="toggleSubMenu"
                         :class="{ active: selectedParentMenu == 'settings' }"
                         class="nav-item"
@@ -260,28 +240,27 @@
                     </li>
 
                     <li
-                        v-show="currentUserPermissions &&
-                     (currentUserPermissions.includes('Reports_payments_Sales')
-                     || currentUserPermissions.includes('Reports_payments_Purchases')
-                     || currentUserPermissions.includes('Reports_payments_Sale_Returns')
-                     || currentUserPermissions.includes('Reports_payments_purchase_Return')
-                     || currentUserPermissions.includes('Warehouse_report')
-                     || currentUserPermissions.includes('Reports_profit')
-                     || currentUserPermissions.includes('inventory_valuation')
-                     || currentUserPermissions.includes('expenses_report')
-                     || currentUserPermissions.includes('deposits_report')
-                     || currentUserPermissions.includes('Reports_purchase')
-                     || currentUserPermissions.includes('Reports_quantity_alerts')
-                     || currentUserPermissions.includes('Reports_sales')
-                     || currentUserPermissions.includes('product_sales_report')
-                     || currentUserPermissions.includes('product_purchases_report')
-                     || currentUserPermissions.includes('Reports_suppliers')
-                     || currentUserPermissions.includes('Reports_customers')
-                     || currentUserPermissions.includes('Top_products')
-                     || currentUserPermissions.includes('Top_customers')
-                     || currentUserPermissions.includes('users_report')
-                     || currentUserPermissions.includes('product_report')
-                     || currentUserPermissions.includes('stock_report'))"
+                        v-show="hasPermission(['Reports_payments_Sales',
+                     'Reports_payments_Purchases',
+                     'Reports_payments_Sale_Returns',
+                     'Reports_payments_purchase_Return',
+                     'Warehouse_report',
+                     'Reports_profit',
+                     'inventory_valuation',
+                     'expenses_report',
+                     'deposits_report',
+                     'Reports_purchase',
+                     'Reports_quantity_alerts',
+                     'Reports_sales',
+                     'product_sales_report',
+                     'product_purchases_report',
+                     'Reports_suppliers',
+                     'Reports_customers',
+                     'Top_products',
+                     'Top_customers',
+                     'users_report',
+                     'product_report',
+                     'stock_report'])"
                         @mouseenter="toggleSubMenu"
                         :class="{ active: selectedParentMenu == 'reports' }"
                         class="nav-item"
@@ -312,7 +291,7 @@
                 >
                     <li
                         class="nav-item"
-                        v-if="currentUserPermissions && currentUserPermissions.includes('products_add')"
+                        v-if="hasPermission('products_add')"
                     >
                         <router-link tag="a" class to="/app/products/store">
                             <i class="nav-icon i-Add-File"></i>
@@ -321,7 +300,7 @@
                     </li>
                     <li
                         class="nav-item"
-                        v-if="currentUserPermissions && currentUserPermissions.includes('products_view')"
+                        v-if="hasPermission('products_view')"
                     >
                         <router-link tag="a" class to="/app/products/list">
                             <i class="nav-icon i-Files"></i>
@@ -330,7 +309,7 @@
                     </li>
                     <li
                         class="nav-item"
-                        v-if="currentUserPermissions && currentUserPermissions.includes('barcode_view')"
+                        v-if="hasPermission('barcode_view')"
                     >
                         <router-link tag="a" class to="/app/products/barcode">
                             <i class="nav-icon i-Bar-Code"></i>
@@ -340,7 +319,7 @@
 
                     <li
                         class="nav-item"
-                        v-if="currentUserPermissions && currentUserPermissions.includes('count_stock')"
+                        v-if="hasPermission('count_stock')"
                     >
                         <router-link tag="a" class to="/app/products/count_stock">
                             <i class="nav-icon i-Check-2"></i>
@@ -349,7 +328,7 @@
                     </li>
                     <li
                         class="nav-item"
-                        v-if="currentUserPermissions && currentUserPermissions.includes('category')"
+                        v-if="hasPermission('category')"
                     >
                         <router-link tag="a" class to="/app/products/Categories">
                             <i class="nav-icon i-Duplicate-Layer"></i>
@@ -358,7 +337,7 @@
                     </li>
                     <li
                         class="nav-item"
-                        v-if="currentUserPermissions && currentUserPermissions.includes('brand')"
+                        v-if="hasPermission('brand')"
                     >
                         <router-link tag="a" class to="/app/products/Brands">
                             <i class="nav-icon i-Bookmark"></i>
@@ -367,7 +346,7 @@
                     </li>
                     <li
                         class="nav-item"
-                        v-if="currentUserPermissions && currentUserPermissions.includes('unit')"
+                        v-if="hasPermission('unit')"
                     >
                         <router-link tag="a" class to="/app/products/Units">
                             <i class="nav-icon i-Quotes"></i>
@@ -383,7 +362,7 @@
                 >
                     <li
                         class="nav-item"
-                        v-if="currentUserPermissions && currentUserPermissions.includes('adjustment_add')"
+                        v-if="hasPermission('adjustment_add')"
                     >
                         <router-link tag="a" class to="/app/adjustments/store">
                             <i class="nav-icon i-Add-File"></i>
@@ -392,7 +371,7 @@
                     </li>
                     <li
                         class="nav-item"
-                        v-if="currentUserPermissions && currentUserPermissions.includes('adjustment_view')"
+                        v-if="hasPermission('adjustment_view')"
                     >
                         <router-link tag="a" class to="/app/adjustments/list">
                             <i class="nav-icon i-Files"></i>
@@ -408,7 +387,7 @@
                 >
                     <li
                         class="nav-item"
-                        v-if="currentUserPermissions && currentUserPermissions.includes('transfer_add')"
+                        v-if="hasPermission('transfer_add')"
                     >
                         <router-link tag="a" class to="/app/transfers/store">
                             <i class="nav-icon i-Add-File"></i>
@@ -417,7 +396,7 @@
                     </li>
                     <li
                         class="nav-item"
-                        v-if="currentUserPermissions && currentUserPermissions.includes('transfer_view')"
+                        v-if="hasPermission('transfer_view')"
                     >
                         <router-link tag="a" class to="/app/transfers/list">
                             <i class="nav-icon i-Files"></i>
@@ -434,7 +413,7 @@
 
                     <li
                         class="nav-item"
-                        v-if="currentUserPermissions && currentUserPermissions.includes('account')"
+                        v-if="hasPermission('account')"
                     >
                         <router-link tag="a" class to="/app/accounts">
                             <i class="nav-icon i-Files"></i>
@@ -444,7 +423,7 @@
 
                     <li
                         class="nav-item"
-                        v-if="currentUserPermissions && currentUserPermissions.includes('transfer_money')"
+                        v-if="hasPermission('transfer_money')"
                     >
                         <router-link tag="a" class to="/app/transfer_money">
                             <i class="nav-icon i-Files"></i>
@@ -454,7 +433,7 @@
 
                     <li
                         class="nav-item"
-                        v-if="currentUserPermissions && currentUserPermissions.includes('expense_add')"
+                        v-if="hasPermission('expense_add')"
                     >
                         <router-link tag="a" class to="/app/expenses/store">
                             <i class="nav-icon i-Add-File"></i>
@@ -463,7 +442,7 @@
                     </li>
                     <li
                         class="nav-item"
-                        v-if="currentUserPermissions && currentUserPermissions.includes('expense_view')"
+                        v-if="hasPermission('expense_view')"
                     >
                         <router-link tag="a" class to="/app/expenses/list">
                             <i class="nav-icon i-Files"></i>
@@ -473,7 +452,7 @@
 
                     <li
                         class="nav-item"
-                        v-if="currentUserPermissions && currentUserPermissions.includes('deposit_add')"
+                        v-if="hasPermission('deposit_add')"
                     >
                         <router-link tag="a" class to="/app/deposits/store">
                             <i class="nav-icon i-Add-File"></i>
@@ -482,7 +461,7 @@
                     </li>
                     <li
                         class="nav-item"
-                        v-if="currentUserPermissions && currentUserPermissions.includes('deposit_view')"
+                        v-if="hasPermission('deposit_view')"
                     >
                         <router-link tag="a" class to="/app/deposits/list">
                             <i class="nav-icon i-Files"></i>
@@ -491,7 +470,7 @@
                     </li>
                     <li
                         class="nav-item"
-                        v-if="currentUserPermissions && currentUserPermissions.includes('expense_view')"
+                        v-if="hasPermission('expense_view')"
                     >
                         <router-link tag="a" class to="/app/expenses/category">
                             <i class="nav-icon i-Files"></i>
@@ -501,7 +480,7 @@
 
                     <li
                         class="nav-item"
-                        v-if="currentUserPermissions && currentUserPermissions.includes('deposit_view')"
+                        v-if="hasPermission('deposit_view')"
                     >
                         <router-link tag="a" class to="/app/deposits/category">
                             <i class="nav-icon i-Files"></i>
@@ -517,7 +496,7 @@
                 >
                     <li
                         class="nav-item"
-                        v-if="currentUserPermissions && currentUserPermissions.includes('Quotations_add')"
+                        v-if="hasPermission('Quotations_add')"
                     >
                         <router-link tag="a" class to="/app/quotations/store">
                             <i class="nav-icon i-Add-File"></i>
@@ -526,7 +505,7 @@
                     </li>
                     <li
                         class="nav-item"
-                        v-if="currentUserPermissions && currentUserPermissions.includes('Quotations_view')"
+                        v-if="hasPermission('Quotations_view')"
                     >
                         <router-link tag="a" class to="/app/quotations/list">
                             <i class="nav-icon i-Files"></i>
@@ -542,7 +521,7 @@
                 >
                     <li
                         class="nav-item"
-                        v-if="currentUserPermissions && currentUserPermissions.includes('Purchases_add')"
+                        v-if="hasPermission('Purchases_add')"
                     >
                         <router-link tag="a" class to="/app/purchases/store">
                             <i class="nav-icon i-Add-File"></i>
@@ -551,7 +530,7 @@
                     </li>
                     <li
                         class="nav-item"
-                        v-if="currentUserPermissions && currentUserPermissions.includes('Purchases_view')"
+                        v-if="hasPermission('Purchases_view')"
                     >
                         <router-link tag="a" class to="/app/purchases/list">
                             <i class="nav-icon i-Files"></i>
@@ -567,7 +546,7 @@
                 >
                     <li
                         class="nav-item"
-                        v-if="currentUserPermissions && currentUserPermissions.includes('Sales_add')"
+                        v-if="hasPermission('Sales_add')"
                     >
                         <router-link tag="a" class to="/app/sales/store">
                             <i class="nav-icon i-Add-File"></i>
@@ -576,7 +555,7 @@
                     </li>
                     <li
                         class="nav-item"
-                        v-if="currentUserPermissions && currentUserPermissions.includes('Sales_view')"
+                        v-if="hasPermission('Sales_view')"
                     >
                         <router-link tag="a" class to="/app/sales/list">
                             <i class="nav-icon i-Files"></i>
@@ -585,7 +564,7 @@
                     </li>
                     <li
                         class="nav-item"
-                        v-if="currentUserPermissions && currentUserPermissions.includes('Pos_view')"
+                        v-if="hasPermission('Pos_view')"
                     >
                         <router-link tag="a" class to="/app/pos">
                             <i class="nav-icon i-Files"></i>
@@ -594,7 +573,7 @@
                     </li>
                     <li
                         class="nav-item"
-                        v-if="currentUserPermissions && currentUserPermissions.includes('shipment')"
+                        v-if="hasPermission('shipment')"
                     >
                         <router-link tag="a" class to="/app/sales/shipment">
                             <i class="nav-icon i-Files"></i>
@@ -612,7 +591,7 @@
                 >
                     <li
                         class="nav-item"
-                        v-if="currentUserPermissions && currentUserPermissions.includes('company')"
+                        v-if="hasPermission('company')"
                     >
                         <router-link tag="a" class to="/app/hrm/company">
                             <i class="nav-icon i-Management"></i>
@@ -621,7 +600,7 @@
                     </li>
                     <li
                         class="nav-item"
-                        v-if="currentUserPermissions && currentUserPermissions.includes('department')"
+                        v-if="hasPermission('department')"
                     >
                         <router-link tag="a" class to="/app/hrm/departments">
                             <i class="nav-icon i-Shop"></i>
@@ -630,7 +609,7 @@
                     </li>
                     <li
                         class="nav-item"
-                        v-if="currentUserPermissions && currentUserPermissions.includes('designation')"
+                        v-if="hasPermission('designation')"
                     >
                         <router-link tag="a" class to="/app/hrm/designations">
                             <i class="nav-icon i-Shutter"></i>
@@ -639,7 +618,7 @@
                     </li>
                     <li
                         class="nav-item"
-                        v-if="currentUserPermissions && currentUserPermissions.includes('office_shift')"
+                        v-if="hasPermission('office_shift')"
                     >
                         <router-link tag="a" class to="/app/hrm/office_Shift">
                             <i class="nav-icon i-Clock"></i>
@@ -648,7 +627,7 @@
                     </li>
                     <li
                         class="nav-item"
-                        v-if="currentUserPermissions && currentUserPermissions.includes('view_employee')"
+                        v-if="hasPermission('view_employee')"
                     >
                         <router-link tag="a" class to="/app/hrm/employees">
                             <i class="nav-icon i-Engineering"></i>
@@ -657,7 +636,7 @@
                     </li>
                     <li
                         class="nav-item"
-                        v-if="currentUserPermissions && currentUserPermissions.includes('attendance')"
+                        v-if="hasPermission('attendance')"
                     >
                         <router-link tag="a" class to="/app/hrm/attendance">
                             <i class="nav-icon i-Clock"></i>
@@ -667,7 +646,7 @@
                     <li
                         v-if="currentUserPermissions && (currentUserPermissions.includes('leave'))"
 
-                        @click.prevent="toggleSidebarDropdwon($event)"
+                        @click.prevent="toggleSidebarDropdown($event)"
                         class="nav-item dropdown-sidemenu"
                     >
 
@@ -697,7 +676,7 @@
 
                     <li
                         class="nav-item"
-                        v-if="currentUserPermissions && currentUserPermissions.includes('holiday')"
+                        v-if="hasPermission('holiday')"
                     >
                         <router-link tag="a" class to="/app/hrm/holidays">
                             <i class="nav-icon i-Christmas-Bell"></i>
@@ -707,7 +686,7 @@
 
                     <li
                         class="nav-item"
-                        v-if="currentUserPermissions && currentUserPermissions.includes('payroll')"
+                        v-if="hasPermission('payroll')"
                     >
                         <router-link tag="a" class to="/app/hrm/payrolls">
                             <i class="nav-icon i-Money-2"></i>
@@ -725,7 +704,7 @@
                 >
                     <li
                         class="nav-item"
-                        v-if="currentUserPermissions && currentUserPermissions.includes('Customers_view')"
+                        v-if="hasPermission('Customers_view')"
                     >
                         <router-link tag="a" class to="/app/People/Customers">
                             <i class="nav-icon i-Administrator"></i>
@@ -734,7 +713,7 @@
                     </li>
                     <li
                         class="nav-item"
-                        v-if="currentUserPermissions && currentUserPermissions.includes('Suppliers_view')"
+                        v-if="hasPermission('Suppliers_view')"
                     >
                         <router-link tag="a" class to="/app/People/Suppliers">
                             <i class="nav-icon i-Administrator"></i>
@@ -743,7 +722,7 @@
                     </li>
                     <li
                         class="nav-item"
-                        v-if="currentUserPermissions && currentUserPermissions.includes('users_view')"
+                        v-if="hasPermission('users_view')"
                     >
                         <router-link tag="a" class to="/app/People/Users">
                             <i class="nav-icon i-Administrator"></i>
@@ -759,7 +738,7 @@
                 >
                     <li
                         class="nav-item"
-                        v-if="currentUserPermissions && currentUserPermissions.includes('setting_system')"
+                        v-if="hasPermission('setting_system')"
                     >
                         <router-link tag="a" class to="/app/settings/System_settings">
                             <i class="nav-icon i-Gear"></i>
@@ -769,7 +748,7 @@
 
                     <li
                         class="nav-item"
-                        v-if="currentUserPermissions && currentUserPermissions.includes('sms_settings')"
+                        v-if="hasPermission('sms_settings')"
                     >
                         <router-link tag="a" class to="/app/settings/sms_settings">
                             <i class="nav-icon i-Speach-Bubble"></i>
@@ -779,7 +758,7 @@
 
                     <li
                         class="nav-item"
-                        v-if="currentUserPermissions && currentUserPermissions.includes('notification_template')"
+                        v-if="hasPermission('notification_template')"
                     >
                         <router-link tag="a" class to="/app/settings/sms_templates">
                             <i class="nav-icon i-Speach-Bubble"></i>
@@ -789,7 +768,7 @@
 
                     <li
                         class="nav-item"
-                        v-if="currentUserPermissions && currentUserPermissions.includes('mail_settings')"
+                        v-if="hasPermission('mail_settings')"
                     >
                         <router-link tag="a" class to="/app/settings/mail_settings">
                             <i class="nav-icon i-Email"></i>
@@ -799,7 +778,7 @@
 
                     <li
                         class="nav-item"
-                        v-if="currentUserPermissions && currentUserPermissions.includes('notification_template')"
+                        v-if="hasPermission('notification_template')"
                     >
                         <router-link tag="a" class to="/app/settings/email_templates">
                             <i class="nav-icon i-Email"></i>
@@ -809,7 +788,7 @@
 
                     <li
                         class="nav-item"
-                        v-if="currentUserPermissions && currentUserPermissions.includes('pos_settings')"
+                        v-if="hasPermission('pos_settings')"
                     >
                         <router-link tag="a" class to="/app/settings/pos_settings">
                             <i class="nav-icon i-Cash-Register"></i>
@@ -819,7 +798,7 @@
 
                     <li
                         class="nav-item"
-                        v-if="currentUserPermissions && currentUserPermissions.includes('module_settings')"
+                        v-if="hasPermission('module_settings')"
                     >
                         <router-link tag="a" class to="/app/settings/module_settings">
                             <i class="nav-icon i-Data-Settings"></i>
@@ -829,7 +808,7 @@
 
                     <li
                         class="nav-item"
-                        v-if="currentUserPermissions && currentUserPermissions.includes('setting_system')"
+                        v-if="hasPermission('setting_system')"
                     >
                         <router-link tag="a" class to="/app/settings/update_settings">
                             <i class="nav-icon i-Upgrade"></i>
@@ -839,7 +818,7 @@
 
                     <li
                         class="nav-item"
-                        v-if="currentUserPermissions && currentUserPermissions.includes('payment_gateway')"
+                        v-if="hasPermission('payment_gateway')"
                     >
                         <router-link tag="a" class to="/app/settings/payment_gateway">
                             <i class="nav-icon i-Money-2"></i>
@@ -850,7 +829,7 @@
 
                     <li
                         class="nav-item"
-                        v-if="currentUserPermissions && currentUserPermissions.includes('permissions_view')"
+                        v-if="hasPermission('permissions_view')"
                     >
                         <router-link tag="a" class to="/app/settings/permissions">
                             <i class="nav-icon i-Key"></i>
@@ -859,7 +838,7 @@
                     </li>
                     <li
                         class="nav-item"
-                        v-if="currentUserPermissions && currentUserPermissions.includes('warehouse')"
+                        v-if="hasPermission('warehouse')"
                     >
                         <router-link tag="a" class to="/app/settings/Warehouses">
                             <i class="nav-icon i-Clothing-Store"></i>
@@ -868,7 +847,7 @@
                     </li>
                     <li
                         class="nav-item"
-                        v-if="currentUserPermissions && currentUserPermissions.includes('currency')"
+                        v-if="hasPermission('currency')"
                     >
                         <router-link tag="a" class to="/app/settings/Currencies">
                             <i class="nav-icon i-Dollar-Sign"></i>
@@ -878,7 +857,7 @@
 
                     <li
                         class="nav-item"
-                        v-if="currentUserPermissions && currentUserPermissions.includes('backup')"
+                        v-if="hasPermission('backup')"
                     >
                         <router-link tag="a" class to="/app/settings/Backup">
                             <i class="nav-icon i-Data-Backup"></i>
@@ -894,12 +873,11 @@
                     :class="{ 'd-block': selectedParentMenu == 'reports' }"
                 >
                     <li
-                        v-if="currentUserPermissions &&
-             (currentUserPermissions.includes('Reports_payments_Purchases')
-           || currentUserPermissions.includes('Reports_payments_Sales')
-           || currentUserPermissions.includes('Reports_payments_Sale_Returns')
-           || currentUserPermissions.includes('Reports_payments_purchase_Return'))"
-                        @click.prevent="toggleSidebarDropdwon($event)"
+                        v-if="hasPermission(['Reports_payments_Purchases',
+           'Reports_payments_Sales',
+           'Reports_payments_Sale_Returns',
+           'Reports_payments_purchase_Return'])"
+                        @click.prevent="toggleSidebarDropdown($event)"
                         class="nav-item dropdown-sidemenu"
                     >
                         <a href="#">
@@ -909,7 +887,7 @@
                         </a>
                         <ul class="submenu">
                             <li
-                                v-if="currentUserPermissions && currentUserPermissions.includes('Reports_payments_Purchases')"
+                                v-if="hasPermission('Reports_payments_Purchases')"
                             >
                                 <router-link tag="a" class to="/app/reports/payments_purchase">
                                     <i class="nav-icon i-ID-Card"></i>
@@ -917,7 +895,7 @@
                                 </router-link>
                             </li>
                             <li
-                                v-if="currentUserPermissions && currentUserPermissions.includes('Reports_payments_Sales')"
+                                v-if="hasPermission('Reports_payments_Sales')"
                             >
                                 <router-link tag="a" class to="/app/reports/payments_sale">
                                     <i class="nav-icon i-ID-Card"></i>
@@ -925,7 +903,7 @@
                                 </router-link>
                             </li>
                             <li
-                                v-if="currentUserPermissions && currentUserPermissions.includes('Reports_payments_Sale_Returns')"
+                                v-if="hasPermission('Reports_payments_Sale_Returns')"
                             >
                                 <router-link tag="a" class to="/app/reports/payments_sales_returns">
                                     <i class="nav-icon i-ID-Card"></i>
@@ -933,7 +911,7 @@
                                 </router-link>
                             </li>
                             <li
-                                v-if="currentUserPermissions && currentUserPermissions.includes('Reports_payments_purchase_Return')"
+                                v-if="hasPermission('Reports_payments_purchase_Return')"
                             >
                                 <router-link tag="a" class to="/app/reports/payments_purchases_returns">
                                     <i class="nav-icon i-ID-Card"></i>
@@ -944,7 +922,7 @@
                     </li>
                     <li
                         class="nav-item"
-                        v-if="currentUserPermissions && currentUserPermissions.includes('Reports_profit')"
+                        v-if="hasPermission('Reports_profit')"
                     >
                         <router-link tag="a" class to="/app/reports/profit_and_loss">
                             <i class="nav-icon i-Split-FourSquareWindow"></i>
@@ -954,7 +932,7 @@
 
                     <li
                         class="nav-item"
-                        v-if="currentUserPermissions && currentUserPermissions.includes('inventory_valuation')"
+                        v-if="hasPermission('inventory_valuation')"
                     >
                         <router-link tag="a" class to="/app/reports/inventory_valuation_summary">
                             <i class="nav-icon i-Pie-Chart"></i>
@@ -964,7 +942,7 @@
 
                     <li
                         class="nav-item"
-                        v-if="currentUserPermissions && currentUserPermissions.includes('expenses_report')"
+                        v-if="hasPermission('expenses_report')"
                     >
                         <router-link tag="a" class to="/app/reports/expenses_report">
                             <i class="nav-icon i-Line-Chart"></i>
@@ -974,7 +952,7 @@
 
                     <li
                         class="nav-item"
-                        v-if="currentUserPermissions && currentUserPermissions.includes('deposits_report')"
+                        v-if="hasPermission('deposits_report')"
                     >
                         <router-link tag="a" class to="/app/reports/deposits_report">
                             <i class="nav-icon i-Bar-Chart5"></i>
@@ -984,7 +962,7 @@
 
                     <li
                         class="nav-item"
-                        v-if="currentUserPermissions && currentUserPermissions.includes('Reports_quantity_alerts')"
+                        v-if="hasPermission('Reports_quantity_alerts')"
                     >
                         <router-link tag="a" class to="/app/reports/quantity_alerts">
                             <i class="nav-icon i-Dollar"></i>
@@ -993,7 +971,7 @@
                     </li>
                     <li
                         class="nav-item"
-                        v-if="currentUserPermissions && currentUserPermissions.includes('Warehouse_report')"
+                        v-if="hasPermission('Warehouse_report')"
                     >
                         <router-link tag="a" class to="/app/reports/warehouse_report">
                             <i class="nav-icon i-Pie-Chart"></i>
@@ -1002,7 +980,7 @@
                     </li>
                     <li
                         class="nav-item"
-                        v-if="currentUserPermissions && currentUserPermissions.includes('stock_report')"
+                        v-if="hasPermission('stock_report')"
                     >
                         <router-link tag="a" class to="/app/reports/stock_report">
                             <i class="nav-icon i-Pie-Chart"></i>
@@ -1012,7 +990,7 @@
 
                     <li
                         class="nav-item"
-                        v-if="currentUserPermissions && currentUserPermissions.includes('product_report')"
+                        v-if="hasPermission('product_report')"
                     >
                         <router-link tag="a" class to="/app/reports/product_report">
                             <i class="nav-icon i-Pie-Chart"></i>
@@ -1021,7 +999,7 @@
                     </li>
                     <li
                         class="nav-item"
-                        v-if="currentUserPermissions && currentUserPermissions.includes('Reports_sales')"
+                        v-if="hasPermission('Reports_sales')"
                     >
                         <router-link tag="a" class to="/app/reports/sales_report">
                             <i class="nav-icon i-Line-Chart"></i>
@@ -1031,7 +1009,7 @@
 
                     <li
                         class="nav-item"
-                        v-if="currentUserPermissions && currentUserPermissions.includes('product_sales_report')"
+                        v-if="hasPermission('product_sales_report')"
                     >
                         <router-link tag="a" class to="/app/reports/product_sales_report">
                             <i class="nav-icon i-Line-Chart"></i>
@@ -1041,7 +1019,7 @@
 
                     <li
                         class="nav-item"
-                        v-if="currentUserPermissions && currentUserPermissions.includes('Reports_purchase')"
+                        v-if="hasPermission('Reports_purchase')"
                     >
                         <router-link tag="a" class to="/app/reports/purchase_report">
                             <i class="nav-icon i-Bar-Chart5"></i>
@@ -1051,7 +1029,7 @@
 
                     <li
                         class="nav-item"
-                        v-if="currentUserPermissions && currentUserPermissions.includes('product_purchases_report')"
+                        v-if="hasPermission('product_purchases_report')"
                     >
                         <router-link tag="a" class to="/app/reports/product_purchases_report">
                             <i class="nav-icon i-Line-Chart"></i>
@@ -1061,7 +1039,7 @@
 
                     <li
                         class="nav-item"
-                        v-if="currentUserPermissions && currentUserPermissions.includes('Reports_customers')"
+                        v-if="hasPermission('Reports_customers')"
                     >
                         <router-link tag="a" class to="/app/reports/customers_report">
                             <i class="nav-icon i-Bar-Chart"></i>
@@ -1070,7 +1048,7 @@
                     </li>
                     <li
                         class="nav-item"
-                        v-if="currentUserPermissions && currentUserPermissions.includes('Reports_suppliers')"
+                        v-if="hasPermission('Reports_suppliers')"
                     >
                         <router-link tag="a" class to="/app/reports/providers_report">
                             <i class="nav-icon i-Pie-Chart"></i>
@@ -1080,7 +1058,7 @@
 
                     <li
                         class="nav-item"
-                        v-if="currentUserPermissions && currentUserPermissions.includes('Top_products')"
+                        v-if="hasPermission('Top_products')"
                     >
                         <router-link tag="a" class to="/app/reports/top_selling_products">
                             <i class="nav-icon i-Pie-Chart"></i>
@@ -1090,7 +1068,7 @@
 
                     <li
                         class="nav-item"
-                        v-if="currentUserPermissions && currentUserPermissions.includes('Top_customers')"
+                        v-if="hasPermission('Top_customers')"
                     >
                         <router-link tag="a" class to="/app/reports/top_customers">
                             <i class="nav-icon i-Pie-Chart"></i>
@@ -1100,7 +1078,7 @@
 
                     <li
                         class="nav-item"
-                        v-if="currentUserPermissions && currentUserPermissions.includes('users_report')"
+                        v-if="hasPermission('users_report')"
                     >
                         <router-link tag="a" class to="/app/reports/users_report">
                             <i class="nav-icon i-Pie-Chart"></i>
@@ -1154,7 +1132,7 @@ export default {
     },
 
     computed: {
-        ...mapGetters(["getSideBarToggleProperties", "currentUserPermissions", "getallmodules"])
+        ...mapGetters(["getSideBarToggleProperties", "currentUserPermissions", "getAllModules", "hasPermission"])
     },
 
     methods: {
@@ -1216,7 +1194,7 @@ export default {
             }
         },
 
-        toggleSidebarDropdwon(event) {
+        toggleSidebarDropdown(event) {
             let dropdownMenus = this.$el.querySelectorAll(".dropdown-sidemenu.open");
 
             event.currentTarget.classList.toggle("open");
@@ -1224,7 +1202,7 @@ export default {
             dropdownMenus.forEach(dropdown => {
                 dropdown.classList.remove("open");
             });
-        }
+        },
     }
 };
 </script>

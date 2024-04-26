@@ -2,21 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Account;
 use App\Models\Client;
 use App\Models\EcommerceClient;
-use App\Models\Setting;
-use App\Models\Account;
-use App\utils\helpers;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\Auth;
-use App\Models\SaleReturn;
+use App\Models\PaymentSale;
 use App\Models\PaymentSaleReturns;
 use App\Models\Sale;
-use App\Models\PaymentSale;
+use App\Models\SaleReturn;
+use App\Models\Setting;
+use App\utils\helpers;
+use Carbon\Carbon;
 use DB;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class ClientController extends BaseController
 {
@@ -42,7 +41,7 @@ class ClientController extends BaseController
 
         //Multiple Filter
         $Filtred = $helpers->filter($clients, $columns, $param, $request)
-        // Search With Multiple Param
+            // Search With Multiple Param
             ->where(function ($query) use ($request) {
                 return $query->when($request->filled('search'), function ($query) use ($request) {
                     return $query->where('name', 'LIKE', "%{$request->search}%")
@@ -52,7 +51,7 @@ class ClientController extends BaseController
                 });
             });
         $totalRows = $Filtred->count();
-        if($perPage == "-1"){
+        if ($perPage == "-1") {
             $perPage = $totalRows;
         }
         $clients = $Filtred->offset($offSet)
@@ -64,9 +63,9 @@ class ClientController extends BaseController
 
             $client_exist = EcommerceClient::where('client_id', $client->id)->exists();
 
-            if($client_exist){
+            if ($client_exist) {
                 $item['client_ecommerce'] = 'yes';
-            }else{
+            } else {
                 $item['client_ecommerce'] = 'no';
             }
 
@@ -104,14 +103,14 @@ class ClientController extends BaseController
             $item['email'] = $client->email;
             $item['country'] = $client->country;
             $item['city'] = $client->city;
-            $item['Address'] = $client->Address;
+            $item['address'] = $client->address;
             $data[] = $item;
         }
 
         $company_info = Setting::where('deleted_at', '=', null)->first();
-        $accounts = Account::where('deleted_at', '=', null)->orderBy('id', 'desc')->get(['id','account_name']);
+        $accounts = Account::where('deleted_at', '=', null)->orderBy('id', 'desc')->get(['id', 'account_name']);
 
-        $clientsWithoutEcommerce = \App\Models\Client::whereNotIn('id', function($query){
+        $clientsWithoutEcommerce = \App\Models\Client::whereNotIn('id', function ($query) {
             $query->select('client_id')->from('ecommerce_clients');
         })->count();
 
@@ -134,14 +133,14 @@ class ClientController extends BaseController
         $this->authorizeForUser($request->user('api'), 'create', Client::class);
 
         $this->validate($request, [
-            'name' => 'required',
+                'name' => 'required',
             ]
         );
 
         Client::create([
             'name' => $request['name'],
             'code' => $this->getNumberOrder(),
-            'Address' => $request['Address'],
+            'address' => $request['address'],
             'phone' => $request['phone'],
             'email' => $request['email'],
             'country' => $request['country'],
@@ -153,7 +152,8 @@ class ClientController extends BaseController
 
     //------------ function show -----------\\
 
-    public function show($id){
+    public function show($id)
+    {
         //
 
     }
@@ -165,13 +165,13 @@ class ClientController extends BaseController
         $this->authorizeForUser($request->user('api'), 'update', Client::class);
 
         $this->validate($request, [
-            'name' => 'required',
+                'name' => 'required',
             ]
         );
 
         Client::whereId($id)->update([
             'name' => $request['name'],
-            'Address' => $request['Address'],
+            'address' => $request['address'],
             'phone' => $request['phone'],
             'email' => $request['email'],
             'country' => $request['country'],
@@ -226,9 +226,9 @@ class ClientController extends BaseController
 
     //------------- Get Clients Without Paginate -------------\\
 
-    public function Get_Clients_Without_Paginate()
+    public function get_clients_without_paginate()
     {
-        $clients = Client::where('deleted_at', '=', null)->get(['id', 'name']);
+        $clients = Client::whereNull('deleted_at')->get(['id', 'name']);
         return response()->json($clients);
     }
 
@@ -238,15 +238,14 @@ class ClientController extends BaseController
     {
         $client = EcommerceClient::where('client_id', $id)->first();
 
-        $data['id']        = $client->id;
+        $data['id'] = $client->id;
         $data['client_id'] = $client->client_id;
-        $item['name']      = $client->username;
-        $data['email']     = $client->email;
-        $data['NewPassword']     = NULL;
+        $item['name'] = $client->username;
+        $data['email'] = $client->email;
+        $data['NewPassword'] = NULL;
 
         return response()->json($data);
     }
-
 
 
     // import clients
@@ -293,7 +292,7 @@ class ClientController extends BaseController
                     Client::create([
                         'name' => $value['name'],
                         'code' => $this->getNumberOrder(),
-                        'Address' => $value['Address'] == '' ? null : $value['Address'],
+                        'address' => $value['address'] == '' ? null : $value['address'],
                         'phone' => $value['phone'] == '' ? null : $value['phone'],
                         'email' => $value['email'] == '' ? null : $value['email'],
                         'country' => $value['country'] == '' ? null : $value['country'],
@@ -314,38 +313,38 @@ class ClientController extends BaseController
     }
 
 
-     //------------- clients_pay_due -------------\\
+    //------------- clients_pay_due -------------\\
 
-     public function clients_pay_due(Request $request)
-     {
-         $this->authorizeForUser($request->user('api'), 'pay_due', Client::class);
+    public function clients_pay_due(Request $request)
+    {
+        $this->authorizeForUser($request->user('api'), 'pay_due', Client::class);
 
-         if($request['amount'] > 0){
+        if ($request['amount'] > 0) {
             $client_sales_due = Sale::where('deleted_at', '=', null)
-            ->where('status', 'completed')
-            ->where([
-                ['payment_status', '!=', 'paid'],
-                ['client_id', $request->client_id]
-            ])->get();
+                ->where('status', 'completed')
+                ->where([
+                    ['payment_status', '!=', 'paid'],
+                    ['client_id', $request->client_id]
+                ])->get();
 
             $paid_amount_total = $request->amount;
 
-            foreach($client_sales_due as $key => $client_sale){
-                if($paid_amount_total == 0)
-                break;
-                $due = $client_sale->GrandTotal  - $client_sale->paid_amount;
+            foreach ($client_sales_due as $key => $client_sale) {
+                if ($paid_amount_total == 0)
+                    break;
+                $due = $client_sale->GrandTotal - $client_sale->paid_amount;
 
-                if($paid_amount_total >= $due){
+                if ($paid_amount_total >= $due) {
                     $amount = $due;
                     $payment_status = 'paid';
-                }else{
+                } else {
                     $amount = $paid_amount_total;
                     $payment_status = 'partial';
                 }
 
                 $payment_sale = new PaymentSale();
                 $payment_sale->sale_id = $client_sale->id;
-                $payment_sale->account_id =  $request['account_id']?$request['account_id']:NULL;
+                $payment_sale->account_id = $request['account_id'] ? $request['account_id'] : NULL;
                 $payment_sale->Ref = app('App\Http\Controllers\PaymentSalesController')->getNumberOrder();
                 $payment_sale->date = Carbon::now();
                 $payment_sale->Reglement = $request['Reglement'];
@@ -373,9 +372,9 @@ class ClientController extends BaseController
             }
         }
 
-         return response()->json(['success' => true]);
+        return response()->json(['success' => true]);
 
-     }
+    }
 
     //------------- clients_pay_sale_return_due -------------\\
 
@@ -383,31 +382,31 @@ class ClientController extends BaseController
     {
         $this->authorizeForUser($request->user('api'), 'pay_sale_return_due', Client::class);
 
-        if($request['amount'] > 0){
+        if ($request['amount'] > 0) {
             $client_sell_return_due = SaleReturn::where('deleted_at', '=', null)
-            ->where([
-                ['payment_status', '!=', 'paid'],
-                ['client_id', $request->client_id]
-            ])->get();
+                ->where([
+                    ['payment_status', '!=', 'paid'],
+                    ['client_id', $request->client_id]
+                ])->get();
 
             $paid_amount_total = $request->amount;
 
-            foreach($client_sell_return_due as $key => $client_sale_return){
-                if($paid_amount_total == 0)
-                break;
-                $due = $client_sale_return->GrandTotal  - $client_sale_return->paid_amount;
+            foreach ($client_sell_return_due as $key => $client_sale_return) {
+                if ($paid_amount_total == 0)
+                    break;
+                $due = $client_sale_return->GrandTotal - $client_sale_return->paid_amount;
 
-                if($paid_amount_total >= $due){
+                if ($paid_amount_total >= $due) {
                     $amount = $due;
                     $payment_status = 'paid';
-                }else{
+                } else {
                     $amount = $paid_amount_total;
                     $payment_status = 'partial';
                 }
 
                 $payment_sale_return = new PaymentSaleReturns();
                 $payment_sale_return->sale_return_id = $client_sale_return->id;
-                $payment_sale_return->account_id =  $request['account_id']?$request['account_id']:NULL;
+                $payment_sale_return->account_id = $request['account_id'] ? $request['account_id'] : NULL;
                 $payment_sale_return->Ref = app('App\Http\Controllers\PaymentSaleReturnsController')->getNumberOrder();
                 $payment_sale_return->date = Carbon::now();
                 $payment_sale_return->Reglement = $request['Reglement'];

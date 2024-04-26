@@ -331,7 +331,7 @@
         id="Add_Payment"
         :title="EditPaymentMode?$t('EditPayment'):$t('AddPayment')"
       >
-        <b-form @submit.prevent="Submit_Payment">
+        <b-form @submit.prevent="submitPayment">
           <b-row>
             <!-- date -->
             <b-col lg="4" md="12" sm="12">
@@ -694,8 +694,8 @@ export default {
       this.GET_Sales_Return(this.serverParams.page);
     },
 
-    //------ Validate Form Submit_Payment
-    Submit_Payment() {
+    //------ Validate Form submitPayment
+    submitPayment() {
       this.$refs.Add_payment.validate().then(success => {
         if (!success) {
           return;

@@ -30,12 +30,12 @@ Route::group([
 
 Route::post('getAccessToken', 'AuthController@getAccessToken');
 Route::middleware(['auth:api', 'Is_Active'])->group(function () {
-    
+
     Route::get("dashboard_data", "DashboardController@dashboard_data");
-    
+
     Route::get('/retrieve-customer', 'StripeController@retrieveCustomer');
     Route::post('/update-customer-stripe', 'StripeController@updateCustomer');
-    
+
     //-------------------------- Clear Cache ---------------------------
 
     Route::get("clear_cache", "SettingsController@Clear_Cache");
@@ -113,13 +113,13 @@ Route::middleware(['auth:api', 'Is_Active'])->group(function () {
 
     //------------------------------- Employee Experience ----------------\\
     //--------------------------------------------------------------------\\
-    
+
     Route::resource('work_experience', 'hrm\EmployeeExperienceController');
 
 
     //------------------------------- Employee Accounts bank ----------------\\
     //--------------------------------------------------------------------\\
-    
+
     Route::resource('employee_account', 'hrm\EmployeeAccountController');
 
 
@@ -157,7 +157,7 @@ Route::middleware(['auth:api', 'Is_Active'])->group(function () {
     Route::post("attendances/delete/by_selection", "hrm\AttendancesController@delete_by_selection");
 
 
-    
+
     //------------------------------- Request leave  -----------------------\\
     //----------------------------------------------------------------\\
 
@@ -196,14 +196,14 @@ Route::middleware(['auth:api', 'Is_Active'])->group(function () {
 
     Route::resource('clients', 'ClientController');
     Route::post('clients/import/csv', 'ClientController@import_clients');
-    Route::get('get_clients_without_paginate', 'ClientController@Get_Clients_Without_Paginate');
+    Route::get('get_clients_without_paginate', 'ClientController@get_clients_without_paginate');
     Route::post('clients/delete/by_selection', 'ClientController@delete_by_selection');
     Route::post('clients_pay_due', 'ClientController@clients_pay_due');
     Route::post('clients_pay_return_due', 'ClientController@pay_sale_return_due');
     Route::get('get_client_store_data/{id}', 'ClientController@get_client_store_data');
 
 
-    
+
     //------------------------------- CLIENTS Ecommerce--------------------------\\
     //------------------------------------------------------------------\\
 
@@ -223,7 +223,7 @@ Route::middleware(['auth:api', 'Is_Active'])->group(function () {
 
     Route::post('pos/create_pos', 'PosController@CreatePOS');
     Route::get('pos/get_products_pos', 'PosController@GetProductsByParametre');
-    Route::get('pos/data_create_pos', 'PosController@GetELementPos');
+    Route::get('pos/data_create_pos', 'PosController@GetElementPos');
 
     //----------------------Draft -------------------------------------\\
     //------------------------------------------------------------------\\
@@ -393,7 +393,7 @@ Route::middleware(['auth:api', 'Is_Active'])->group(function () {
     Route::post('returns/purchase/delete/by_selection', 'PurchasesReturnController@delete_by_selection');
     Route::get('returns/purchase/create_purchase_return/{id}', 'PurchasesReturnController@create_purchase_return');
     Route::get('returns/purchase/edit_purchase_return/{id}/{purchase_id}', 'PurchasesReturnController@edit_purchase_return');
-    
+
     //------------------------------- Payment Sale Returns --------------------------\\
     //--------------------------------------------------------------------------------\\
 
@@ -438,9 +438,9 @@ Route::middleware(['auth:api', 'Is_Active'])->group(function () {
     Route::resource('roles/check/create_page', 'PermissionsController@Check_Create_Page');
     Route::post('roles/delete/by_selection', 'PermissionsController@delete_by_selection');
 
-    
+
     //------------------------------- Settings ------------------------\\
-    //------------------------------------------------------------------\\    
+    //------------------------------------------------------------------\\
     Route::resource('settings', 'SettingsController');
     Route::get('get_Settings_data', 'SettingsController@getSettings');
     Route::put('pos_settings/{id}', 'SettingsController@update_pos_settings');
@@ -476,10 +476,10 @@ Route::middleware(['auth:api', 'Is_Active'])->group(function () {
     //------------------------------- Update Settings ------------------------\\
 
     Route::get('get_version_info', 'UpdateController@get_version_info');
-    
+
     //------------------------------- Backup --------------------------\\
     //------------------------------------------------------------------\\
-    
+
     Route::get("get_backup", "BackupController@Get_Backup");
     Route::get("generate_new_backup", "BackupController@Generate_Backup");
     Route::delete("delete_backup/{name}", "BackupController@Delete_Backup");

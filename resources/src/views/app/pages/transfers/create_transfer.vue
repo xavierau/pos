@@ -114,7 +114,7 @@
                             <span>{{detail.code}}</span>
                             <br>
                             <span class="badge badge-success">{{detail.name}}</span>
-                            <i @click="Modal_Updat_Detail(detail)" class="i-Edit"></i>
+                            <i @click="modal_update_detail(detail)" class="i-Edit"></i>
                           </td>
                           <td>{{currentUser.currency}} {{formatNumber(detail.Net_cost, 3)}}</td>
                           <td>
@@ -315,7 +315,7 @@
     <!-- Modal Update detail Product -->
     <validation-observer ref="Update_Detail_transfer">
       <b-modal hide-footer size="md" id="form_Update_Detail" :title="detail.name">
-        <b-form @submit.prevent="submit_Update_Detail">
+        <b-form @submit.prevent="submitUpdateDetail">
           <b-row>
             <!-- Unit Cost -->
             <b-col lg="12" md="12" sm="12">
@@ -548,7 +548,7 @@ export default {
     },
 
     //---Submit Validation Update Detail
-    submit_Update_Detail() {
+    submitUpdateDetail() {
       this.$refs.Update_Detail_transfer.validate().then(success => {
         if (!success) {
           return;
@@ -566,7 +566,7 @@ export default {
     },
 
     //------ Show Modal Update Detail Product
-    Modal_Updat_Detail(detail) {
+    modal_update_detail(detail) {
       this.detail = {};
       this.detail.name = detail.name;
       this.get_units(detail.product_id);
@@ -740,7 +740,7 @@ export default {
           this.product.quantity = 1;
         }
         this.product.product_variant_id = result.product_variant_id;
-        this.Get_Product_Details(result.id, result.product_variant_id);
+        this.getProductDetails(result.id, result.product_variant_id);
       }
 
       this.search_input= '';
@@ -1003,7 +1003,7 @@ export default {
 
     //---------------------------------Get Product Details ------------------------\\
 
-    Get_Product_Details(product_id, variant_id) {
+    getProductDetails(product_id, variant_id) {
       axios.get("/show_product_data/" + product_id +"/"+ variant_id).then(response => {
         this.product.discount = 0;
         this.product.DiscountNet = 0;

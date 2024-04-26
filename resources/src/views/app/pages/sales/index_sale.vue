@@ -424,7 +424,7 @@
         id="Add_Payment"
         :title="EditPaymentMode?$t('EditPayment'):$t('AddPayment')"
       >
-        <b-form @submit.prevent="Submit_Payment">
+        <b-form @submit.prevent="submitPayment">
           <h1 class="text-center mt-3 mb-3">{{client_name}}</h1>
           <b-row>
             <!-- date -->
@@ -1251,8 +1251,8 @@ export default {
     },
 
 
-    //------ Validate Form Submit_Payment
-    Submit_Payment() {
+    //------ Validate Form submitPayment
+    submitPayment() {
       this.$refs.Add_payment.validate().then(success => {
         if (!success) {
           this.makeToast(

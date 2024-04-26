@@ -52,11 +52,11 @@
                  <!-- Product -->
                 <b-col md="12" class="mb-5">
                   <h6>{{$t('ProductName')}}</h6>
-                 
+
                   <div id="autocomplete" class="autocomplete">
-                    <input 
+                    <input
                       :placeholder="$t('Scan_Search_Product_by_Code_Name')"
-                      @input='e => search_input = e.target.value' 
+                      @input='e => search_input = e.target.value'
                       @keyup="search(search_input)"
                       @focus="handleFocus"
                       @blur="handleBlur"
@@ -67,7 +67,7 @@
                     </ul>
                 </div>
                 </b-col>
-                
+
                 <!-- Products -->
                 <b-col md="12">
                   <div class="table-responsive">
@@ -226,7 +226,7 @@ export default {
     handleBlur() {
       this.focused = false
     },
-    
+
     // Search Products
     search(){
 
@@ -281,7 +281,7 @@ export default {
           this.product.quantity = 1;
         }
         this.product.product_variant_id = result.product_variant_id;
-        this.Get_Product_Details(result.id, result.product_variant_id);
+        this.getProductDetails(result.id, result.product_variant_id);
       }
       this.search_input= '';
       this.$refs.product_autocomplete.value = "";
@@ -515,7 +515,7 @@ export default {
 
     //---------------------------------Get Product Details ------------------------\\
 
-    Get_Product_Details(product_id, variant_id) {
+    getProductDetails(product_id, variant_id) {
       axios.get("/show_product_data/" + product_id +"/"+ variant_id).then(response => {
         this.product.product_id = response.data.id;
         this.product.name = response.data.name;

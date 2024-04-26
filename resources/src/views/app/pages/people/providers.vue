@@ -301,7 +301,7 @@
         id="modal_Pay_due"
         title="Pay Due"
       >
-        <b-form @submit.prevent="Submit_Payment_Purchase_due">
+        <b-form @submit.prevent="submitPayment_Purchase_due">
           <b-row>
 
             <!-- Paying Amount  -->
@@ -401,7 +401,7 @@
         id="modal_Pay_return_due"
         title="Pay Purchase Return Due"
       >
-        <b-form @submit.prevent="Submit_Payment_purchase_return_due">
+        <b-form @submit.prevent="submitPayment_purchase_return_due">
           <b-row>
 
             <!-- Paying Amount -->
@@ -1295,8 +1295,8 @@ export default {
 
 
 
-     //------ Validate Form Submit_Payment_Purchase_due
-    Submit_Payment_Purchase_due() {
+     //------ Validate Form submitPayment_Purchase_due
+    submitPayment_Purchase_due() {
       this.$refs.ref_pay_due.validate().then(success => {
         if (!success) {
            this.makeToast(
@@ -1422,9 +1422,9 @@ export default {
 
     //-------------------------------Pay Purchase return due -----------------------------------\\
 
-     //------ Validate Form Submit_Payment_purchase_return_due
+     //------ Validate Form submitPayment_purchase_return_due
 
-    Submit_Payment_purchase_return_due() {
+    submitPayment_purchase_return_due() {
       this.$refs.ref_pay_return_due.validate().then(success => {
         if (!success) {
            this.makeToast(

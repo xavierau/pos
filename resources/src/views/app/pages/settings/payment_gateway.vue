@@ -5,7 +5,7 @@
 
     <!-- Payment Gateway -->
     <validation-observer ref="form_payment" v-if="!isLoading">
-      <b-form @submit.prevent="Submit_Payment">
+      <b-form @submit.prevent="submitPayment">
         <b-row class="mt-5">
           <b-col lg="12" md="12" sm="12">
             <b-card no-body :header="$t('Payment_Gateway')">
@@ -74,7 +74,7 @@ export default {
         stripe_secret:"",
         deleted:false,
       },
-    
+
     };
   },
 
@@ -82,7 +82,7 @@ export default {
     ...mapActions(["refreshUserPermissions"]),
 
      //------------- Submit Validation Payment
-    Submit_Payment() {
+    submitPayment() {
       this.$refs.form_payment.validate().then(success => {
         if (!success) {
           this.makeToast(
@@ -149,7 +149,7 @@ export default {
     },
 
 
-   
+
   }, //end Methods
 
   //----------------------------- Created function-------------------

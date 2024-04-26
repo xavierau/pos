@@ -10,7 +10,7 @@ class Client extends Model
     protected $dates = ['deleted_at'];
 
     protected $fillable = [
-        'name', 'code', 'Address', 'email', 'phone', 'country', 'city','tax_number'
+        'name', 'code', 'address', 'email', 'phone', 'country', 'city','tax_number'
 
     ];
 

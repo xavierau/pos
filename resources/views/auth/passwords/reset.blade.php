@@ -22,7 +22,7 @@
     <!-- built files will be auto injected -->
     <div class="loading_wrap" id="loading_wrap">
       <div class="loader_logo">
-      <img src="/images/logo.png" class="" alt="logo" />
+      <img src="/images/logo.jpeg" class="" alt="logo" />
 
       </div>
 
@@ -36,4 +36,3 @@
   </body>
 </html>
 
-    

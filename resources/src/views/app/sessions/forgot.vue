@@ -6,7 +6,7 @@
           <div class="col-md-12">
             <div class="p-4">
               <div class="auth-logo text-center mb-30">
-                <img :src="'/images/logo.png'" alt>
+                <img src="/images/logo.jpeg" alt>
               </div>
               <h1 class="mb-3 text-18">{{$t('Forgot_Password')}}</h1>
               <validation-observer ref="Reset_password">

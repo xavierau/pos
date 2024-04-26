@@ -1,4 +1,5 @@
 <?php
+
 namespace App\utils;
 
 use App\Models\Currency;
@@ -25,8 +26,8 @@ class helpers
                 return $model->when($request->filled($field['value']),
                     function ($query) use ($request, $model, $field) {
                         $field['param'] = 'like' ?
-                        $model->where($field['value'], 'like', "{$request[$field['value']]}")
-                        : $model->where($field['value'], $request[$field['value']]);
+                            $model->where($field['value'], 'like', "{$request[$field['value']]}")
+                            : $model->where($field['value'], $request[$field['value']]);
                     });
             });
         }
@@ -50,7 +51,13 @@ class helpers
     // Get Currency
     public function Get_Currency()
     {
-        $settings = Setting::with('Currency')->where('deleted_at', '=', null)->first();
+//        $setting = Setting::with(['Currency' => function ($query) {
+//            $query->whereNull('deleted_at');
+//        }])->whereNull('deleted_at')->first();
+//
+//        return $setting->Currency->symbol ?? "";
+
+        $settings = Setting::with('Currency')->whereNull('deleted_at')->first();
 
         if ($settings && $settings->currency_id) {
             if (Currency::where('id', $settings->currency_id)
@@ -63,6 +70,7 @@ class helpers
         } else {
             $symbol = '';
         }
+
         return $symbol;
     }
 

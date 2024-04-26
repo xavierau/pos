@@ -23,12 +23,12 @@ class Setting extends Model
 
     public function Currency()
     {
-        return $this->belongsTo('App\Models\Currency');
+        return $this->belongsTo(Currency::class);
     }
 
     public function Client()
     {
-        return $this->belongsTo('App\Models\Client');
+        return $this->belongsTo(Client::class);
     }
 
 }

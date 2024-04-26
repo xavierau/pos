@@ -4,7 +4,7 @@
     <div v-if="isLoading" class="loading_page spinner spinner-primary mr-3"></div>
     <div v-else>
       <div class="mb-5">
-        <span class="alert alert-danger" v-show="clients_without_ecommerce > 0 && (getallmodules && getallmodules.some(module => module.name === module_name))">
+        <span class="alert alert-danger" v-show="clients_without_ecommerce > 0 && (getAllModules && getAllModules.some(module => module.name === module_name))">
           There are <strong>{{ clients_without_ecommerce}}</strong>
           customers not having an account in the online store.
           <router-link  to="/app/People/Customers_without_ecommerce">
@@ -100,7 +100,7 @@
                 <b-dropdown-item
                  v-if="props.row.client_ecommerce == 'yes' &&
                  (currentUserPermissions && currentUserPermissions.includes('Customers_edit')) &&
-                 (getallmodules && getallmodules.some(module => module.name === module_name))"
+                 (getAllModules && getAllModules.some(module => module.name === module_name))"
                   @click="Edit_Online_Store_Account(props.row)"
                 >
                   <i class="nav-icon i-Edit font-weight-bold mr-2"></i>
@@ -219,7 +219,7 @@
         id="modal_Pay_due"
         title="Pay Due"
       >
-        <b-form @submit.prevent="Submit_Payment_sell_due">
+        <b-form @submit.prevent="submitPayment_sell_due">
           <b-row>
 
             <!-- Paying Amount  -->
@@ -319,7 +319,7 @@
         id="modal_Pay_return_due"
         title="Pay Sell Return Due"
       >
-        <b-form @submit.prevent="Submit_Payment_sell_return_due">
+        <b-form @submit.prevent="submitPayment_sell_return_due">
           <b-row>
 
             <!-- Paying Amount -->
@@ -971,7 +971,7 @@ export default {
   },
 
   computed: {
-    ...mapGetters(["currentUserPermissions", "currentUser","getallmodules"]),
+    ...mapGetters(["currentUserPermissions", "currentUser","getAllModules"]),
 
 
     isSelectedCard() {
@@ -1593,8 +1593,8 @@ export default {
     },
 
 
-    //------ Validate Form Submit_Payment_sell_due
-    Submit_Payment_sell_due() {
+    //------ Validate Form submitPayment_sell_due
+    submitPayment_sell_due() {
       this.$refs.ref_pay_due.validate().then(success => {
         if (!success) {
            this.makeToast(
@@ -1705,8 +1705,8 @@ export default {
 
     //-------------------------------Pay sell return due -----------------------------------\\
 
-     //------ Validate Form Submit_Payment_sell_return_due
-    Submit_Payment_sell_return_due() {
+     //------ Validate Form submitPayment_sell_return_due
+    submitPayment_sell_return_due() {
       this.$refs.ref_pay_return_due.validate().then(success => {
         if (!success) {
            this.makeToast(
