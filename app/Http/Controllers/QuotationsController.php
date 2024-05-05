@@ -412,7 +412,7 @@ class QuotationsController extends BaseController
             $data['quantity']  = $detail->quantity;
             $data['total']     = $detail->total;
             $data['price']     = $detail->price;
-            $data['unit_sale'] = $unit?$unit->ShortName:'';
+            $data['unit_sale'] = $unit?$unit->short_name:'';
 
             if ($detail->discount_method == '2') {
                 $data['DiscountNet'] = $detail->discount;
@@ -524,7 +524,7 @@ class QuotationsController extends BaseController
                 $data['detail_id'] = $detail_id += 1;
                 $data['quantity'] = number_format($detail->quantity, 2, '.', '');
                 $data['total'] = number_format($detail->total, 2, '.', '');
-                $data['unitSale'] = $unit?$unit->ShortName:'';
+                $data['unitSale'] = $unit?$unit->short_name:'';
                 $data['price'] = number_format($detail->price, 2, '.', '');
 
             if ($detail->discount_method == '2') {
@@ -725,7 +725,7 @@ class QuotationsController extends BaseController
             $data['etat'] = 'current';
             $data['qte_copy'] = $detail->quantity;
             $data['total'] = $detail->total;
-            $data['unitSale'] = $unit?$unit->ShortName:'';
+            $data['unitSale'] = $unit?$unit->short_name:'';
             $data['sale_unit_id'] = $unit?$unit->id:'';
             $data['is_imei'] = $detail['product']['is_imei'];
             $data['imei_number'] = $detail->imei_number;
@@ -826,7 +826,7 @@ class QuotationsController extends BaseController
         $email['body'] = $message_body;
         $email['company_name'] = $business_name;
 
-        $this->Set_config_mail();
+        $this->set_config_mail();
 
         $mail = Mail::to($receiver_email)->send(new CustomEmail($email));
 

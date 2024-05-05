@@ -15,8 +15,7 @@ class CreateCurrenciesTable extends Migration {
 	{
 		Schema::create('currencies', function(Blueprint $table)
 		{
-			$table->engine = 'InnoDB';
-			$table->integer('id', true);
+			$table->id('id', true);
 			$table->string('code', 192);
 			$table->string('name', 192);
 			$table->string('symbol', 192);

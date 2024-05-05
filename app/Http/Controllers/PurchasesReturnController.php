@@ -731,7 +731,7 @@ class PurchasesReturnController extends BaseController
              $data['quantity'] = 0;
              $data['purchase_quantity'] = $detail->quantity;
              $data['product_id'] = $detail->product_id;
-             $data['unitPurchase'] = $unit->ShortName;
+             $data['unitPurchase'] = $unit->short_name;
              $data['purchase_unit_id'] = $unit->id;
 
              $data['is_imei'] = $detail['product']['is_imei'];
@@ -875,7 +875,7 @@ class PurchasesReturnController extends BaseController
             $data['id'] = $detail->id;
             $data['detail_id'] = $detail_id += 1;
             $data['product_id'] = $detail->product_id;
-            $data['unitPurchase'] = $unit->ShortName;
+            $data['unitPurchase'] = $unit->short_name;
             $data['purchase_unit_id'] = $unit->id;
 
             $data['is_imei'] = $detail['product']['is_imei'];
@@ -1034,7 +1034,7 @@ class PurchasesReturnController extends BaseController
             $data['quantity'] = $detail->quantity;
             $data['total'] = $detail->total;
             $data['cost'] = $detail->cost;
-            $data['unit_purchase'] = $unit->ShortName;
+            $data['unit_purchase'] = $unit->short_name;
 
             if ($detail->discount_method == '2') {
                 $data['DiscountNet'] = $detail->discount;
@@ -1126,7 +1126,7 @@ class PurchasesReturnController extends BaseController
                 $data['quantity'] = number_format($detail->quantity, 2, '.', '');
                 $data['total'] = number_format($detail->total, 2, '.', '');
                 $data['cost'] = number_format($detail->cost, 2, '.', '');
-                $data['unit_purchase'] = $unit->ShortName;
+                $data['unit_purchase'] = $unit->short_name;
 
             if ($detail->discount_method == '2') {
                 $data['DiscountNet'] = number_format($detail->discount, 2, '.', '');

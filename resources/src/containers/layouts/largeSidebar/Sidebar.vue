@@ -166,36 +166,6 @@
                         </a>
                         <div class="triangle"></div>
                     </li>
-                    <li
-                        v-show="hasPermission(['expense_view','expense_add','deposit_view','deposit_add','account','transfer_money',])"
-                        @mouseenter="toggleSubMenu"
-                        class="nav-item"
-                        :class="{ active: selectedParentMenu == 'accounting' }"
-                        data-item="accounting"
-                        :data-submenu="true"
-                    >
-                        <a class="nav-item-hold" href="#">
-                            <i class="nav-icon i-Wallet"></i>
-                            <span class="nav-text">{{ $t('Accounting') }}</span>
-                        </a>
-                        <div class="triangle"></div>
-                    </li>
-
-
-                    <li
-                        v-show="hasPermission(['Customers_view','Suppliers_view','users_view'])"
-                        @mouseenter="toggleSubMenu"
-                        :class="{ active: selectedParentMenu == 'People' }"
-                        class="nav-item"
-                        data-item="People"
-                        :data-submenu="true"
-                    >
-                        <a class="nav-item-hold" href="#">
-                            <i class="nav-icon i-Business-Mens"></i>
-                            <span class="nav-text">{{ $t('People') }}</span>
-                        </a>
-                        <div class="triangle"></div>
-                    </li>
 
 
                     <!-- //import component Modules -->
@@ -407,90 +377,6 @@
 
                 <ul
                     class="childNav d-none"
-                    data-parent="accounting"
-                    :class="{ 'd-block': selectedParentMenu == 'accounting' }"
-                >
-
-                    <li
-                        class="nav-item"
-                        v-if="hasPermission('account')"
-                    >
-                        <router-link tag="a" class to="/app/accounts">
-                            <i class="nav-icon i-Files"></i>
-                            <span class="item-name">{{ $t('List_accounts') }}</span>
-                        </router-link>
-                    </li>
-
-                    <li
-                        class="nav-item"
-                        v-if="hasPermission('transfer_money')"
-                    >
-                        <router-link tag="a" class to="/app/transfer_money">
-                            <i class="nav-icon i-Files"></i>
-                            <span class="item-name">{{ $t('Transfers_Money') }}</span>
-                        </router-link>
-                    </li>
-
-                    <li
-                        class="nav-item"
-                        v-if="hasPermission('expense_add')"
-                    >
-                        <router-link tag="a" class to="/app/expenses/store">
-                            <i class="nav-icon i-Add-File"></i>
-                            <span class="item-name">{{ $t('Create_Expense') }}</span>
-                        </router-link>
-                    </li>
-                    <li
-                        class="nav-item"
-                        v-if="hasPermission('expense_view')"
-                    >
-                        <router-link tag="a" class to="/app/expenses/list">
-                            <i class="nav-icon i-Files"></i>
-                            <span class="item-name">{{ $t('ListExpenses') }}</span>
-                        </router-link>
-                    </li>
-
-                    <li
-                        class="nav-item"
-                        v-if="hasPermission('deposit_add')"
-                    >
-                        <router-link tag="a" class to="/app/deposits/store">
-                            <i class="nav-icon i-Add-File"></i>
-                            <span class="item-name">{{ $t('Create_deposit') }}</span>
-                        </router-link>
-                    </li>
-                    <li
-                        class="nav-item"
-                        v-if="hasPermission('deposit_view')"
-                    >
-                        <router-link tag="a" class to="/app/deposits/list">
-                            <i class="nav-icon i-Files"></i>
-                            <span class="item-name">{{ $t('List_Deposit') }}</span>
-                        </router-link>
-                    </li>
-                    <li
-                        class="nav-item"
-                        v-if="hasPermission('expense_view')"
-                    >
-                        <router-link tag="a" class to="/app/expenses/category">
-                            <i class="nav-icon i-Files"></i>
-                            <span class="item-name">{{ $t('Expense_Category') }}</span>
-                        </router-link>
-                    </li>
-
-                    <li
-                        class="nav-item"
-                        v-if="hasPermission('deposit_view')"
-                    >
-                        <router-link tag="a" class to="/app/deposits/category">
-                            <i class="nav-icon i-Files"></i>
-                            <span class="item-name">{{ $t('deposit_Category') }}</span>
-                        </router-link>
-                    </li>
-                </ul>
-
-                <ul
-                    class="childNav d-none"
                     data-parent="quotations"
                     :class="{ 'd-block': selectedParentMenu == 'quotations' }"
                 >
@@ -694,41 +580,6 @@
                         </router-link>
                     </li>
 
-                </ul>
-
-                <!-- People -->
-                <ul
-                    class="childNav d-none"
-                    data-parent="People"
-                    :class="{ 'd-block': selectedParentMenu == 'People' }"
-                >
-                    <li
-                        class="nav-item"
-                        v-if="hasPermission('Customers_view')"
-                    >
-                        <router-link tag="a" class to="/app/People/Customers">
-                            <i class="nav-icon i-Administrator"></i>
-                            <span class="item-name">{{ $t('Customers') }}</span>
-                        </router-link>
-                    </li>
-                    <li
-                        class="nav-item"
-                        v-if="hasPermission('Suppliers_view')"
-                    >
-                        <router-link tag="a" class to="/app/People/Suppliers">
-                            <i class="nav-icon i-Administrator"></i>
-                            <span class="item-name">{{ $t('Suppliers') }}</span>
-                        </router-link>
-                    </li>
-                    <li
-                        class="nav-item"
-                        v-if="hasPermission('users_view')"
-                    >
-                        <router-link tag="a" class to="/app/People/Users">
-                            <i class="nav-icon i-Administrator"></i>
-                            <span class="item-name">{{ $t('Users') }}</span>
-                        </router-link>
-                    </li>
                 </ul>
 
                 <ul

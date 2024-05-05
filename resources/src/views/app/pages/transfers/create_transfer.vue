@@ -595,11 +595,11 @@ export default {
               if (this.units[k].id == this.detail.purchase_unit_id) {
                 if(this.units[k].operator == '/'){
                   this.details[i].stock       = this.detail.fix_stock  * this.units[k].operator_value;
-                  this.details[i].unitPurchase    = this.units[k].ShortName;
+                  this.details[i].unitPurchase    = this.units[k].short_name;
 
                 }else{
                   this.details[i].stock       = this.detail.fix_stock  / this.units[k].operator_value;
-                  this.details[i].unitPurchase    = this.units[k].ShortName;
+                  this.details[i].unitPurchase    = this.units[k].short_name;
                 }
               }
             }

@@ -16,6 +16,6 @@ export const posClient = {
     },
     getPosElements() {
         return axios
-            .get("pos/get_pos_elements")
+            .get("pos/data_create_pos")
     }
 }

@@ -813,7 +813,7 @@ class PosController extends BaseController
             $data['quantity'] = $detail->quantity;
             $data['qte_copy'] = $detail->quantity;
             $data['etat'] = 'current';
-            $data['unitSale'] = $unit ? $unit->ShortName : '';
+            $data['unitSale'] = $unit ? $unit->short_name : '';
             $data['sale_unit_id'] = $unit ? $unit->id : '';
             $data['is_imei'] = $detail['product']['is_imei'];
             $data['imei_number'] = $detail->imei_number;

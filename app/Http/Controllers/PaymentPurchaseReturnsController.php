@@ -323,7 +323,7 @@ class PaymentPurchaseReturnsController extends BaseController
         $payment['company_name'] = $settings->CompanyName;
 
         $pdf = $this->payment_return($request, $payment['id']);
-        $this->Set_config_mail(); // Set_config_mail => BaseController
+        $this->set_config_mail(); // Set_config_mail => BaseController
         $mail = Mail::to($request->to)->send(new PaymentReturn($payment, $pdf));
         return $mail;
     }

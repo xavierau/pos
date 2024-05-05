@@ -39,7 +39,7 @@ class PasswordResetController extends BaseController
             ]
         );
         if ($user && $passwordReset) {
-            $this->Set_config_mail();
+            $this->set_config_mail();
         }
         // Set_config_mail => BaseController
         $url = url('/password/find/' . $passwordReset->token);
@@ -112,7 +112,7 @@ class PasswordResetController extends BaseController
         $user->password = bcrypt($request->password);
         $user->save();
         $passwordReset->delete();
-        $this->Set_config_mail(); // Set_config_mail => BaseController
+        $this->set_config_mail(); // Set_config_mail => BaseController
         Mail::to($request->email)->send(new Password_Reset_Success());
 
         return response()->json([

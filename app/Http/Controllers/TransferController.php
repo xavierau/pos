@@ -974,7 +974,7 @@ class TransferController extends BaseController
             $data['product_id'] = $detail->product_id;
             $data['etat'] = 'current';
             $data['qte_copy'] = $detail->quantity;
-            $data['unitPurchase'] = $unit->ShortName;
+            $data['unitPurchase'] = $unit->short_name;
             $data['purchase_unit_id'] = $unit->id;
 
             if ($detail->discount_method == '2') {
@@ -1071,7 +1071,7 @@ class TransferController extends BaseController
             }
 
             $data['quantity'] = $detail->quantity;
-            $data['unit'] = $unit->ShortName;
+            $data['unit'] = $unit->short_name;
             $data['total'] = $detail->total;
 
             $details[] = $data;

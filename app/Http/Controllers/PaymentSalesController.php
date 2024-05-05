@@ -563,7 +563,7 @@ class PaymentSalesController extends BaseController
         $email['body'] = $message_body;
         $email['company_name'] = $business_name;
 
-        $this->Set_config_mail();
+        $this->set_config_mail();
 
         $mail = Mail::to($receiver_email)->send(new CustomEmail($email));
 

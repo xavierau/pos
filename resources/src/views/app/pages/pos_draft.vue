@@ -1992,11 +1992,11 @@ export default {
               if (this.units[k].operator == "/") {
                 this.details[i].current =
                   this.detail.fix_stock * this.units[k].operator_value;
-                this.details[i].unitSale = this.units[k].ShortName;
+                this.details[i].unitSale = this.units[k].short_name;
               } else {
                 this.details[i].current =
                   this.detail.fix_stock / this.units[k].operator_value;
-                this.details[i].unitSale = this.units[k].ShortName;
+                this.details[i].unitSale = this.units[k].short_name;
               }
             }
           }

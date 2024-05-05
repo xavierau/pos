@@ -15,9 +15,9 @@
         @on-search="onSearch"
         :search-options="{
         enabled: true,
-        placeholder: $t('Search_this_table'),  
+        placeholder: $t('Search_this_table'),
       }"
-        :select-options="{ 
+        :select-options="{
           enabled: true ,
           clearSelectionText: '',
         }"
@@ -77,7 +77,7 @@
               </validation-provider>
             </b-col>
 
-            <!-- ShortName -->
+            <!-- $unit->short_name -->
             <b-col md="12">
               <validation-provider
                 name="ShortName"
@@ -90,7 +90,7 @@
                     :state="getValidationState(validationContext)"
                     aria-describedby="ShortName-feedback"
                     label="ShortName"
-                    v-model="unit.ShortName"
+                    v-model="unit.short_name"
                   ></b-form-input>
                   <b-form-invalid-feedback id="ShortName-feedback">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
                 </b-form-group>
@@ -189,7 +189,7 @@ export default {
       unit: {
         id: "",
         name: "",
-        ShortName: "",
+        short_name: "",
         base_unit: "",
         base_unit_name: "",
         operator: "*",
@@ -209,7 +209,7 @@ export default {
         },
         {
           label: this.$t("ShortName"),
-          field: "ShortName",
+          field: "short_name",
           tdClass: "text-left",
           thClass: "text-left"
         },
@@ -396,7 +396,7 @@ export default {
       axios
         .post("units", {
           name: this.unit.name,
-          ShortName: this.unit.ShortName,
+          short_name: this.unit.short_name,
           base_unit: this.unit.base_unit,
           operator: this.unit.operator,
           operator_value: this.unit.operator_value
@@ -424,7 +424,7 @@ export default {
       axios
         .put("units/" + this.unit.id, {
           name: this.unit.name,
-          ShortName: this.unit.ShortName,
+          short_name: this.unit.short_name,
           base_unit: this.unit.base_unit,
           operator: this.unit.operator,
           operator_value: this.unit.operator_value
@@ -450,7 +450,7 @@ export default {
       this.unit = {
         id: "",
         name: "",
-        ShortName: "",
+        short_name: "",
         base_unit: "",
         base_unit_name: "",
         operator: "*",

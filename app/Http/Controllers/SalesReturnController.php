@@ -762,7 +762,7 @@ class SalesReturnController extends BaseController
             $data['quantity'] = $detail->quantity;
             $data['total'] = $detail->total;
             $data['price'] = $detail->price;
-            $data['unit_sale'] = $unit?$unit->ShortName:'';
+            $data['unit_sale'] = $unit?$unit->short_name:'';
 
             if ($detail->discount_method == '2') {
                 $data['DiscountNet'] = $detail->discount;
@@ -900,7 +900,7 @@ class SalesReturnController extends BaseController
             $data['quantity'] = 0;
             $data['sale_quantity'] = $detail->quantity;
             $data['product_id'] = $detail->product_id;
-            $data['unitSale'] = $unit?$unit->ShortName:'';
+            $data['unitSale'] = $unit?$unit->short_name:'';
             $data['sale_unit_id'] = $unit?$unit->id:'';
             $data['is_imei'] = $detail['product']['is_imei'];
             $data['imei_number'] = $detail->imei_number;
@@ -999,7 +999,7 @@ class SalesReturnController extends BaseController
                 $data['detail_id'] = $detail_id += 1;
                 $data['quantity'] = number_format($detail->quantity, 2, '.', '');
                 $data['total'] = number_format($detail->total, 2, '.', '');
-                $data['unitSale'] = $unit?$unit->ShortName:'';
+                $data['unitSale'] = $unit?$unit->short_name:'';
                 $data['price'] = number_format($detail->price, 2, '.', '');
 
             if ($detail->discount_method == '2') {
@@ -1141,7 +1141,7 @@ class SalesReturnController extends BaseController
             $data['product_type'] = $detail['product']['type'];
             $data['quantity'] = $detail->quantity;
             $data['product_id'] = $detail->product_id;
-            $data['unitSale'] = $unit?$unit->ShortName:'';
+            $data['unitSale'] = $unit?$unit->short_name:'';
             $data['sale_unit_id'] = $unit?$unit->id:'';
             $data['is_imei'] = $detail['product']['is_imei'];
             $data['imei_number'] = $detail->imei_number;

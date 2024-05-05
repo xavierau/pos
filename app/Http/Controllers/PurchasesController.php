@@ -728,7 +728,7 @@ class PurchasesController extends BaseController
             $data['quantity'] = $detail->quantity;
             $data['total'] = $detail->total;
             $data['cost'] = $detail->cost;
-            $data['unit_purchase'] = $unit->ShortName;
+            $data['unit_purchase'] = $unit->short_name;
 
             if ($detail->discount_method == '2') {
                 $data['DiscountNet'] = $detail->discount;
@@ -867,7 +867,7 @@ class PurchasesController extends BaseController
                 $data['detail_id'] = $detail_id += 1;
                 $data['quantity'] = number_format($detail->quantity, 2, '.', '');
                 $data['total'] = number_format($detail->total, 2, '.', '');
-                $data['unit_purchase'] = $unit->ShortName;
+                $data['unit_purchase'] = $unit->short_name;
                 $data['cost'] = number_format($detail->cost, 2, '.', '');
 
             if ($detail->discount_method == '2') {
@@ -1056,7 +1056,7 @@ class PurchasesController extends BaseController
                 $data['detail_id'] = $detail_id += 1;
                 $data['quantity'] = $detail->quantity;
                 $data['product_id'] = $detail->product_id;
-                $data['unitPurchase'] = $unit->ShortName;
+                $data['unitPurchase'] = $unit->short_name;
                 $data['purchase_unit_id'] = $unit->id;
 
                 $data['is_imei'] = $detail['product']['is_imei'];
@@ -1203,7 +1203,7 @@ class PurchasesController extends BaseController
             $data['quantity'] = $detail->quantity;
             $data['purchase_quantity'] = $detail->quantity;
             $data['product_id'] = $detail->product_id;
-            $data['unitPurchase'] = $unit->ShortName;
+            $data['unitPurchase'] = $unit->short_name;
             $data['purchase_unit_id'] = $unit->id;
 
             $data['is_imei'] = $detail['product']['is_imei'];
@@ -1285,20 +1285,34 @@ class PurchasesController extends BaseController
         $receiver_email = $purchase['provider']->email;
 
         //replace the text with tags
-        $message_body = str_replace('{contact_name}', $contact_name, $message_body);
-        $message_body = str_replace('{business_name}', $business_name, $message_body);
-        $message_body = str_replace('{invoice_url}', $invoice_url, $message_body);
-        $message_body = str_replace('{invoice_number}', $invoice_number, $message_body);
+        $tagsMapping = [
+            '{contact_name}' => $contact_name,
+            '{business_name}' => $business_name,
+            '{invoice_url}' => $invoice_url,
+            '{invoice_number}' => $invoice_number,
+            '{total_amount}' => $total_amount,
+            '{paid_amount}' => $paid_amount,
+            '{due_amount}' => $due_amount,
+        ];
 
-        $message_body = str_replace('{total_amount}', $total_amount, $message_body);
-        $message_body = str_replace('{paid_amount}', $paid_amount, $message_body);
-        $message_body = str_replace('{due_amount}', $due_amount, $message_body);
+        foreach($tagsMapping as $key=>$value){
+            $message_body = str_replace($key, $value, $message_body);
+    }
+
+//        $message_body = str_replace('{contact_name}', $contact_name, $message_body);
+//        $message_body = str_replace('{business_name}', $business_name, $message_body);
+//        $message_body = str_replace('{invoice_url}', $invoice_url, $message_body);
+//        $message_body = str_replace('{invoice_number}', $invoice_number, $message_body);
+//
+//        $message_body = str_replace('{total_amount}', $total_amount, $message_body);
+//        $message_body = str_replace('{paid_amount}', $paid_amount, $message_body);
+//        $message_body = str_replace('{due_amount}', $due_amount, $message_body);
 
         $email['subject'] = $message_subject;
         $email['body'] = $message_body;
         $email['company_name'] = $business_name;
 
-        $this->Set_config_mail();
+        $this->set_config_mail();
         $mail = Mail::to($receiver_email)->send(new CustomEmail($email));
         return $mail;
     }

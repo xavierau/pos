@@ -2989,7 +2989,7 @@ class ReportController extends BaseController
             $item['Ref'] = $detail['sale']->Ref;
             $item['sale_id'] = $detail['sale']->id;
             $item['client_name'] = $detail['sale']['client']->name;
-            $item['unit_sale'] = $unit?$unit->ShortName:'';
+            $item['unit_sale'] = $unit?$unit->short_name:'';
             $item['warehouse_name'] = $detail['sale']['warehouse']->name;
             $item['quantity'] = $detail->quantity .' '.$item['unit_sale'];
             $item['total'] = $detail->total;
@@ -3095,7 +3095,7 @@ class ReportController extends BaseController
             $item['quotation_id'] = $detail['quotation']->id;
             $item['client_name'] = $detail['quotation']['client']->name;
             $item['warehouse_name'] = $detail['quotation']['warehouse']->name;
-            $item['unit_sale'] = $unit?$unit->ShortName:'';
+            $item['unit_sale'] = $unit?$unit->short_name:'';
             $item['quantity'] = $detail->quantity .' '.$item['unit_sale'];
             $item['total'] = $detail->total;
             $item['product_name'] = $product_name;
@@ -3196,10 +3196,10 @@ class ReportController extends BaseController
             $item['purchase_id'] = $detail['purchase']->id;
             $item['provider_name'] = $detail['purchase']['provider']->name;
             $item['warehouse_name'] = $detail['purchase']['warehouse']->name;
-            $item['quantity'] = $detail->quantity .' '.$unit->ShortName;;
+            $item['quantity'] = $detail->quantity .' '.$unit->short_name;;
             $item['total'] = $detail->total;
             $item['product_name'] = $product_name;
-            $item['unit_purchase'] = $unit->ShortName;
+            $item['unit_purchase'] = $unit->short_name;
 
             $data[] = $item;
         }
@@ -3298,10 +3298,10 @@ class ReportController extends BaseController
             $item['return_purchase_id'] = $detail['PurchaseReturn']->id;
             $item['provider_name'] = $detail['PurchaseReturn']['provider']->name;
             $item['warehouse_name'] = $detail['PurchaseReturn']['warehouse']->name;
-            $item['quantity'] = $detail->quantity .' '.$unit->ShortName;;
+            $item['quantity'] = $detail->quantity .' '.$unit->short_name;;
             $item['total'] = $detail->total;
             $item['product_name'] = $product_name;
-            $item['unit_purchase'] = $unit->ShortName;
+            $item['unit_purchase'] = $unit->short_name;
 
             $data[] = $item;
         }
@@ -3406,7 +3406,7 @@ class ReportController extends BaseController
             $item['return_sale_id'] = $detail['SaleReturn']->id;
             $item['client_name'] = $detail['SaleReturn']['client']->name;
             $item['warehouse_name'] = $detail['SaleReturn']['warehouse']->name;
-            $item['unit_sale'] = $unit?$unit->ShortName:'';
+            $item['unit_sale'] = $unit?$unit->short_name:'';
             $item['quantity'] = $detail->quantity .' '.$item['unit_sale'];
             $item['total'] = $detail->total;
             $item['product_name'] = $product_name;
@@ -4071,7 +4071,7 @@ class ReportController extends BaseController
             $item['sale_id'] = $detail['sale']->id;
             $item['client_name'] = $detail['sale']['client']->name;
             $item['warehouse_name'] = $detail['sale']['warehouse']->name;
-            $item['unit_sale'] = $unit?$unit->ShortName:'';
+            $item['unit_sale'] = $unit?$unit->short_name:'';
             $item['quantity'] = $detail->quantity .' '.$item['unit_sale'];
             $item['total'] = $detail->total;
             $item['product_name'] = $product_name;
@@ -4231,7 +4231,7 @@ class ReportController extends BaseController
              $item['quantity'] = $detail->quantity;
              $item['total'] = $detail->total;
              $item['product_name'] = $product_name;
-             $item['unit_sale'] = $unit?$unit->ShortName:'';
+             $item['unit_sale'] = $unit?$unit->short_name:'';
 
              $data[] = $item;
          }
@@ -4386,7 +4386,7 @@ class ReportController extends BaseController
               $item['quantity'] = $detail->quantity;
               $item['total'] = $detail->total;
               $item['product_name'] = $product_name;
-              $item['unit_purchase'] = $unit->ShortName;
+              $item['unit_purchase'] = $unit->short_name;
 
               $data[] = $item;
           }

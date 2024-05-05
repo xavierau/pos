@@ -30,7 +30,7 @@ class UnitsController extends BaseController
             ->where(function ($query) use ($request) {
                 return $query->when($request->filled('search'), function ($query) use ($request) {
                     return $query->where('name', 'LIKE', "%{$request->search}%")
-                        ->orWhere('ShortName', 'LIKE', "%{$request->search}%");
+                        ->orWhere('short_name', 'LIKE', "%{$request->search}%");
                 });
             });
         $totalRows = $Units->count();
@@ -45,7 +45,7 @@ class UnitsController extends BaseController
         foreach ($Units as $unit) {
             $unit_data['id'] = $unit->id;
             $unit_data['name'] = $unit->name;
-            $unit_data['ShortName'] = $unit->ShortName;
+            $unit_data['short_name'] = $unit->short_name;
             $unit_data['operator'] = $unit->operator;
             $unit_data['operator_value'] = $unit->operator_value;
 
@@ -82,7 +82,7 @@ class UnitsController extends BaseController
 
         request()->validate([
             'name' => 'required',
-            'ShortName' => 'required',
+            'short_name' => 'required',
         ]);
 
         if ($request->base_unit == '') {
@@ -95,7 +95,7 @@ class UnitsController extends BaseController
 
         Unit::create([
             'name' => $request['name'],
-            'ShortName' => $request['ShortName'],
+            'short_name' => $request['short_name'],
             'base_unit' => $request['base_unit'],
             'operator' => $operator,
             'operator_value' => $operator_value,
@@ -113,7 +113,7 @@ class UnitsController extends BaseController
 
         request()->validate([
             'name' => 'required',
-            'ShortName' => 'required',
+            'short_name' => 'required',
         ]);
 
         if ($request->base_unit == '' || $request->base_unit == $id) {
@@ -128,7 +128,7 @@ class UnitsController extends BaseController
 
         Unit::whereId($id)->update([
             'name' => $request['name'],
-            'ShortName' => $request['ShortName'],
+            'short_name' => $request['short_name'],
             'base_unit' => $base_unit,
             'operator' => $operator,
             'operator_value' => $operator_value,
@@ -187,7 +187,7 @@ class UnitsController extends BaseController
         $units = Unit::where('base_unit', $product_unit_id->unit_id)
                         ->orWhere('id', $product_unit_id->unit_id)
                         ->get();
-        
+
         return response()->json($units);
     }
 
