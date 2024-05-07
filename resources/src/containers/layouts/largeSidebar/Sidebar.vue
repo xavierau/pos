@@ -167,6 +167,23 @@
                         <div class="triangle"></div>
                     </li>
 
+                    <li
+                        v-show="currentUserPermissions && (currentUserPermissions.includes('Customers_view')
+                        ||currentUserPermissions.includes('Suppliers_view')
+                        ||currentUserPermissions.includes('users_view'))"
+                        @mouseenter="toggleSubMenu"
+                        :class="{ active: selectedParentMenu == 'People' }"
+                        class="nav-item"
+                        data-item="People"
+                        :data-submenu="true"
+                    >
+                        <a class="nav-item-hold" href="#">
+                            <i class="nav-icon i-Business-Mens"></i>
+                            <span class="nav-text">{{$t('People')}}</span>
+                        </a>
+                        <div class="triangle"></div>
+                    </li>
+
 
                     <!-- //import component Modules -->
 
@@ -580,6 +597,40 @@
                         </router-link>
                     </li>
 
+                </ul>
+
+                <ul
+                    class="childNav d-none"
+                    data-parent="People"
+                    :class="{ 'd-block': selectedParentMenu == 'People' }"
+                >
+                    <li
+                        class="nav-item"
+                        v-if="currentUserPermissions && currentUserPermissions.includes('Customers_view')"
+                    >
+                        <router-link tag="a" class to="/app/People/Customers">
+                            <i class="nav-icon i-Administrator"></i>
+                            <span class="item-name">{{$t('Customers')}}</span>
+                        </router-link>
+                    </li>
+                    <li
+                        class="nav-item"
+                        v-if="currentUserPermissions && currentUserPermissions.includes('Suppliers_view')"
+                    >
+                        <router-link tag="a" class to="/app/People/Suppliers">
+                            <i class="nav-icon i-Administrator"></i>
+                            <span class="item-name">{{$t('Suppliers')}}</span>
+                        </router-link>
+                    </li>
+                    <li
+                        class="nav-item"
+                        v-if="currentUserPermissions && currentUserPermissions.includes('users_view')"
+                    >
+                        <router-link tag="a" class to="/app/People/Users">
+                            <i class="nav-icon i-Administrator"></i>
+                            <span class="item-name">{{$t('Users')}}</span>
+                        </router-link>
+                    </li>
                 </ul>
 
                 <ul
