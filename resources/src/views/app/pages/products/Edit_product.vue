@@ -39,7 +39,7 @@
                       <v-select
                         :class="{'is-invalid': !!errors.length}"
                         :state="errors[0] ? false : (valid ? true : null)"
-                        v-model="product.Type_barcode"
+                        v-model="product.type_barcode"
                         :reduce="label => label.value"
                         :placeholder="$t('Choose_Symbology')"
                         :options="
@@ -189,7 +189,7 @@
 
             <b-card class="mt-3">
               <b-row>
-              
+
                  <!-- type -->
 
                 <b-col md="6" class="mb-2" v-if="product.type == 'is_single'">
@@ -356,6 +356,72 @@
                   </validation-provider>
                 </b-col>
 
+                  <!-- promotion price start date  -->
+                  <b-col lg="6" md="6" sm="12">
+                      <validation-provider
+                          name="date"
+                          :rules="{ required: true}"
+                          v-slot="validationContext"
+                      >
+                          <b-form-group :label="$t('promotional_start_date') + ' ' + '*'">
+                              <b-form-input
+                                  :state="getValidationState(validationContext)"
+                                  aria-describedby="date-feedback"
+                                  type="date"
+                                  v-model="product.promotional_start_date"
+                              ></b-form-input>
+                              <b-form-invalid-feedback
+                                  id="OrderTax-feedback"
+                              >{{ validationContext.errors[0] }}
+                              </b-form-invalid-feedback>
+                          </b-form-group>
+                      </validation-provider>
+                  </b-col>
+                  <!-- promotion price end date  -->
+                  <b-col lg="6" md="6" sm="12">
+                      <validation-provider
+                          name="date"
+                          :rules="{ required: true}"
+                          v-slot="validationContext"
+                      >
+                          <b-form-group :label="$t('promotional_end_date') + ' ' + '*'">
+                              <b-form-input
+                                  :state="getValidationState(validationContext)"
+                                  aria-describedby="date-feedback"
+                                  type="date"
+                                  v-model="product.promotional_end_date"
+                              ></b-form-input>
+                              <b-form-invalid-feedback
+                                  id="OrderTax-feedback"
+                              >{{ validationContext.errors[0] }}
+                              </b-form-invalid-feedback>
+                          </b-form-group>
+                      </validation-provider>
+                  </b-col>
+                  <!-- Promotional Price -->
+                  <b-col md="6" class="mb-2" v-if="product.type == 'is_single' || product.type == 'is_service'">
+                      <validation-provider
+                          name="Promotional Price"
+                          :rules="{ regex: /^\d*\.?\d*$/}"
+                          v-slot="validationContext"
+                      >
+                          <b-form-group :label="$t('promotional_price')">
+                              <b-form-input
+                                  :state="getValidationState(validationContext)"
+                                  aria-describedby="ProductPrice-feedback"
+                                  label="Price"
+                                  :placeholder="$t('Enter_Promotional_Price')"
+                                  v-model="product.promotional_price"
+                              ></b-form-input>
+
+                              <b-form-invalid-feedback
+                                  id="ProductPrice-feedback"
+                              >{{ validationContext.errors[0] }}
+                              </b-form-invalid-feedback>
+                          </b-form-group>
+                      </validation-provider>
+                  </b-col>
+
                 <div class="col-md-9 mb-3 mt-3" v-if="product.type == 'is_variant'">
                   <div class="d-flex">
                     <input
@@ -420,7 +486,7 @@
                 </div>
               </b-row>
             </b-card>
-           
+
             <b-card class="mt-3">
               <b-row>
                 <!-- Product_Has_Imei_Serial_number -->
@@ -527,7 +593,7 @@ export default {
         type: "",
         name: "",
         code: "",
-        Type_barcode: "",
+        type_barcode: "",
         cost: "",
         price: "",
         brand_id: "",
@@ -564,7 +630,7 @@ export default {
             (Math.pow(10, 8) - Math.pow(10, 7) - 1)
       );
     },
-    
+
     //------------- Submit Validation Update Product
     Submit_Product() {
       this.$refs.Edit_Product.validate().then(success => {
@@ -624,7 +690,7 @@ export default {
               "Please Enter the Variant",
               this.$t("Warning")
             );
-            
+
           }
       }
     },
@@ -637,7 +703,7 @@ export default {
       }
     },
 
-   
+
 
     //------ event upload Image Success
     uploadImageSuccess(formData, index, fileList, imageArray) {
@@ -695,7 +761,7 @@ export default {
 
     //------------------------------ Update Product ------------------------------\\
     Update_Product() {
-      
+
       NProgress.start();
       NProgress.set(0.1);
       var self = this;
@@ -712,7 +778,7 @@ export default {
       Object.entries(self.product).forEach(([key, value]) => {
           self.data.append(key, value);
       });
-                
+
       //append array variants
       if (self.variants.length) {
           for (var i = 0; i < self.variants.length; i++) {

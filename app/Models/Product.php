@@ -7,12 +7,18 @@ use Illuminate\Database\Eloquent\Model;
 class Product extends Model
 {
 
-    protected $dates = ['deleted_at'];
+    protected $dates = [
+        'deleted_at',
+        'promotional_start_date' => 'date:Y-m-d',
+        'promotional_end_date' => 'date:Y-m-d',
+    ];
 
     protected $fillable = [
-        'code', 'Type_barcode', 'name', 'cost', 'price', 'unit_id', 'unit_sale_id', 'unit_purchase_id',
-        'stock_alert', 'category_id', 'sub_category_id', 'is_variant','is_imei',
-        'tax_method', 'image', 'brand_id', 'is_active', 'note','type'
+        'code', 'type_barcode', 'name', 'cost', 'price', 'unit_id', 'unit_sale_id', 'unit_purchase_id',
+        'stock_alert', 'category_id', 'sub_category_id', 'is_variant', 'is_imei',
+        'tax_method', 'image', 'brand_id', 'is_active', 'note', 'type', 'promotional_price',
+        'promotional_start_date',
+        'promotional_end_date',
     ];
 
     protected $casts = [
@@ -29,7 +35,12 @@ class Product extends Model
         'price' => 'double',
         'stock_alert' => 'double',
         'TaxNet' => 'double',
+        'promotional_price' => 'double',
+
     ];
+
+
+    protected $appends = ['active_price'];
 
     public function ProductVariant()
     {
@@ -75,5 +86,20 @@ class Product extends Model
     {
         return $this->belongsTo('App\Models\Brand');
     }
+
+    public function getActivePrice()
+    {
+
+        // if promotional price is not null and start date and end date is not null and within the range
+        if ($this->promotional_price != null && $this->promotional_start_date != null && $this->promotional_end_date != null) {
+            $today = date('Y-m-d');
+            if ($today >= $this->promotional_start_date && $today <= $this->promotional_end_date) {
+                return $this->promotional_price;
+            }
+        }
+
+        return $this->price;
+    }
+
 
 }
