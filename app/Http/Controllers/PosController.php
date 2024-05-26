@@ -11,7 +11,7 @@ use App\Models\DraftSaleDetail;
 use App\Models\PaymentSale;
 use App\Models\PaymentWithCreditCard;
 use App\Models\Product;
-use App\Models\product_warehouse;
+use App\Models\ProductWarehouse;
 use App\Models\ProductVariant;
 use App\Models\Role;
 use App\Models\Sale;
@@ -87,7 +87,7 @@ class PosController extends BaseController
                 ];
 
                 if ($value['product_variant_id'] !== null) {
-                    $product_warehouse = product_warehouse::where('warehouse_id', $order->warehouse_id)
+                    $product_warehouse = ProductWarehouse::where('warehouse_id', $order->warehouse_id)
                         ->where('product_id', $value['product_id'])->where('product_variant_id', $value['product_variant_id'])
                         ->first();
 
@@ -101,7 +101,7 @@ class PosController extends BaseController
                     }
 
                 } else {
-                    $product_warehouse = product_warehouse::where('warehouse_id', $order->warehouse_id)
+                    $product_warehouse = ProductWarehouse::where('warehouse_id', $order->warehouse_id)
                         ->where('product_id', $value['product_id'])
                         ->first();
                     if ($unit && $product_warehouse) {
@@ -484,7 +484,7 @@ class PosController extends BaseController
                     ];
 
                     if ($value['product_variant_id'] !== null) {
-                        $product_warehouse = product_warehouse::where('warehouse_id', $order->warehouse_id)
+                        $product_warehouse = ProductWarehouse::where('warehouse_id', $order->warehouse_id)
                             ->where('product_id', $value['product_id'])->where('product_variant_id', $value['product_variant_id'])
                             ->first();
 
@@ -498,7 +498,7 @@ class PosController extends BaseController
                         }
 
                     } else {
-                        $product_warehouse = product_warehouse::where('warehouse_id', $order->warehouse_id)
+                        $product_warehouse = ProductWarehouse::where('warehouse_id', $order->warehouse_id)
                             ->where('product_id', $value['product_id'])
                             ->first();
                         if ($unit && $product_warehouse) {
@@ -760,7 +760,7 @@ class PosController extends BaseController
 
 
             if ($detail->product_variant_id) {
-                $item_product = product_warehouse::where('product_id', $detail->product_id)
+                $item_product = ProductWarehouse::where('product_id', $detail->product_id)
                     ->whereNull('deleted_at')
                     ->where('product_variant_id', $detail->product_variant_id)
                     ->where('warehouse_id', $draft_sale_data->warehouse_id)
@@ -783,7 +783,7 @@ class PosController extends BaseController
                 }
 
             } else {
-                $item_product = product_warehouse::where('product_id', $detail->product_id)
+                $item_product = ProductWarehouse::where('product_id', $detail->product_id)
                     ->whereNull('deleted_at')->where('warehouse_id', $draft_sale_data->warehouse_id)
                     ->where('product_variant_id', '=', null)->first();
 
@@ -879,7 +879,7 @@ class PosController extends BaseController
         $offSet = ($pageStart * $perPage) - $perPage;
         $data = array();
 
-        $product_warehouse_data = product_warehouse::where('warehouse_id', $request->warehouse_id)
+        $product_warehouse_data = ProductWarehouse::where('warehouse_id', $request->warehouse_id)
             ->with('product', 'product.unitSale')
             ->whereNull('deleted_at')
             ->where(function ($query) use ($request) {

@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Role extends Model
 {
+    use HasFactory;
+
     protected $guarded = ['id'];
-    protected $fillable = array('name','status', 'label', 'description');
+    protected $fillable = array('name', 'status', 'label', 'description');
 
     public function permissions()
     {
@@ -18,20 +21,22 @@ class Role extends Model
     {
         return $this->permissions()->save($permission);
     }
+
     /**
      * Determine if the user may perform the given permission.
      *
-     * @param  Permission $permission
+     * @param Permission $permission
      * @return boolean
      */
     public function hasPermission(Permission $permission, User $user)
     {
         return $this->hasRole($permission->roles);
     }
+
     /**
      * Determine if the role has the given permission.
      *
-     * @param  mixed $permission
+     * @param mixed $permission
      * @return boolean
      */
     public function inRole($permission)

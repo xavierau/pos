@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Permission extends Model
 {
+    use HasFactory;
+
     protected $guarded = ['id'];
     protected $fillable = array('name', 'label', 'description');
 
@@ -13,10 +16,11 @@ class Permission extends Model
     {
         return $this->belongsToMany(Role::class);
     }
+
     /**
      * Determine if the permission belongs to the role.
      *
-     * @param  mixed $role
+     * @param mixed $role
      * @return boolean
      */
     public function inRole($role)

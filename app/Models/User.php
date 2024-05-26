@@ -2,13 +2,16 @@
 
 namespace App\Models;
 
+use Database\Factories\UserFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, Notifiable;
+    use HasApiTokens, Notifiable, HasFactory;
+
     protected $dates = ['deleted_at'];
 
     /**
@@ -17,7 +20,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'firstname', 'lastname', 'username', 'email', 'password', 'phone', 'status', 'avatar', 'role_id','is_all_warehouses'
+        'firstname', 'lastname', 'username', 'email', 'password', 'phone', 'status', 'avatar', 'role_id', 'is_all_warehouses'
     ];
 
     /**
@@ -67,6 +70,11 @@ class User extends Authenticatable
     public function assignedWarehouses()
     {
         return $this->belongsToMany('App\Models\Warehouse');
+    }
+
+    protected static function newFactory()
+    {
+        return UserFactory::new();
     }
 
 }

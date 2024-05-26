@@ -1,0 +1,13 @@
+{
+    "name": "SimplePOSLogin",
+    "alias": "simpleposlogin",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\SimplePOSLogin\\Providers\\SimplePOSLoginServiceProvider"
+    ],
+    "aliases": {},
+    "files": [],
+    "requires": []
+}

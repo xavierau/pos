@@ -8,7 +8,7 @@ use App\Models\Unit;
 use App\Models\PaymentSaleReturns;
 use App\Models\Product;
 use App\Models\ProductVariant;
-use App\Models\product_warehouse;
+use App\Models\ProductWarehouse;
 use App\Models\Role;
 use App\Models\Sale;
 use App\Models\SaleDetail;
@@ -217,7 +217,7 @@ class SalesReturnController extends BaseController
 
                 if ($order->status == "received") {
                     if ($value['product_variant_id'] !== null) {
-                        $product_warehouse = product_warehouse::where('deleted_at', '=', null)
+                        $product_warehouse = ProductWarehouse::where('deleted_at', '=', null)
                             ->where('warehouse_id', $order->warehouse_id)
                             ->where('product_id', $value['product_id'])
                             ->where('product_variant_id', $value['product_variant_id'])
@@ -234,7 +234,7 @@ class SalesReturnController extends BaseController
                         }
 
                     } else {
-                        $product_warehouse = product_warehouse::where('deleted_at', '=', null)
+                        $product_warehouse = ProductWarehouse::where('deleted_at', '=', null)
                             ->where('warehouse_id', $order->warehouse_id)
                             ->where('product_id', $value['product_id'])
                             ->first();
@@ -308,7 +308,7 @@ class SalesReturnController extends BaseController
                 if($value['sale_unit_id'] !== null){
                     if ($current_SaleReturn->status == "received") {
                         if ($value['product_variant_id'] !== null) {
-                            $product_warehouse = product_warehouse::where('deleted_at', '=', null)->where('warehouse_id', $current_SaleReturn->warehouse_id)
+                            $product_warehouse = ProductWarehouse::where('deleted_at', '=', null)->where('warehouse_id', $current_SaleReturn->warehouse_id)
                                 ->where('product_id', $value['product_id'])->where('product_variant_id', $value['product_variant_id'])
                                 ->first();
 
@@ -322,7 +322,7 @@ class SalesReturnController extends BaseController
                             }
 
                         } else {
-                            $product_warehouse = product_warehouse::where('deleted_at', '=', null)->where('warehouse_id', $current_SaleReturn->warehouse_id)
+                            $product_warehouse = ProductWarehouse::where('deleted_at', '=', null)->where('warehouse_id', $current_SaleReturn->warehouse_id)
                                 ->where('product_id', $value['product_id'])
                                 ->first();
 
@@ -358,7 +358,7 @@ class SalesReturnController extends BaseController
                     if ($request['status'] == "received") {
 
                         if ($product_detail['product_variant_id'] !== null) {
-                            $product_warehouse = product_warehouse::where('deleted_at', '=', null)
+                            $product_warehouse = ProductWarehouse::where('deleted_at', '=', null)
                                 ->where('warehouse_id', $request->warehouse_id)
                                 ->where('product_id', $product_detail['product_id'])
                                 ->where('product_variant_id', $product_detail['product_variant_id'])
@@ -374,7 +374,7 @@ class SalesReturnController extends BaseController
                             }
 
                         } else {
-                            $product_warehouse = product_warehouse::where('deleted_at', '=', null)
+                            $product_warehouse = ProductWarehouse::where('deleted_at', '=', null)
                                 ->where('warehouse_id', $request->warehouse_id)
                                 ->where('product_id', $product_detail['product_id'])
                                 ->first();
@@ -475,7 +475,7 @@ class SalesReturnController extends BaseController
 
                 if ($current_SaleReturn->status == "received") {
                     if ($value['product_variant_id'] !== null) {
-                        $product_warehouse = product_warehouse::where('deleted_at', '=', null)->where('warehouse_id', $current_SaleReturn->warehouse_id)
+                        $product_warehouse = ProductWarehouse::where('deleted_at', '=', null)->where('warehouse_id', $current_SaleReturn->warehouse_id)
                             ->where('product_id', $value['product_id'])->where('product_variant_id', $value['product_variant_id'])
                             ->first();
 
@@ -489,7 +489,7 @@ class SalesReturnController extends BaseController
                         }
 
                     } else {
-                        $product_warehouse = product_warehouse::where('deleted_at', '=', null)->where('warehouse_id', $current_SaleReturn->warehouse_id)
+                        $product_warehouse = ProductWarehouse::where('deleted_at', '=', null)->where('warehouse_id', $current_SaleReturn->warehouse_id)
                             ->where('product_id', $value['product_id'])
                             ->first();
 
@@ -575,7 +575,7 @@ class SalesReturnController extends BaseController
 
                    if ($current_SaleReturn->status == "received") {
                        if ($value['product_variant_id'] !== null) {
-                           $product_warehouse = product_warehouse::where('deleted_at', '=', null)->where('warehouse_id', $current_SaleReturn->warehouse_id)
+                           $product_warehouse = ProductWarehouse::where('deleted_at', '=', null)->where('warehouse_id', $current_SaleReturn->warehouse_id)
                                ->where('product_id', $value['product_id'])->where('product_variant_id', $value['product_variant_id'])
                                ->first();
 
@@ -589,7 +589,7 @@ class SalesReturnController extends BaseController
                            }
 
                        } else {
-                           $product_warehouse = product_warehouse::where('deleted_at', '=', null)->where('warehouse_id', $current_SaleReturn->warehouse_id)
+                           $product_warehouse = ProductWarehouse::where('deleted_at', '=', null)->where('warehouse_id', $current_SaleReturn->warehouse_id)
                                ->where('product_id', $value['product_id'])
                                ->first();
 
@@ -867,7 +867,7 @@ class SalesReturnController extends BaseController
             }
 
             if ($detail->product_variant_id) {
-                $item_product = product_warehouse::where('product_id', $detail->product_id)
+                $item_product = ProductWarehouse::where('product_id', $detail->product_id)
                     ->where('product_variant_id', $detail->product_variant_id)
                     ->where('deleted_at', '=', null)
                     ->where('warehouse_id', $SaleReturn->warehouse_id)
@@ -882,7 +882,7 @@ class SalesReturnController extends BaseController
                 $data['name'] = '['.$productsVariants->name . ']' . $detail['product']['name'];
 
             } else {
-                $item_product = product_warehouse::where('product_id', $detail->product_id)
+                $item_product = ProductWarehouse::where('product_id', $detail->product_id)
                     ->where('warehouse_id', $SaleReturn->warehouse_id)
                     ->where('deleted_at', '=', null)->where('product_variant_id', '=', null)
                     ->first();
@@ -1101,7 +1101,7 @@ class SalesReturnController extends BaseController
             }
 
             if ($detail->product_variant_id) {
-                $item_product = product_warehouse::where('product_id', $detail->product_id)
+                $item_product = ProductWarehouse::where('product_id', $detail->product_id)
                     ->where('product_variant_id', $detail->product_variant_id)
                     ->where('deleted_at', '=', null)
                     ->where('warehouse_id', $SaleReturn->warehouse_id)
@@ -1117,7 +1117,7 @@ class SalesReturnController extends BaseController
                 $data['name'] = '['.$productsVariants->name . ']' . $detail['product']['name'];
 
             } else {
-                $item_product = product_warehouse::where('product_id', $detail->product_id)
+                $item_product = ProductWarehouse::where('product_id', $detail->product_id)
                     ->where('warehouse_id', $SaleReturn->warehouse_id)
                     ->where('deleted_at', '=', null)->where('product_variant_id', '=', null)
                     ->first();

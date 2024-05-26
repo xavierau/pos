@@ -19,7 +19,7 @@ use App\Models\Client;
 use App\Models\Product;
 use App\Models\Unit;
 use App\Models\ProductVariant;
-use App\Models\product_warehouse;
+use App\Models\ProductWarehouse;
 use App\Models\Quotation;
 use App\Models\QuotationDetail;
 use App\Models\Role;
@@ -671,7 +671,7 @@ class QuotationsController extends BaseController
             }
 
             if ($detail->product_variant_id) {
-                $item_product = product_warehouse::where('product_id', $detail->product_id)
+                $item_product = ProductWarehouse::where('product_id', $detail->product_id)
                     ->where('product_variant_id', $detail->product_variant_id)
                     ->where('warehouse_id', $Quotation->warehouse_id)
                     ->where('deleted_at', '=', null)
@@ -695,7 +695,7 @@ class QuotationsController extends BaseController
                 }
 
             } else {
-                $item_product = product_warehouse::where('product_id', $detail->product_id)
+                $item_product = ProductWarehouse::where('product_id', $detail->product_id)
                     ->where('deleted_at', '=', null)
                     ->where('warehouse_id', $Quotation->warehouse_id)
                     ->where('product_variant_id', '=', null)

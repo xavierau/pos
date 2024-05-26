@@ -16,7 +16,7 @@ use App\Models\TransferDetail;
 use App\Models\Adjustment;
 use App\Models\AdjustmentDetail;
 use App\Models\ProductVariant;
-use App\Models\product_warehouse;
+use App\Models\ProductWarehouse;
 use App\Models\Provider;
 use App\Models\Purchase;
 use App\Models\Setting;
@@ -1472,7 +1472,7 @@ class ReportController extends BaseController
     {
         $this->authorizeForUser($request->user('api'), 'WarehouseStock', Product::class);
 
-        $stock_count = product_warehouse::join('products', 'product_warehouse.product_id', '=', 'products.id')
+        $stock_count = ProductWarehouse::join('products', 'product_warehouse.product_id', '=', 'products.id')
             ->join('warehouses', 'product_warehouse.warehouse_id', '=', 'warehouses.id')
             ->where('product_warehouse.deleted_at', '=', null)
             ->select(
@@ -1484,7 +1484,7 @@ class ReportController extends BaseController
             ->groupBy('warehouses.name')
             ->get();
 
-        $stock_value = product_warehouse::join('products', 'product_warehouse.product_id', '=', 'products.id')
+        $stock_value = ProductWarehouse::join('products', 'product_warehouse.product_id', '=', 'products.id')
             ->join('warehouses', 'product_warehouse.warehouse_id', '=', 'warehouses.id')
             ->where('product_warehouse.deleted_at', '=', null)
             ->select(
@@ -1526,7 +1526,7 @@ class ReportController extends BaseController
     public function count_quantity_alert(request $request)
     {
 
-        $products_alerts = product_warehouse::join('products', 'product_warehouse.product_id', '=', 'products.id')
+        $products_alerts = ProductWarehouse::join('products', 'product_warehouse.product_id', '=', 'products.id')
             ->whereRaw('qte <= stock_alert')
             ->count();
 
@@ -2860,7 +2860,7 @@ class ReportController extends BaseController
                 $item['name'] = $product->name;
                 $item['category'] = $product['category']->name;
 
-                $current_stock = product_warehouse::where('product_id', $product->id)
+                $current_stock = ProductWarehouse::where('product_id', $product->id)
                 ->where('deleted_at', '=', null)
                 ->whereIn('warehouse_id', $warehouses_id)
                 ->where(function ($query) use ($request) {
@@ -4488,7 +4488,7 @@ class ReportController extends BaseController
                 $item['variant_name']  .= '<br>';
 
 
-                $current_stock = product_warehouse::where('product_id', $product->id)
+                $current_stock = ProductWarehouse::where('product_id', $product->id)
                 ->where('product_variant_id', $product_variant->id)
                 ->where(function ($query) use ($warehouse_id, $array_warehouses_id) {
                     if ($warehouse_id !== 0) {
@@ -4516,7 +4516,7 @@ class ReportController extends BaseController
 
             $item['variant_name'] = '---';
 
-            $current_stock = product_warehouse::where('product_id', $product->id)
+            $current_stock = ProductWarehouse::where('product_id', $product->id)
             ->where(function ($query) use ($warehouse_id, $array_warehouses_id) {
                 if ($warehouse_id !== 0) {
                     return  $query->where('warehouse_id', $warehouse_id);

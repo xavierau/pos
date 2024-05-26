@@ -153,7 +153,7 @@ Route::middleware(['auth:api', 'Is_Active'])->group(function () {
     //--------------------------------------------------------------------\\
     Route::resource('attendances', 'hrm\AttendancesController');
     Route::get("daily_attendance", "hrm\AttendancesController@daily_attendance")->name('daily_attendance');
-    Route::post('attendance_by_employee/{id}', 'hrm\EmployeeSessionController@attendance_by_employee')->name('attendance_by_employee.post');
+//    Route::post('attendance_by_employee/{id}', 'hrm\EmployeeSessionController@attendance_by_employee')->name('attendance_by_employee.post');
     Route::post("attendances/delete/by_selection", "hrm\AttendancesController@delete_by_selection");
 
 

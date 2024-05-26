@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class Product extends Model
@@ -74,7 +75,7 @@ class Product extends Model
 
     public function unitPurchase()
     {
-        return $this->belongsTo('App\Models\Unit', 'unit_purchase_id');
+        return $this->belongsTo(Unit::class, 'unit_purchase_id');
     }
 
     public function unitSale()
@@ -100,6 +101,78 @@ class Product extends Model
 
         return $this->price;
     }
+
+    public function check_code_exist($code)
+    {
+        $check_code = Product::where('code', $code)->whereNull('deleted_at')->first();
+        if ($check_code) {
+            $this->generate_random_code($code);
+        } else {
+            return $code;
+        }
+    }
+
+    public function generate_random_code($value_code)
+    {
+        if ($value_code == '') {
+            $gen_code = substr(number_format(time() * mt_rand(), 0, '', ''), 0, 8);
+            $this->check_code_exist($gen_code);
+        } else {
+            $this->check_code_exist($value_code);
+        }
+    }
+
+    // region scopes
+
+    public function scopeSearch(Builder $query, ?string $search)
+    {
+        return $search ?
+            $query->where('products.name', 'LIKE', "%{$search}%")
+            ->orWhere('products.code', 'LIKE', "%{$search}%")
+            ->orWhere(fn($query) => $query->whereHas('category', fn($q) => $q->where('name', 'LIKE', "%{$search}%")))
+            ->orWhere(fn($query) => $query->whereHas('brand', fn($q) => $q->where('name', 'LIKE', "%{$search}%"))) :
+            $query;
+    }
+
+    // endregion
+
+    // region helpers
+
+    public function getUnitPurchaseCost()
+    {
+        if (!$this->unitPurchase) {
+            return 0;
+        }
+
+        return $this->unitPurchase->operator == '/' ?
+            $this->cost / $this->unitPurchase->operator_value :
+            $this->cost * $this->unitPurchase->operator_value;
+    }
+
+    public function getUnitPrice()
+    {
+        if (!$this->unitSale) {
+            return $this->price;
+        }
+
+        return $this->unitSale->operator == '/' ?
+            $this->price / $this->unitSale->operator_value :
+            $this->price * $this->unitSale->operator_value;
+    }
+
+    public function removeImages(): void
+    {
+        foreach (explode(',', $this->image) as $img) {
+            $pathIMG = public_path() . '/images/products/' . $img;
+            if (file_exists($pathIMG)) {
+                if ($img != 'no-image.png') {
+                    @unlink($pathIMG);
+                }
+            }
+        }
+    }
+
+    // endregion
 
 
 }

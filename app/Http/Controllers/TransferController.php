@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\ProductVariant;
-use App\Models\product_warehouse;
+use App\Models\ProductWarehouse;
 use App\Models\Role;
 use App\Models\Unit;
 use App\Models\Transfer;
@@ -147,7 +147,7 @@ class TransferController extends BaseController
                     if ($value['product_variant_id'] !== null) {
 
                         //--------- eliminate the quantity ''from_warehouse''--------------\\
-                        $product_warehouse_from = product_warehouse::where('deleted_at', '=', null)
+                        $product_warehouse_from = ProductWarehouse::where('deleted_at', '=', null)
                             ->where('warehouse_id', $request->transfer['from_warehouse'])
                             ->where('product_id', $value['product_id'])
                             ->where('product_variant_id', $value['product_variant_id'])
@@ -163,7 +163,7 @@ class TransferController extends BaseController
                         }
 
                         //--------- ADD the quantity ''TO_warehouse''------------------\\
-                        $product_warehouse_to = product_warehouse::where('deleted_at', '=', null)
+                        $product_warehouse_to = ProductWarehouse::where('deleted_at', '=', null)
                             ->where('warehouse_id', $request->transfer['to_warehouse'])
                             ->where('product_id', $value['product_id'])
                             ->where('product_variant_id', $value['product_variant_id'])
@@ -181,7 +181,7 @@ class TransferController extends BaseController
                     } else {
 
                         //--------- eliminate the quantity ''from_warehouse''--------------\\
-                        $product_warehouse_from = product_warehouse::where('deleted_at', '=', null)
+                        $product_warehouse_from = ProductWarehouse::where('deleted_at', '=', null)
                             ->where('warehouse_id', $request->transfer['from_warehouse'])
                             ->where('product_id', $value['product_id'])->first();
 
@@ -195,7 +195,7 @@ class TransferController extends BaseController
                         }
 
                         //--------- ADD the quantity ''TO_warehouse''------------------\\
-                        $product_warehouse_to = product_warehouse::where('deleted_at', '=', null)
+                        $product_warehouse_to = ProductWarehouse::where('deleted_at', '=', null)
                             ->where('warehouse_id', $request->transfer['to_warehouse'])
                             ->where('product_id', $value['product_id'])->first();
 
@@ -213,7 +213,7 @@ class TransferController extends BaseController
 
                     if ($value['product_variant_id'] !== null) {
 
-                        $product_warehouse_from = product_warehouse::where('deleted_at', '=', null)
+                        $product_warehouse_from = ProductWarehouse::where('deleted_at', '=', null)
                             ->where('warehouse_id', $request->transfer['from_warehouse'])
                             ->where('product_id', $value['product_id'])
                             ->where('product_variant_id', $value['product_variant_id'])
@@ -230,7 +230,7 @@ class TransferController extends BaseController
 
                     } else {
 
-                        $product_warehouse_from = product_warehouse::where('deleted_at', '=', null)
+                        $product_warehouse_from = ProductWarehouse::where('deleted_at', '=', null)
                             ->where('warehouse_id', $request->transfer['from_warehouse'])
                             ->where('product_id', $value['product_id'])->first();
 
@@ -319,7 +319,7 @@ class TransferController extends BaseController
                     if ($current_Transfer->status == "completed") {
                         if ($value['product_variant_id'] !== null) {
 
-                            $warehouse_from_variant = product_warehouse::where('deleted_at', '=', null)
+                            $warehouse_from_variant = ProductWarehouse::where('deleted_at', '=', null)
                                 ->where('warehouse_id', $current_Transfer->from_warehouse_id)
                                 ->where('product_id', $value['product_id'])
                                 ->where('product_variant_id', $value['product_variant_id'])
@@ -334,7 +334,7 @@ class TransferController extends BaseController
                                 $warehouse_from_variant->save();
                             }
 
-                            $warehouse_To_variant = product_warehouse::where('deleted_at', '=', null)
+                            $warehouse_To_variant = ProductWarehouse::where('deleted_at', '=', null)
                                 ->where('warehouse_id', $current_Transfer->to_warehouse_id)
                                 ->where('product_id', $value['product_id'])
                                 ->where('product_variant_id', $value['product_variant_id'])
@@ -350,7 +350,7 @@ class TransferController extends BaseController
                             }
 
                         } else {
-                            $warehouse_from = product_warehouse::where('deleted_at', '=', null)
+                            $warehouse_from = ProductWarehouse::where('deleted_at', '=', null)
                                 ->where('warehouse_id', $current_Transfer->from_warehouse_id)
                                 ->where('product_id', $value['product_id'])->first();
 
@@ -363,7 +363,7 @@ class TransferController extends BaseController
                                 $warehouse_from->save();
                             }
 
-                            $warehouse_To = product_warehouse::where('deleted_at', '=', null)
+                            $warehouse_To = ProductWarehouse::where('deleted_at', '=', null)
                                 ->where('warehouse_id', $current_Transfer->to_warehouse_id)
                                 ->where('product_id', $value['product_id'])->first();
 
@@ -380,7 +380,7 @@ class TransferController extends BaseController
                     } elseif ($current_Transfer->status == "sent") {
                         if ($value['product_variant_id'] !== null) {
 
-                            $Sent_variant_To = product_warehouse::where('deleted_at', '=', null)
+                            $Sent_variant_To = ProductWarehouse::where('deleted_at', '=', null)
                                 ->where('warehouse_id', $current_Transfer->from_warehouse_id)
                                 ->where('product_id', $value['product_id'])
                                 ->where('product_variant_id', $value['product_variant_id'])
@@ -395,7 +395,7 @@ class TransferController extends BaseController
                                 $Sent_variant_To->save();
                             }
                         } else {
-                            $Sent_variant_From = product_warehouse::where('deleted_at', '=', null)
+                            $Sent_variant_From = ProductWarehouse::where('deleted_at', '=', null)
                                 ->where('warehouse_id', $current_Transfer->from_warehouse_id)
                                 ->where('product_id', $value['product_id'])->first();
 
@@ -428,7 +428,7 @@ class TransferController extends BaseController
                         if ($product_detail['product_variant_id'] !== null) {
 
                             //--------- eliminate the quantity ''from_warehouse''--------------\\
-                            $product_warehouse_from = product_warehouse::where('deleted_at', '=', null)
+                            $product_warehouse_from = ProductWarehouse::where('deleted_at', '=', null)
                                 ->where('warehouse_id', $Trans['from_warehouse'])
                                 ->where('product_id', $product_detail['product_id'])
                                 ->where('product_variant_id', $product_detail['product_variant_id'])
@@ -444,7 +444,7 @@ class TransferController extends BaseController
                             }
 
                             //--------- ADD the quantity ''TO_warehouse''------------------\\
-                            $product_warehouse_to = product_warehouse::where('deleted_at', '=', null)
+                            $product_warehouse_to = ProductWarehouse::where('deleted_at', '=', null)
                                 ->where('warehouse_id', $Trans['to_warehouse'])
                                 ->where('product_id', $product_detail['product_id'])
                                 ->where('product_variant_id', $product_detail['product_variant_id'])
@@ -462,7 +462,7 @@ class TransferController extends BaseController
                         } else {
 
                             //--------- eliminate the quantity ''from_warehouse''--------------\\
-                            $product_warehouse_from = product_warehouse::where('deleted_at', '=', null)
+                            $product_warehouse_from = ProductWarehouse::where('deleted_at', '=', null)
                                 ->where('warehouse_id', $Trans['from_warehouse'])
                                 ->where('product_id', $product_detail['product_id'])->first();
 
@@ -476,7 +476,7 @@ class TransferController extends BaseController
                             }
 
                             //--------- ADD the quantity ''TO_warehouse''------------------\\
-                            $product_warehouse_to = product_warehouse::where('deleted_at', '=', null)
+                            $product_warehouse_to = ProductWarehouse::where('deleted_at', '=', null)
                                 ->where('warehouse_id', $Trans['to_warehouse'])
                                 ->where('product_id', $product_detail['product_id'])->first();
 
@@ -494,7 +494,7 @@ class TransferController extends BaseController
 
                         if ($product_detail['product_variant_id'] !== null) {
 
-                            $product_warehouse_from = product_warehouse::where('deleted_at', '=', null)
+                            $product_warehouse_from = ProductWarehouse::where('deleted_at', '=', null)
                                 ->where('warehouse_id', $Trans['from_warehouse'])
                                 ->where('product_id', $product_detail['product_id'])
                                 ->where('product_variant_id', $product_detail['product_variant_id'])
@@ -511,7 +511,7 @@ class TransferController extends BaseController
 
                         } else {
 
-                            $product_warehouse_from = product_warehouse::where('deleted_at', '=', null)
+                            $product_warehouse_from = ProductWarehouse::where('deleted_at', '=', null)
                                 ->where('warehouse_id', $Trans['from_warehouse'])
                                 ->where('product_id', $product_detail['product_id'])->first();
 
@@ -598,7 +598,7 @@ class TransferController extends BaseController
                 if ($current_Transfer->status == "completed") {
                     if ($value['product_variant_id'] !== null) {
 
-                        $warehouse_from_variant = product_warehouse::where('deleted_at', '=', null)
+                        $warehouse_from_variant = ProductWarehouse::where('deleted_at', '=', null)
                             ->where('warehouse_id', $current_Transfer->from_warehouse_id)
                             ->where('product_id', $value['product_id'])
                             ->where('product_variant_id', $value['product_variant_id'])
@@ -613,7 +613,7 @@ class TransferController extends BaseController
                             $warehouse_from_variant->save();
                         }
 
-                        $warehouse_To_variant = product_warehouse::where('deleted_at', '=', null)
+                        $warehouse_To_variant = ProductWarehouse::where('deleted_at', '=', null)
                             ->where('warehouse_id', $current_Transfer->to_warehouse_id)
                             ->where('product_id', $value['product_id'])
                             ->where('product_variant_id', $value['product_variant_id'])
@@ -629,7 +629,7 @@ class TransferController extends BaseController
                         }
 
                     } else {
-                        $warehouse_from = product_warehouse::where('deleted_at', '=', null)
+                        $warehouse_from = ProductWarehouse::where('deleted_at', '=', null)
                             ->where('warehouse_id', $current_Transfer->from_warehouse_id)
                             ->where('product_id', $value['product_id'])->first();
 
@@ -642,7 +642,7 @@ class TransferController extends BaseController
                             $warehouse_from->save();
                         }
 
-                        $warehouse_To = product_warehouse::where('deleted_at', '=', null)
+                        $warehouse_To = ProductWarehouse::where('deleted_at', '=', null)
                             ->where('warehouse_id', $current_Transfer->to_warehouse_id)
                             ->where('product_id', $value['product_id'])->first();
 
@@ -659,7 +659,7 @@ class TransferController extends BaseController
                 } elseif ($current_Transfer->status == "sent") {
                     if ($value['product_variant_id'] !== null) {
 
-                        $Sent_variant_To = product_warehouse::where('deleted_at', '=', null)
+                        $Sent_variant_To = ProductWarehouse::where('deleted_at', '=', null)
                             ->where('warehouse_id', $current_Transfer->from_warehouse_id)
                             ->where('product_id', $value['product_id'])
                             ->where('product_variant_id', $value['product_variant_id'])
@@ -674,7 +674,7 @@ class TransferController extends BaseController
                             $Sent_variant_To->save();
                         }
                     } else {
-                        $Sent_variant_From = product_warehouse::where('deleted_at', '=', null)
+                        $Sent_variant_From = ProductWarehouse::where('deleted_at', '=', null)
                             ->where('warehouse_id', $current_Transfer->from_warehouse_id)
                             ->where('product_id', $value['product_id'])->first();
 
@@ -737,7 +737,7 @@ class TransferController extends BaseController
                if ($current_Transfer->status == "completed") {
                    if ($value['product_variant_id'] !== null) {
 
-                       $warehouse_from_variant = product_warehouse::where('deleted_at', '=', null)
+                       $warehouse_from_variant = ProductWarehouse::where('deleted_at', '=', null)
                            ->where('warehouse_id', $current_Transfer->from_warehouse_id)
                            ->where('product_id', $value['product_id'])
                            ->where('product_variant_id', $value['product_variant_id'])
@@ -752,7 +752,7 @@ class TransferController extends BaseController
                            $warehouse_from_variant->save();
                        }
 
-                       $warehouse_To_variant = product_warehouse::where('deleted_at', '=', null)
+                       $warehouse_To_variant = ProductWarehouse::where('deleted_at', '=', null)
                            ->where('warehouse_id', $current_Transfer->to_warehouse_id)
                            ->where('product_id', $value['product_id'])
                            ->where('product_variant_id', $value['product_variant_id'])
@@ -768,7 +768,7 @@ class TransferController extends BaseController
                        }
 
                    } else {
-                       $warehouse_from = product_warehouse::where('deleted_at', '=', null)
+                       $warehouse_from = ProductWarehouse::where('deleted_at', '=', null)
                            ->where('warehouse_id', $current_Transfer->from_warehouse_id)
                            ->where('product_id', $value['product_id'])->first();
 
@@ -781,7 +781,7 @@ class TransferController extends BaseController
                            $warehouse_from->save();
                        }
 
-                       $warehouse_To = product_warehouse::where('deleted_at', '=', null)
+                       $warehouse_To = ProductWarehouse::where('deleted_at', '=', null)
                            ->where('warehouse_id', $current_Transfer->to_warehouse_id)
                            ->where('product_id', $value['product_id'])->first();
 
@@ -798,7 +798,7 @@ class TransferController extends BaseController
                } elseif ($current_Transfer->status == "sent") {
                    if ($value['product_variant_id'] !== null) {
 
-                       $Sent_variant_To = product_warehouse::where('deleted_at', '=', null)
+                       $Sent_variant_To = ProductWarehouse::where('deleted_at', '=', null)
                            ->where('warehouse_id', $current_Transfer->from_warehouse_id)
                            ->where('product_id', $value['product_id'])
                            ->where('product_variant_id', $value['product_variant_id'])
@@ -813,7 +813,7 @@ class TransferController extends BaseController
                            $Sent_variant_To->save();
                        }
                    } else {
-                       $Sent_variant_From = product_warehouse::where('deleted_at', '=', null)
+                       $Sent_variant_From = ProductWarehouse::where('deleted_at', '=', null)
                            ->where('warehouse_id', $current_Transfer->from_warehouse_id)
                            ->where('product_id', $value['product_id'])->first();
 
@@ -924,7 +924,7 @@ class TransferController extends BaseController
             }
 
             if ($detail->product_variant_id) {
-                $item_product = product_warehouse::where('product_id', $detail->product_id)
+                $item_product = ProductWarehouse::where('product_id', $detail->product_id)
                     ->where('deleted_at', '=', null)
                     ->where('product_variant_id', $detail->product_variant_id)
                     ->where('warehouse_id', $Transfer_data->from_warehouse_id)
@@ -949,7 +949,7 @@ class TransferController extends BaseController
                 $data['unitPurchase'] = $detail['product']['unitPurchase']->ShortName;
 
             } else {
-                $item_product = product_warehouse::where('product_id', $detail->product_id)
+                $item_product = ProductWarehouse::where('product_id', $detail->product_id)
                     ->where('deleted_at', '=', null)->where('warehouse_id', $Transfer_data->from_warehouse_id)
                     ->where('product_variant_id', '=', null)->first();
 

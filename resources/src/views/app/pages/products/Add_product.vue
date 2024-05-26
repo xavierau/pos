@@ -357,10 +357,10 @@
                                 </b-col>
 
                                 <!-- promotion price start date  -->
-                                <b-col lg="6" md="6" sm="12">
+                                <b-col lg="6" md="6" sm="12"
+                                       v-if="product.type == 'is_single' || product.type == 'is_service'">
                                     <validation-provider
                                         name="date"
-                                        :rules="{ required: true}"
                                         v-slot="validationContext"
                                     >
                                         <b-form-group :label="$t('promotional_start_date') + ' ' + '*'">
@@ -378,10 +378,10 @@
                                     </validation-provider>
                                 </b-col>
                                 <!-- promotion price end date  -->
-                                <b-col lg="6" md="6" sm="12">
+                                <b-col lg="6" md="6" sm="12"
+                                       v-if="product.type == 'is_single' || product.type == 'is_service'">
                                     <validation-provider
                                         name="date"
-                                        :rules="{ required: true}"
                                         v-slot="validationContext"
                                     >
                                         <b-form-group :label="$t('promotional_end_date') + ' ' + '*'">
@@ -399,7 +399,8 @@
                                     </validation-provider>
                                 </b-col>
                                 <!-- Promotional Price -->
-                                <b-col md="6" class="mb-2" v-if="product.type == 'is_single' || product.type == 'is_service'">
+                                <b-col md="6" class="mb-2"
+                                       v-if="product.type == 'is_single' || product.type == 'is_service'">
                                     <validation-provider
                                         name="Promotional Price"
                                         :rules="{ regex: /^\d*\.?\d*$/}"
@@ -410,6 +411,7 @@
                                                 :state="getValidationState(validationContext)"
                                                 aria-describedby="ProductPrice-feedback"
                                                 label="Price"
+                                                type="number"
                                                 :placeholder="$t('Enter_Promotional_Price')"
                                                 v-model="product.promotional_price"
                                             ></b-form-input>

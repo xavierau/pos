@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\ProductVariant;
-use App\Models\product_warehouse;
+use App\Models\ProductWarehouse;
 use App\Models\Warehouse;
 use Carbon\Carbon;
 use DB;
@@ -104,7 +104,7 @@ class WarehouseController extends Controller
                         ];
                     }
 
-                    product_warehouse::insert($product_warehouse);
+                    ProductWarehouse::insert($product_warehouse);
                 }
             }
 
@@ -117,7 +117,7 @@ class WarehouseController extends Controller
 
     public function show($id){
         //
-        
+
         }
 
     //-----------Update Warehouse --------------\\
@@ -153,7 +153,7 @@ class WarehouseController extends Controller
                 'deleted_at' => Carbon::now(),
             ]);
 
-            product_warehouse::where('warehouse_id', $id)->update([
+            ProductWarehouse::where('warehouse_id', $id)->update([
                 'deleted_at' => Carbon::now(),
             ]);
 
@@ -176,7 +176,7 @@ class WarehouseController extends Controller
                     'deleted_at' => Carbon::now(),
                 ]);
 
-                product_warehouse::where('warehouse_id', $warehouse_id)->update([
+                ProductWarehouse::where('warehouse_id', $warehouse_id)->update([
                     'deleted_at' => Carbon::now(),
                 ]);
             }

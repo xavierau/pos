@@ -193,7 +193,7 @@
                                                         :options="clients.map(clients => ({label: clients.name, value: clients.id}))"
                                                     />
                                                     <b-input-group-append>
-                                                        <b-button variant="primary" @click="New_Client()">
+                                                        <b-button variant="primary" @click="new_client()">
                               <span>
                                 <i class="i-Add-User"></i>
                               </span>
@@ -267,7 +267,7 @@
 
                                                                         <input
                                                                             class="form-control"
-                                                                            @keyup="Verified_Qty(detail,detail.detail_id)"
+                                                                            @keyup="verifiedQty(detail,detail.detail_id)"
                                                                             v-model.number="detail.quantity"
                                                                         >
 
@@ -1897,7 +1897,7 @@ export default {
                     }
                 } else {
                     if (this.verifiedForm()) {
-                        this.Create_Draft();
+                        this.create_draft();
                     } else {
                         NProgress.done();
                     }
@@ -1906,7 +1906,7 @@ export default {
         },
 
         //---------------------------------- Create Draft ------------------------------\\
-        Create_Draft() {
+        create_draft() {
             NProgress.start();
             NProgress.set(0.1);
             this.DraftProcessing = true;
@@ -2104,12 +2104,12 @@ export default {
                         this.$t("Failed")
                     );
                 } else {
-                    this.Create_Client();
+                    this.create_client();
                 }
             });
         },
         //---------------------------------------- Create new Customer -------------------------------\\
-        Create_Client() {
+        create_client() {
             axios
                 .post("clients", {
                     name: this.client.name,
@@ -2127,7 +2127,7 @@ export default {
                         this.$t("Create.TitleCustomer"),
                         this.$t("Success")
                     );
-                    this.Get_Client_Without_Paginate();
+                    this.get_all_clients();
                     this.$bvModal.hide("New_Customer");
                 })
                 .catch(error => {
@@ -2136,12 +2136,12 @@ export default {
                 });
         },
         //------------------------------ New Model (create Customer) -------------------------------\\
-        New_Client() {
-            this.reset_Form_client();
+        new_client() {
+            this.reset_form_client();
             this.$bvModal.show("New_Customer");
         },
         //-------------------------------- reset Form -------------------------------\\
-        reset_Form_client() {
+        reset_form_client() {
             this.client = {
                 id: "",
                 name: "",
@@ -2154,7 +2154,7 @@ export default {
             };
         },
         //------------------------------------ Get Clients Without Paginate -------------------------\\
-        Get_Client_Without_Paginate() {
+        get_all_clients() {
             axios
                 .get("get_clients_without_paginate")
                 .then(({data}) => (this.clients = data));
@@ -2581,7 +2581,7 @@ export default {
             this.GrandTotal = parseFloat(grand_total);
         },
         //-------Verified QTY
-        Verified_Qty(detail, id) {
+        verifiedQty(detail, id) {
             for (var i = 0; i < this.details.length; i++) {
                 if (this.details[i].detail_id === id) {
                     if (isNaN(detail.quantity)) {

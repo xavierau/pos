@@ -24,7 +24,6 @@ class CreateUsersTable extends Migration {
 			$table->string('password');
 			$table->string('avatar')->nullable();
 			$table->string('phone', 192);
-			$table->integer('role_id');
 			$table->boolean('status')->default(1);
 			$table->timestamps(6);
 			$table->softDeletes();
