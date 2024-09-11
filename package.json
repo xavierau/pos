@@ -27,6 +27,7 @@
         "jspdf-autotable": "^3.8.3",
         "jspdf-html2canvas": "^1.5.2",
         "laravel-mix": "^6.0.49",
+        "lodash": "^4.17.21",
         "lodash.orderby": "^4.6.0",
         "mini-css-extract-plugin": "^2.9.1",
         "mobile-device-detect": "^0.4.3",
@@ -81,5 +82,5 @@
         "webpack-cli": "^4.10.0",
         "webpack-i18n-extractor-plugin": "^2.0.7"
     },
-    "packageManager": "pnpm@9.9.0+sha512.60c18acd138bff695d339be6ad13f7e936eea6745660d4cc4a776d5247c540d0edee1a563695c183a66eb917ef88f2b4feb1fc25f32a7adcadc7aaf3438e99c1"
+    "packageManager": "yarn@1.22.22+sha1.ac34549e6aa8e7ead463a7407e1c7390f61a6610"
 }
