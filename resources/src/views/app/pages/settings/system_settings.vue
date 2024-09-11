@@ -71,13 +71,13 @@
                       :rules="{ required: true}"
                       v-slot="validationContext"
                     >
-                      <b-form-group :label="$t('CompanyName') + ' ' + '*'">
+                      <b-form-group :label="$t('company_name') + ' ' + '*'">
                         <b-form-input
                           :state="getValidationState(validationContext)"
                           aria-describedby="Company-feedback"
                           label="Company Name"
-                          :placeholder="$t('CompanyName')"
-                          v-model="setting.CompanyName"
+                          :placeholder="$t('company_name')"
+                          v-model="setting.company_name"
                         ></b-form-input>
                         <b-form-invalid-feedback
                           id="Company-feedback"
@@ -93,13 +93,13 @@
                       :rules="{ required: true}"
                       v-slot="validationContext"
                     >
-                      <b-form-group :label="$t('CompanyPhone') + ' ' + '*'">
+                      <b-form-group :label="$t('company_phone') + ' ' + '*'">
                         <b-form-input
                           :state="getValidationState(validationContext)"
                           aria-describedby="Phone-feedback"
                           label="Company Phone"
-                          :placeholder="$t('CompanyPhone')"
-                          v-model="setting.CompanyPhone"
+                          :placeholder="$t('company_phone')"
+                          v-model="setting.company_phone"
                         ></b-form-input>
                         <b-form-invalid-feedback
                           id="Phone-feedback"
@@ -246,7 +246,7 @@
                          <textarea
                           :state="getValidationState(validationContext)"
                           aria-describedby="Address-feedback"
-                          v-model="setting.CompanyAddress"
+                          v-model="setting.company_address"
                           class="form-control"
                           :placeholder="$t('Afewwords')"
                          ></textarea>
@@ -346,9 +346,9 @@ export default {
         currency_id: "",
         email: "",
         logo: "",
-        CompanyName: "",
-        CompanyPhone: "",
-        CompanyAddress: "",
+        company_name: "",
+        company_phone: "",
+        company_address: "",
         footer:"",
         developed_by:"",
         default_language:"",
@@ -428,9 +428,9 @@ export default {
       self.data.append("currency", self.setting.currency_id);
       self.data.append("email", self.setting.email);
       self.data.append("logo", self.setting.logo);
-      self.data.append("CompanyName", self.setting.CompanyName);
-      self.data.append("CompanyPhone", self.setting.CompanyPhone);
-      self.data.append("CompanyAddress", self.setting.CompanyAddress);
+      self.data.append("company_name", self.setting.company_name);
+      self.data.append("company_phone", self.setting.company_phone);
+      self.data.append("company_address", self.setting.company_address);
       self.data.append("footer", self.setting.footer);
       self.data.append("developed_by", self.setting.developed_by);
       self.data.append("default_language", self.setting.default_language);

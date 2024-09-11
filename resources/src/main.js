@@ -14,6 +14,9 @@ import 'vue-select/dist/vue-select.css';
 import '@trevoreyre/autocomplete-vue/dist/style.css';
 import Breadcumb from "./components/breadcumb";
 import {i18n} from "./plugins/i18n";
+import "./assets/styles/sass/app.scss";
+
+
 
 Date.prototype.addDays = function (days) {
     const date = new Date(this.valueOf());

@@ -1,8 +1,6 @@
 <template>
     <div v-if="Loading">
         <router-view></router-view>
-
-        <!--    <customizer></customizer>-->
     </div>
 </template>
 

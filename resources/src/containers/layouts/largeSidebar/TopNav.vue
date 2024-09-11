@@ -2,7 +2,7 @@
   <div class="main-header">
     <div class="logo">
        <router-link to="/app/dashboard">
-        <img :src="'/images/'+currentUser.logo" alt width="60" height="60">
+        <img :src="'/images/'+currentUser.logo" alt width="auto" height="60">
        </router-link>
     </div>
 
@@ -15,7 +15,7 @@
     <div style="margin: auto"></div>
 
     <div class="header-part-right">
-      <router-link 
+      <router-link
         v-if="currentUserPermissions && currentUserPermissions.includes('Pos_view')"
         class="btn btn-outline-primary tn-sm btn-rounded"
         to="/app/pos"
@@ -118,7 +118,7 @@
                 <i title="sa" class="flag-icon flag-icon-squared flag-icon-kr"></i>
                 <span class="title-lang">Korean</span>
               </a>
-             
+
               <a @click="SetLocal('ba')">
                 <i title="sa" class="flag-icon flag-icon-squared flag-icon-bd"></i>
                 <span class="title-lang">Bangla</span>
@@ -141,7 +141,7 @@
       <!-- Notificaiton -->
       <div class="dropdown">
         <b-dropdown
-          id="dropdown-1" 
+          id="dropdown-1"
           text="Dropdown Button"
           class="m-md-2 badge-top-container d-none  d-sm-inline-block"
           toggle-class="text-decoration-none"
@@ -172,7 +172,7 @@
                </router-link>
               </div>
             </div>
-           
+
           </vue-perfect-scrollbar>
         </b-dropdown>
       </div>
@@ -209,7 +209,7 @@
               to="/app/settings/System_settings"
               class="dropdown-item"
             >{{$t('Settings')}}</router-link>
-            <a class="dropdown-item" href="#" @click.prevent="logoutUser">{{$t('logout')}}</a>
+            <a class="dropdown-item" href="#" @click.prevent="logout">{{$t('logout')}}</a>
           </div>
         </b-dropdown>
       </div>
@@ -220,11 +220,9 @@
 </template>
 <script>
 import Util from "./../../../utils";
-// import Sidebar from "./Sidebar";
 import { isMobile } from "mobile-device-detect";
 import { mapGetters, mapActions } from "vuex";
 import { mixin as clickaway } from "vue-clickaway";
-// import { setTimeout } from 'timers';
 import FlagIcon from "vue-flag-icon";
 
 export default {
@@ -234,7 +232,7 @@ export default {
   },
 
   data() {
-  
+
     return {
       langs: [
         "en",
@@ -256,19 +254,19 @@ export default {
         "br",
         "da",
       ],
-      
+
       isDisplay: true,
       isStyle: true,
       isSearchOpen: false,
       isMouseOnMegaMenu: true,
       isMegaMenuOpen: false,
       is_Load:false,
-     
+
     };
   },
- 
+
    computed: {
-     
+
      ...mapGetters([
        "currentUser",
       "getSideBarToggleProperties",
@@ -280,7 +278,7 @@ export default {
   },
 
   methods: {
-    
+
     ...mapActions([
       "changeSecondarySidebarProperties",
       "changeSidebarProperties",
@@ -288,23 +286,15 @@ export default {
       "logout",
     ]),
 
-    logoutUser() {
-      this.$store.dispatch("logout");
-    },
 
     SetLocal(locale) {
       this.$i18n.locale = locale;
       this.$store.dispatch("language/setLanguage", locale);
       Fire.$emit("ChangeLanguage");
     },
-
     handleFullScreen() {
       Util.toggleFullScreen();
     },
-    logoutUser() {
-      this.logout();
-    },
-
     closeMegaMenu() {
       this.isMegaMenuOpen = false;
     },
@@ -314,7 +304,6 @@ export default {
     toggleSearch() {
       this.isSearchOpen = !this.isSearchOpen;
     },
-
     sideBarToggle(el) {
       if (
         this.getSideBarToggleProperties.isSideNavOpen &&

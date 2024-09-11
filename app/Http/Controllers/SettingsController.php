@@ -10,10 +10,11 @@ use App\Models\User;
 use App\Models\Warehouse;
 use App\Models\UserWarehouse;
 use App\Models\sms_gateway;
-use File;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Http\Request;
-use Intervention\Image\ImageManagerStatic as Image;
+use Intervention\Image\Drivers\Gd\Driver;
+use Intervention\Image\Image;
+use Intervention\Image\ImageManager;
 use \Nwidart\Modules\Facades\Module;
 use Illuminate\Support\Facades\Config;
 
@@ -35,9 +36,10 @@ class SettingsController extends Controller
             $path = public_path() . '/images';
             $filename = rand(11111111, 99999999) . $image->getClientOriginalName();
 
-            $image_resize = Image::make($image->getRealPath());
-            $image_resize->resize(80, 80);
-            $image_resize->save(public_path('/images/' . $filename));
+            $imageManager = new ImageManager(new Driver());
+            $image = $imageManager->read($image->getRealPath());
+            $image->scale(80, 80,);
+            $image->save(public_path('/images/' . $filename));
 
             $userPhoto = $path . '/' . $currentAvatar;
             if (file_exists($userPhoto)) {
@@ -96,9 +98,9 @@ class SettingsController extends Controller
             'warehouse_id' => $warehouse,
             'email' => $request['email'],
             'default_language' =>  $default_language,
-            'CompanyName' => $request['CompanyName'],
-            'CompanyPhone' => $request['CompanyPhone'],
-            'CompanyAddress' => $request['CompanyAddress'],
+            'company_name' => $request['company_name'],
+            'company_phone' => $request['company_phone'],
+            'company_address' => $request['company_address'],
             'footer' => $request['footer'],
             'developed_by' => $request['developed_by'],
             'is_invoice_footer' => $is_invoice_footer,
@@ -224,9 +226,9 @@ class SettingsController extends Controller
 
             $item['id'] = $settings->id;
             $item['email'] = $settings->email;
-            $item['CompanyName'] = $settings->CompanyName;
-            $item['CompanyPhone'] = $settings->CompanyPhone;
-            $item['CompanyAddress'] = $settings->CompanyAddress;
+            $item['company_name'] = $settings->company_name;
+            $item['company_phone'] = $settings->company_phone;
+            $item['company_address'] = $settings->company_address;
             $item['logo'] = $settings->logo;
             $item['footer'] = $settings->footer;
             $item['developed_by'] = $settings->developed_by;
