@@ -4,23 +4,28 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ProductWarehouse extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'product_warehouse';
 
     protected $fillable = [
         'product_id',
+        'product_variant_id',
         'warehouse_id',
-        'qte',
+        'qty',
         'manage_stock'
     ];
 
     protected $casts = [
         'product_id' => 'integer',
+        'product_variant_id' => 'integer',
         'warehouse_id' => 'integer',
-        'manage_stock' => 'integer',
-        'qte' => 'double',
+        'manage_stock' => 'boolean',
+        'qty' => 'double',
     ];
 
     public function warehouse()
@@ -45,14 +50,12 @@ class ProductWarehouse extends Model
 
         return $query->join('products', 'product_warehouse.product_id', '=', 'products.id')
             ->where('manage_stock', true)
-            ->whereRaw('qte <= stock_alert')
-            ->where('product_warehouse.deleted_at', null)
+            ->whereRaw('qty <= stock_alert')
+            ->whereNull('product_warehouse.deleted_at')
             ->where(fn($query) => ($warehouse_id !== 0) ?
                 $query->where('product_warehouse.warehouse_id', $warehouse_id) :
                 $query->whereIn('product_warehouse.warehouse_id', $array_warehouses_id))
             ->take('5');
-
-
     }
 
     // endregion
@@ -61,7 +64,7 @@ class ProductWarehouse extends Model
 
     public static function getStockAlert($warehouse_id, $array_warehouses_id, $limit = 5)
     {
-        $product_warehouse_data = static::with('warehouse', 'product','productVariant')
+        $product_warehouse_data = static::with('warehouse', 'product', 'productVariant')
             ->getProductAlert($warehouse_id, $array_warehouses_id)
             ->take('5')
             ->get();
@@ -70,15 +73,15 @@ class ProductWarehouse extends Model
         if ($product_warehouse_data->isNotEmpty()) {
 
             foreach ($product_warehouse_data as $product_warehouse) {
-                if ($product_warehouse->qte <= $product_warehouse['product']->stock_alert) {
+                if ($product_warehouse->qte <= $product_warehouse->product->stock_alert) {
                     $item['code'] = ($product_warehouse->product_variant_id !== null) ?
-                        $product_warehouse['productVariant']->name . '-' . $product_warehouse['product']->code :
+                        $product_warehouse['productVariant']->name . '-' . $product_warehouse->product->code :
                         $product_warehouse['product']->code;
 
                     $item['quantity'] = $product_warehouse->qte;
-                    $item['name'] = $product_warehouse['product']->name;
-                    $item['warehouse'] = $product_warehouse['warehouse']->name;
-                    $item['stock_alert'] = $product_warehouse['product']->stock_alert;
+                    $item['name'] = $product_warehouse->product->name;
+                    $item['warehouse'] = $product_warehouse->warehouse->name;
+                    $item['stock_alert'] = $product_warehouse->product->stock_alert;
                     $stock_alert[] = $item;
                 }
             }

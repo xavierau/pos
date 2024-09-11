@@ -7,36 +7,19 @@
     ),
     'aliases' => 
     array (
-      'PDF' => 'Barryvdh\\DomPDF\\Facade',
+      'Pdf' => 'Barryvdh\\DomPDF\\Facade\\Pdf',
+      'PDF' => 'Barryvdh\\DomPDF\\Facade\\Pdf',
     ),
   ),
-  'facade/ignition' => 
+  'intervention/image-laravel' => 
   array (
     'providers' => 
     array (
-      0 => 'Facade\\Ignition\\IgnitionServiceProvider',
+      0 => 'Intervention\\Image\\Laravel\\ServiceProvider',
     ),
     'aliases' => 
     array (
-      'Flare' => 'Facade\\Ignition\\Facades\\Flare',
-    ),
-  ),
-  'fideloper/proxy' => 
-  array (
-    'providers' => 
-    array (
-      0 => 'Fideloper\\Proxy\\TrustedProxyServiceProvider',
-    ),
-  ),
-  'intervention/image' => 
-  array (
-    'providers' => 
-    array (
-      0 => 'Intervention\\Image\\ImageServiceProvider',
-    ),
-    'aliases' => 
-    array (
-      'Image' => 'Intervention\\Image\\Facades\\Image',
+      'Image' => 'Intervention\\Image\\Laravel\\Facades\\Image',
     ),
   ),
   'laravel/passport' => 
@@ -89,22 +72,11 @@
       0 => 'Carbon\\Laravel\\ServiceProvider',
     ),
   ),
-  'nexmo/laravel' => 
+  'nunomaduro/termwind' => 
   array (
     'providers' => 
     array (
-      0 => 'Nexmo\\Laravel\\NexmoServiceProvider',
-    ),
-    'aliases' => 
-    array (
-      'Nexmo' => 'Nexmo\\Laravel\\Facade\\Nexmo',
-    ),
-  ),
-  'nunomaduro/collision' => 
-  array (
-    'providers' => 
-    array (
-      0 => 'NunoMaduro\\Collision\\Adapters\\Laravel\\CollisionServiceProvider',
+      0 => 'Termwind\\Laravel\\TermwindServiceProvider',
     ),
   ),
   'nwidart/laravel-modules' => 
@@ -118,12 +90,26 @@
       'Module' => 'Nwidart\\Modules\\Facades\\Module',
     ),
   ),
-  'oscarafdev/migrations-generator' => 
+  'spatie/laravel-ignition' => 
   array (
     'providers' => 
     array (
-      0 => 'Way\\Generators\\GeneratorsServiceProvider',
-      1 => 'OscarAFDev\\MigrationsGenerator\\MigrationsGeneratorServiceProvider',
+      0 => 'Spatie\\LaravelIgnition\\IgnitionServiceProvider',
+    ),
+    'aliases' => 
+    array (
+      'Flare' => 'Spatie\\LaravelIgnition\\Facades\\Flare',
+    ),
+  ),
+  'spatie/laravel-pdf' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'Spatie\\LaravelPdf\\PdfServiceProvider',
+    ),
+    'aliases' => 
+    array (
+      'LaravelPdf' => 'Pdf',
     ),
   ),
   'yajra/laravel-datatables-oracle' => 

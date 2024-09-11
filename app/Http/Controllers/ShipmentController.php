@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Shipment;
 use App\Models\Sale;
-use App\utils\helpers;
+use App\utils\Helper;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Http\Request;
@@ -26,7 +26,7 @@ class ShipmentController extends BaseController
         $offSet = ($pageStart * $perPage) - $perPage;
         $order = $request->SortField;
         $dir = $request->SortType;
-        $helpers = new helpers();
+        $helpers = new Helper();
         $data = array();
 
         $shipments = Shipment::with('sale','sale.client','sale.warehouse')
@@ -77,7 +77,7 @@ class ShipmentController extends BaseController
             $item['sale_id'] = $shipment['sale']['id'];
             $item['warehouse_name'] = $shipment['sale']['warehouse']->name;
             $item['customer_name'] = $shipment['sale']['client']->name;
-            
+
             $data[] = $item;
         }
 
@@ -87,7 +87,7 @@ class ShipmentController extends BaseController
         ]);
     }
 
-   
+
 
     //----------- Store new Shipment -------\\
 
@@ -116,7 +116,7 @@ class ShipmentController extends BaseController
             ]);
 
         }, 10);
-       
+
         return response()->json(['success' => true]);
 
     }
@@ -197,7 +197,7 @@ class ShipmentController extends BaseController
 
     }
 
-   
+
    //------------- Reference Number Order SALE -----------\\
 
    public function getNumberOrder()
@@ -216,6 +216,6 @@ class ShipmentController extends BaseController
        return $code;
    }
 
-    
+
 
 }

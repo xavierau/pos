@@ -28,7 +28,6 @@ class AuthController extends BaseController
                     'status' => 'NotActive',
                 ]);
             }
-
         } else {
             return response()->json([
                 'message' => 'Incorrect Login',
@@ -38,7 +37,6 @@ class AuthController extends BaseController
 
         $user = auth()->user();
         $tokenResult = $user->createToken('Access Token');
-        $token = $tokenResult->token;
         $this->setCookie('Stocky_token', $tokenResult->accessToken);
 
         return response()->json([
@@ -58,7 +56,6 @@ class AuthController extends BaseController
             $this->destroyCookie('Stocky_token');
             return response()->json('success');
         }
-
     }
 
 }

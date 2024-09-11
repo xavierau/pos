@@ -15,10 +15,12 @@ class CreatePermissionRoleTable extends Migration {
 	{
 		Schema::create('permission_role', function(Blueprint $table)
 		{
-			$table->engine = 'InnoDB';
-			$table->integer('id', true);
-			$table->integer('permission_id')->index('permission_role_permission_id');
-			$table->integer('role_id')->index('permission_role_role_id');
+			$table->id('id');
+			$table->unsignedBigInteger('permission_id');
+			$table->unsignedBigInteger('role_id');
+
+            $table->foreign('permission_id')->references('id')->on('permissions')->onUpdate('RESTRICT')->onDelete('RESTRICT');
+            $table->foreign('role_id')->references('id')->on('roles')->onUpdate('RESTRICT')->onDelete('RESTRICT');
 		});
 }
 

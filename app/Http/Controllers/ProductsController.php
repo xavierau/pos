@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\DTO\GetProductsByWarehouseDTO;
+use App\Enums\ProductType;
 use App\Exports\StockExport;
 use App\Models\Brand;
 use App\Models\Category;
@@ -15,7 +17,9 @@ use App\Models\Warehouse;
 use App\Services\products\actions\CreateProductAction;
 use App\Services\products\actions\DeleteProductAction;
 use App\Services\products\actions\UpdateProductAction;
-use App\utils\helpers;
+use App\Services\products\GetProductDetail;
+use App\Services\products\GetProductsByWarehouse;
+use App\utils\Helper;
 use Carbon\Carbon;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
@@ -27,6 +31,7 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Str;
 
 class ProductsController extends BaseController
 {
@@ -39,14 +44,13 @@ class ProductsController extends BaseController
         $perPage = $request->get('limit', 15);
         $pageStart = $request->get('page', 1);
         $order = $request->get('SortField', 'id');
-        $dir = $request->get('SortType', 'desc');
+        $dir = $request->get('SortType', 'desc') !== 'none' ? $request->get('SortType', 'desc') : 'desc';
 
         $offSet = ($pageStart * $perPage) - $perPage;
-        $helpers = new helpers();
+        $helpers = new Helper();
         $data = [];
 
-        $products = Product::with('unit', 'category', 'brand')
-            ->whereNull('deleted_at')
+        $products = Product::with('unit', 'category', 'brand', 'variants')
             ->search($request->get('search'));
 
         $filtered = $helpers->filter(
@@ -76,30 +80,26 @@ class ProductsController extends BaseController
             $item['image'] = $firstImage[0];
 
             if ($product->type == 'is_single') {
-
                 $item['type'] = 'Single';
                 $item['name'] = $product->name;
-                $item['cost'] = number_format($product->cost, 2, '.', ',');
-                $item['price'] = number_format($product->price, 2, '.', ',');
-                $item['unit'] = $product['unit']->ShortName;
+                $item['cost'] = $product->cost;
+                $item['price'] = $product->price;
+                $item['unit'] = $product['unit']->short_name;
 
-                $product_warehouse_total_qty = ProductWarehouse::where('product_id', $product->id)
-                    ->whereNull('deleted_at')
-                    ->sum('qte');
+                $product_warehouse_total_qty =
+                    ProductWarehouse::where('product_id', $product->id)
+                        ->sum('qty');
 
-                $item['quantity'] = $product_warehouse_total_qty . ' ' . $product['unit']->ShortName;
+                $item['quantity'] = $product_warehouse_total_qty . ' ' . $product['unit']->short_name;
 
             } elseif ($product->type == 'is_variant') {
 
                 $item['type'] = 'Variable';
-                $product_variant_data = ProductVariant::where('product_id', $product->id)
-                    ->whereNull('deleted_at')
-                    ->get();
-
+                $product_variant_data = $product->variants;
                 $item['cost'] = '';
                 $item['price'] = '';
                 $item['name'] = '';
-                $item['unit'] = $product['unit']->ShortName;
+                $item['unit'] = $product['unit']->short_name;
 
                 foreach ($product_variant_data as $product_variant) {
                     $item['cost'] .= number_format($product_variant->cost, 2, '.', ',');
@@ -111,10 +111,9 @@ class ProductsController extends BaseController
                 }
 
                 $product_warehouse_total_qty = ProductWarehouse::where('product_id', $product->id)
-                    ->whereNull('deleted_at')
-                    ->sum('qte');
+                    ->sum('qty');
 
-                $item['quantity'] = $product_warehouse_total_qty . ' ' . $product['unit']->ShortName;
+                $item['quantity'] = $product_warehouse_total_qty . ' ' . $product['unit']->short_name;
 
             } else {
                 $item['type'] = 'Service';
@@ -163,26 +162,21 @@ class ProductsController extends BaseController
             $productRules = [
                 'code' => [
                     'required',
-                    Rule::unique('products')
-                        ->where(fn($query) => $query->whereNull('deleted_at')),
-                    Rule::unique('product_variants')
-                        ->where(fn($query) => $query->whereNull('deleted_at')),
+                    Rule::unique('products'),
+                    Rule::unique('product_variants'),
                 ],
                 'name' => 'required',
                 'type_barcode' => 'required',
                 'category_id' => 'required',
-                'type' => ['required', 'in:is_service,is_single,is_variant'],
-                'tax_method' => 'required',
-                'unit_id' => Rule::requiredIf($request->type != 'is_service'),
-                'cost' => Rule::requiredIf($request->type == 'is_single'),
-                'price' => Rule::requiredIf($request->type != 'is_variant'),
-                'promotional_price' => ['nullable', 'numeric'],
-                'promotional_start_date' => ['nullable', 'required_with:promotional_price', 'date'],
-                'promotional_end_date' => ['nullable', 'required_with:promotional_start_date', 'date', 'after:promotional_start_date'],
+                'type' => ['required', 'in:' . implode(',', ProductType::values())],
+                'tax_method' => ['required'],
+                'unit_id' => Rule::requiredIf($request->get('type', null) !== 'is_service'),
+                'cost' => Rule::requiredIf($request->get('type', null) === 'is_single'),
+                'price' => Rule::requiredIf($request->get('type', null) !== 'is_variant'),
             ];
 
             // if type is not is_variant, add validation for variants array
-            if ($request->type == 'is_variant') {
+            if ($request->get('type', null) == 'is_variant') {
                 $productRules['variants'] = [
                     'required',
                     function ($attribute, $value, $fail) use ($request) {
@@ -346,16 +340,13 @@ class ProductsController extends BaseController
             'category_id' => 'required',
             'tax_method' => 'required',
             'type' => ['required', 'in:is_service,is_single,is_variant'],
-            'unit_id' => Rule::requiredIf($request->type != 'is_service'),
-            'cost' => Rule::requiredIf($request->type == 'is_single'),
-            'price' => Rule::requiredIf($request->type != 'is_variant'),
-            'promotional_price' => ['nullable', 'numeric'],
-            'promotional_start_date' => ['nullable', 'required_with:promotional_price', 'date'],
-            'promotional_end_date' => ['nullable', 'required_with:promotional_start_date', 'date', 'after:promotional_start_date'],
+            'unit_id' => Rule::requiredIf($request->get('type', null) != 'is_service'),
+            'cost' => Rule::requiredIf($request->get('type', null) == 'is_single'),
+            'price' => Rule::requiredIf($request->get('type', null) != 'is_variant'),
         ];
 
         // if type is not is_variant, add validation for variants array
-        if ($request->type == 'is_variant') {
+        if ($request->get('type', null) == 'is_variant') {
             $productRules['variants'] = [
                 'required',
                 function ($attribute, $value, $fail) use ($request, $id) {
@@ -366,7 +357,6 @@ class ProductsController extends BaseController
                     }
                     // check for duplicate codes in variants array
                     $variants = $request->variants;
-
 
                     if ($variants) {
                         foreach ($variants as $variant) {
@@ -487,6 +477,7 @@ class ProductsController extends BaseController
             ->whereNull('deleted_at')
             ->firstOrFail();
 
+
         $action->execute($product, $request->all());
 
         return response()->json(['success' => true]);
@@ -565,16 +556,16 @@ class ProductsController extends BaseController
         $item['price'] = $Product->price;
         $item['cost'] = $Product->cost;
         $item['stock_alert'] = $Product->stock_alert;
-        $item['taxe'] = $Product->TaxNet;
+        $item['tax'] = $Product->tax_net;
         $item['tax_method'] = $Product->tax_method == '1' ? 'Exclusive' : 'Inclusive';
 
         if ($Product->type == 'is_single') {
             $item['type_name'] = 'Single';
-            $item['unit'] = $Product['unit']->ShortName;
+            $item['unit'] = $Product['unit']->short_name;
 
         } elseif ($Product->type == 'is_variant') {
             $item['type_name'] = 'Variable';
-            $item['unit'] = $Product['unit']->ShortName;
+            $item['unit'] = $Product['unit']->short_name;
 
         } else {
             $item['type_name'] = 'Service';
@@ -596,17 +587,15 @@ class ProductsController extends BaseController
                 $item['products_variants_data'][] = $ProductVariant;
 
                 foreach ($warehouses as $warehouse) {
-                    $product_warehouse = DB::table('product_warehouse')
-                        ->where('product_id', $id)
-                        ->whereNull('deleted_at')
+                    $product_warehouse = ProductWarehouse::where('product_id', $id)
                         ->where('warehouse_id', $warehouse->id)
                         ->where('product_variant_id', $variant->id)
-                        ->select(DB::raw('SUM(product_warehouse.qte) AS sum'))
+                        ->select(DB::raw('SUM(product_warehouse.qty) AS sum'))
                         ->first();
 
                     $war_var['mag'] = $warehouse->name;
                     $war_var['variant'] = $variant->name;
-                    $war_var['qte'] = $product_warehouse->sum;
+                    $war_var['qty'] = $product_warehouse->sum;
                     $item['CountQTY_variants'][] = $war_var;
                 }
 
@@ -617,15 +606,13 @@ class ProductsController extends BaseController
         }
 
         foreach ($warehouses as $warehouse) {
-            $product_warehouse_data = DB::table('product_warehouse')
-                ->whereNull('deleted_at')
-                ->where('product_id', $id)
+            $product_warehouse_data = ProductWarehouse::where('product_id', $id)
                 ->where('warehouse_id', $warehouse->id)
-                ->select(DB::raw('SUM(product_warehouse.qte) AS sum'))
+                ->select(DB::raw('SUM(product_warehouse.qty) AS sum'))
                 ->first();
 
             $war['mag'] = $warehouse->name;
-            $war['qte'] = $product_warehouse_data->sum;
+            $war['qty'] = $product_warehouse_data->sum;
             $item['CountQTY'][] = $war;
         }
 
@@ -643,217 +630,27 @@ class ProductsController extends BaseController
 
     //------------ Get products By Warehouse -----------------\\
 
-    public function Products_by_Warehouse(request $request, $id)
+    public function products_by_warehouse(request $request, $id, GetProductsByWarehouse $service)
     {
-        $data = [];
-        $product_warehouse_data = ProductWarehouse::with('warehouse', 'product')
-            ->where(function ($query) use ($request, $id) {
-                return $query->where('warehouse_id', $id)
-                    ->whereNull('deleted_at')
-                    ->where(function ($query) use ($request) {
-                        return $query->whereHas('product', function ($q) use ($request) {
-                            if ($request->is_sale == '1') {
-                                $q->where('not_selling', '=', 0);
-                            }
-                        });
-                    })
-                    ->where(function ($query) use ($request) {
-                        if ($request->stock == '1' && $request->product_service == '1') {
-                            return $query->where('qte', '>', 0)->orWhere('manage_stock', false);
-                        } elseif ($request->stock == '1' && $request->product_service == '0') {
-                            return $query->where('qte', '>', 0)->orWhere('manage_stock', true);
-                        } else {
-                            return $query->where('manage_stock', true);
-                        }
-                    });
-            })
-            ->get();
-
-        foreach ($product_warehouse_data as $product_warehouse) {
-
-            if ($product_warehouse->product_variant_id) {
-                $item['product_variant_id'] = $product_warehouse->product_variant_id;
-
-                $item['code'] = $product_warehouse['productVariant']->code;
-                $item['Variant'] = '[' . $product_warehouse['productVariant']->name . ']' . $product_warehouse['product']->name;
-                $item['name'] = '[' . $product_warehouse['productVariant']->name . ']' . $product_warehouse['product']->name;
-                $item['barcode'] = $product_warehouse['productVariant']->code;
-
-
-                $product_price = $product_warehouse['productVariant']->price;
-
-            } else {
-                $item['product_variant_id'] = null;
-                $item['Variant'] = null;
-                $item['code'] = $product_warehouse['product']->code;
-                $item['name'] = $product_warehouse['product']->name;
-                $item['barcode'] = $product_warehouse['product']->code;
-
-                $product_price = $product_warehouse['product']->price;
-            }
-
-            $item['id'] = $product_warehouse->product_id;
-            $item['product_type'] = $product_warehouse['product']->type;
-            $item['type_barcode'] = $product_warehouse['product']->type_barcode;
-            $firstImage = explode(',', $product_warehouse['product']->image);
-            $item['image'] = $firstImage[0];
-
-            if ($product_warehouse['product']['unitSale']) {
-
-                if ($product_warehouse['product']['unitSale']->operator == '/') {
-                    $item['qte_sale'] = $product_warehouse->qte * $product_warehouse['product']['unitSale']->operator_value;
-                    $price = $product_price / $product_warehouse['product']['unitSale']->operator_value;
-                } else {
-                    $item['qte_sale'] = $product_warehouse->qte / $product_warehouse['product']['unitSale']->operator_value;
-                    $price = $product_price * $product_warehouse['product']['unitSale']->operator_value;
-                }
-
-
-            } else {
-                $item['qte_sale'] = $product_warehouse['product']->type != 'is_service' ? $product_warehouse->qte : '---';
-                $price = $product_price;
-            }
-
-            if ($product_warehouse['product']['unitPurchase']) {
-
-                if ($product_warehouse['product']['unitPurchase']->operator == '/') {
-                    $item['qte_purchase'] = round($product_warehouse->qte * $product_warehouse['product']['unitPurchase']->operator_value, 5);
-                } else {
-                    $item['qte_purchase'] = round($product_warehouse->qte / $product_warehouse['product']['unitPurchase']->operator_value, 5);
-                }
-
-            } else {
-                $item['qte_purchase'] = $product_warehouse->qte;
-            }
-
-            $item['manage_stock'] = $product_warehouse->manage_stock;
-            $item['qte'] = $product_warehouse['product']->type != 'is_service' ? $product_warehouse->qte : '---';
-            $item['unitSale'] = $product_warehouse['product']['unitSale'] ? $product_warehouse['product']['unitSale']->ShortName : '';
-            $item['unitPurchase'] = $product_warehouse['product']['unitPurchase'] ? $product_warehouse['product']['unitPurchase']->ShortName : '';
-
-            if ($product_warehouse['product']->TaxNet !== 0.0) {
-                //Exclusive
-                if ($product_warehouse['product']->tax_method == '1') {
-                    $tax_price = $price * $product_warehouse['product']->TaxNet / 100;
-                    $item['Net_price'] = $price + $tax_price;
-                    // Inxclusive
-                } else {
-                    $item['Net_price'] = $price;
-                }
-            } else {
-                $item['Net_price'] = $price;
-            }
-
-            $data[] = $item;
-        }
+        $data = $service->execute(new GetProductsByWarehouseDTO(
+            warehouse_id: $id,
+            is_sale: $request->is_sale == '1',
+            stock: $request->stock,
+            product_service: $request->product_service,
+            included_empty_stock: $request->included_empty_stock || false
+        ));
 
         return response()->json($data);
     }
 
 
     //------------ Get product By ID -----------------\\
-    public function show_product_data($id, $variant_id)
+    public function show_product_data($id, $variant_id, GetProductDetail $service)
     {
 
-        $Product_data = Product::with('unit')
-            ->where('id', $id)
-            ->whereNull('deleted_at')
-            ->first();
+        $data = $service->execute($id, $variant_id);
 
-        $data = [];
-        $item['id'] = $Product_data['id'];
-        $item['image'] = $Product_data['image'];
-        $item['product_type'] = $Product_data['type'];
-        $item['type_barcode'] = $Product_data['type_barcode'];
-
-        $item['unit_id'] = $Product_data['unit'] ? $Product_data['unit']->id : '';
-        $item['unit'] = $Product_data['unit'] ? $Product_data['unit']->ShortName : '';
-
-        $item['purchase_unit_id'] = $Product_data['unitPurchase'] ? $Product_data['unitPurchase']->id : '';
-        $item['unitPurchase'] = $Product_data['unitPurchase'] ? $Product_data['unitPurchase']->ShortName : '';
-
-        $item['sale_unit_id'] = $Product_data['unitSale'] ? $Product_data['unitSale']->id : '';
-        $item['unitSale'] = $Product_data['unitSale'] ? $Product_data['unitSale']->ShortName : '';
-
-        $item['tax_method'] = $Product_data['tax_method'];
-        $item['tax_percent'] = $Product_data['TaxNet'];
-
-        $item['is_imei'] = $Product_data['is_imei'];
-        $item['not_selling'] = $Product_data['not_selling'];
-
-        //product single
-        if ($Product_data['type'] == 'is_single') {
-            $product_price = $Product_data['price'];
-            $product_cost = $Product_data['cost'];
-
-            $item['code'] = $Product_data['code'];
-            $item['name'] = $Product_data['name'];
-
-            //product is_variant
-        } elseif ($Product_data['type'] == 'is_variant') {
-
-            $product_variant_data = ProductVariant::where('product_id', $id)
-                ->where('id', $variant_id)
-                ->first();
-
-            $product_price = $product_variant_data['price'];
-            $product_cost = $product_variant_data['cost'];
-            $item['code'] = $product_variant_data['code'];
-            $item['name'] = '[' . $product_variant_data['name'] . ']' . $Product_data['name'];
-
-            //product is_service
-        } else {
-
-            $product_price = $Product_data['price'];
-            $product_cost = 0;
-
-            $item['code'] = $Product_data['code'];
-            $item['name'] = $Product_data['name'];
-        }
-
-        $cost = $Product_data->getUnitPurchaseCost();
-        $price = $Product_data->getUnitPrice();
-
-
-        $item['Unit_cost'] = $cost;
-        $item['fix_cost'] = $product_cost;
-        $item['Unit_price'] = $price;
-        $item['fix_price'] = $product_price;
-
-        if ($Product_data->TaxNet !== 0.0) {
-            //Exclusive
-            if ($Product_data['tax_method'] == '1') {
-                $tax_price = $price * $Product_data['TaxNet'] / 100;
-                $tax_cost = $cost * $Product_data['TaxNet'] / 100;
-
-                $item['Total_cost'] = $cost + $tax_cost;
-                $item['Total_price'] = $price + $tax_price;
-                $item['Net_cost'] = $cost;
-                $item['Net_price'] = $price;
-                $item['tax_price'] = $tax_price;
-                $item['tax_cost'] = $tax_cost;
-
-                // Inxclusive
-            } else {
-                $item['Total_cost'] = $cost;
-                $item['Total_price'] = $price;
-                $item['Net_cost'] = $cost / (($Product_data['TaxNet'] / 100) + 1);
-                $item['Net_price'] = $price / (($Product_data['TaxNet'] / 100) + 1);
-                $item['tax_cost'] = $item['Total_cost'] - $item['Net_cost'];
-                $item['tax_price'] = $item['Total_price'] - $item['Net_price'];
-            }
-        } else {
-            $item['Total_cost'] = $cost;
-            $item['Total_price'] = $price;
-            $item['Net_cost'] = $cost;
-            $item['Net_price'] = $price;
-            $item['tax_price'] = 0;
-            $item['tax_cost'] = 0;
-        }
-
-        $data[] = $item;
-
-        return response()->json($data[0]);
+        return response()->json($data);
     }
 
     //--------------  Product Quantity Alerts ---------------\\
@@ -865,7 +662,7 @@ class ProductsController extends BaseController
         $product_warehouse_data = ProductWarehouse::with('warehouse', 'product', 'productVariant')
             ->join('products', 'product_warehouse.product_id', '=', 'products.id')
             ->where('manage_stock', true)
-            ->whereRaw('qte <= stock_alert')
+            ->whereRaw('qty <= stock_alert')
             ->where(function ($query) use ($request) {
                 return $query->when($request->filled('warehouse'), function ($query) use ($request) {
                     return $query->where('warehouse_id', $request->warehouse);
@@ -877,7 +674,7 @@ class ProductsController extends BaseController
         if ($product_warehouse_data->isNotEmpty()) {
 
             foreach ($product_warehouse_data as $product_warehouse) {
-                if ($product_warehouse->qte <= $product_warehouse['product']->stock_alert) {
+                if ($product_warehouse->qty <= $product_warehouse['product']->stock_alert) {
                     if ($product_warehouse->product_variant_id !== null) {
                         $item['code'] = $product_warehouse['productVariant']->code;
                         $item['name'] = '[' . $product_warehouse['productVariant']->name . ']' . $product_warehouse['product']->name;
@@ -885,7 +682,7 @@ class ProductsController extends BaseController
                         $item['code'] = $product_warehouse['product']->code;
                         $item['name'] = $product_warehouse['product']->name;
                     }
-                    $item['quantity'] = $product_warehouse->qte;
+                    $item['quantity'] = $product_warehouse->qty;
                     $item['warehouse'] = $product_warehouse['warehouse']->name;
                     $item['stock_alert'] = $product_warehouse['product']->stock_alert;
                     $data[] = $item;
@@ -969,9 +766,6 @@ class ProductsController extends BaseController
         $item['code'] = $product->code;
         $item['type_barcode'] = $product->type_barcode;
         $item['name'] = $product->name;
-        $item['promotional_price'] = $product->promotional_price;
-        $item['promotional_start_date'] = $product->promotional_start_date;
-        $item['promotional_end_date'] = $product->promotional_end_date;
         $item['category_id'] = Category::where('id', $product->category_id)
             ->whereNull('deleted_at')
             ->exists() ? $product->category_id : '';
@@ -1000,19 +794,22 @@ class ProductsController extends BaseController
         $item['price'] = $product->price;
         $item['cost'] = $product->cost;
         $item['stock_alert'] = $product->stock_alert;
-        $item['TaxNet'] = $product->TaxNet;
+        $item['tax_net'] = $product->tax_net;
         $item['note'] = $product->note ?? '';
         $item['images'] = [];
+        $item['discounted_price'] = $product->discountedPrices()->latest()->valid()->first();
         if ($product->image != '' && $product->image != 'no-image.png') {
             $product->removeImages();
         }
 
         if ($product->type == 'is_variant') {
             $item['is_variant'] = true;
-            $productsVariants = ProductVariant::where('product_id', $id)
+            $productsVariants = ProductVariant::with(['discountedPrices' => function ($query) {
+                $query->latest();
+            }])
+                ->where('product_id', $id)
                 ->whereNull('deleted_at')
                 ->get();
-
             $var_id = 0;
             foreach ($productsVariants as $variant) {
                 $variant_item['var_id'] = $var_id += 1;
@@ -1022,6 +819,7 @@ class ProductsController extends BaseController
                 $variant_item['price'] = $variant->price;
                 $variant_item['cost'] = $variant->cost;
                 $variant_item['product_id'] = $variant->product_id;
+                $variant_item['discounted_price'] = $variant->discountedPrices->first();
                 $item['ProductVariant'][] = $variant_item;
             }
         } else {
@@ -1073,21 +871,25 @@ class ProductsController extends BaseController
             $rowcount = 0;
             if (($handle = fopen($file->getPathname(), "r")) !== false) {
                 $max_line_length = 10000;
-                $header = fgetcsv($handle, $max_line_length, ';'); // Use semicolon as the delimiter
+                $header = fgetcsv($handle, $max_line_length); // Use semicolon as the delimiter
+
+
+
+
 
                 // Process the header row
-                $escapedHeader = [];
-                foreach ($header as $key => $value) {
-                    $lheader = strtolower($value);
-                    $escapedItem = preg_replace('/[^a-z]/', '', $lheader);
-                    $escapedHeader[] = $escapedItem;
-                }
+                // $escapedHeader = [];
+                // foreach ($header as $value) {
+                //     $lheader = strtolower($value);
+                //     $escapedItem = preg_replace('/[^a-z]/', '', $lheader);
+                //     $escapedHeader[] = $escapedItem;
+                // }
 
                 $header_colcount = count($header);
-                while (($row = fgetcsv($handle, $max_line_length, ';')) !== false) { // Use semicolon as the delimiter
+                while (($row = fgetcsv($handle, $max_line_length)) !== false) { // Use semicolon as the delimiter
                     $row_colcount = count($row);
                     if ($row_colcount == $header_colcount) {
-                        $entry = array_combine($escapedHeader, $row);
+                        $entry = array_combine($header, $row);
                         $data[] = $entry;
                     } else {
                         return null;
@@ -1144,10 +946,15 @@ class ProductsController extends BaseController
                     foreach ($cleanedData as $key => $value) {
 
                         $category = Category::whereNull('deleted_at')
-                            ->firstOrCreate(['name' => $value['category']]);
+                            ->firstOrCreate(['name' => $value['category']], ['code' => Str::ascii($value['category'])]);
 
-                        $unit = Unit::where(['ShortName' => $value['unit']])
-                            ->orWhere(['name' => $value['unit']])
+                        $sale_unit = Unit::where(['short_name' => $value['unit_sale']])
+                            ->orWhere(['name' => $value['unit_sale']])
+                            ->whereNull('deleted_at')
+                            ->first();
+
+                        $purchase_unit = Unit::where(['short_name' => $value['unit_purchase']])
+                            ->orWhere(['name' => $value['unit_purchase']])
                             ->whereNull('deleted_at')
                             ->first();
 
@@ -1163,20 +970,19 @@ class ProductsController extends BaseController
                         $product = new Product;
                         $product->name = htmlspecialchars(trim($value['name']));;
                         $product->code = $product->check_code_exist($value['code']);
-                        $product->type_barcode = 'CODE128';
+                        $product->type_barcode = $value['type_barcode'] ?? 'CODE128';
                         $product->type = 'is_single';
                         $product->price = str_replace(",", "", $value['price']);
                         $product->cost = str_replace(",", "", $value['cost']);
                         $product->category_id = $category->id;
                         $product->brand_id = $brand_id;
-                        $product->TaxNet = 0;
+                        $product->tax_net = 0;
                         $product->tax_method = 1;
-                        $product->note = $value['note'] ? $value['note'] : '';
-                        $product->unit_id = $unit->id;
-                        $product->unit_sale_id = $unit->id;
-                        $product->unit_purchase_id = $unit->id;
-                        $product->stock_alert = $value['stockalert'] ? $value['stockalert'] : 0;
-                        $product->is_variant = 0;
+                        $product->note = $value['note'] ?? '';
+                        $product->unit_id = $sale_unit->id;
+                        $product->unit_sale_id = $sale_unit->id;
+                        $product->unit_purchase_id = $purchase_unit->id;
+                        $product->stock_alert = floatval($value['stock_alert']) ?? 0.0;
                         $product->image = 'no-image.png';
                         $product->save();
 
@@ -1186,6 +992,7 @@ class ProductsController extends BaseController
                                 $product_warehouse->product_id = $product->id;
                                 $product_warehouse->warehouse_id = $warehouse;
                                 $product_warehouse->manage_stock = 1;
+                                $product_warehouse->qty = $data['qty'] ?? 0;
                                 $product_warehouse->save();
 
                             }
@@ -1247,7 +1054,7 @@ class ProductsController extends BaseController
         $offSet = ($pageStart * $perPage) - $perPage;
         $order = $request->SortField;
         $dir = $request->SortType;
-        $helpers = new helpers();
+        $helpers = new Helper();
 
         $count_stock = CountStock::whereNull('deleted_at')->with('warehouse', 'user')
 
@@ -1312,7 +1119,7 @@ class ProductsController extends BaseController
             ->whereNull('product_warehouse.deleted_at')
             ->where('product_warehouse.warehouse_id', '=', $request->warehouse_id)
             ->select('product_warehouse.product_id as productID', 'products.name',
-                'product_warehouse.product_variant_id as productVariantID', 'product_warehouse.qte')
+                'product_warehouse.product_variant_id as productVariantID', 'product_warehouse.qty')
             ->get();
 
         $stock = [];
@@ -1327,7 +1134,7 @@ class ProductsController extends BaseController
                 $item['product_name'] = $product->name;
             }
 
-            $item['quantity'] = $product->qte === 0.0 ? '0' : $product->qte;
+            $item['quantity'] = $product->qty === 0.0 ? '0' : $product->qty;
 
 
             $stock[] = $item;

@@ -2,7 +2,7 @@
 <html lang="en">
    <head>
       <meta charset="utf-8">
-      <title>Purchase _{{$purchase['Ref']}}</title>
+      <title>Purchase _{{$purchase['ref']}}</title>
       <link rel="stylesheet" href="{{asset('/css/pdf_style.css')}}" media="all" />
    </head>
 
@@ -13,12 +13,12 @@
          </div>
          <div id="company">
             <div><strong> Date: </strong>{{$purchase['date']}}</div>
-            <div><strong> Number: </strong> {{$purchase['Ref']}}</div>
+            <div><strong> Number: </strong> {{$purchase['ref']}}</div>
             <div><strong> Status: </strong> {{$purchase['status']}}</div>
-            <div><strong> Payment Status: </strong> {{$purchase['payment_status']}}</div>
+            <div><strong> Payment Status: </strong> {{$purchase['payment_status']->value}}</div>
          </div>
          <div id="Title-heading">
-             Purchase  : {{$purchase['Ref']}}
+             Purchase  : {{$purchase['ref']}}
          </div>
          </div>
       </header>
@@ -54,9 +54,9 @@
                   <tbody>
                      <tr>
                         <td>
-                           <div id="comp">{{$setting['CompanyName']}}</div>
-                           <div><strong>Address :</strong>  {{$setting['CompanyAddress']}}</div>
-                           <div><strong>Phone :</strong>  {{$setting['CompanyPhone']}}</div>
+                           <div id="comp">{{$setting['company_name']}}</div>
+                           <div><strong>Address :</strong>  {{$setting['company_address']}}</div>
+                           <div><strong>Phone :</strong>  {{$setting['company_phone']}}</div>
                            <div><strong>Email :</strong>  {{$setting['email']}}</div>
                         </td>
                      </tr>
@@ -87,8 +87,8 @@
                      </td>
                      <td>{{$detail['cost']}} </td>
                      <td>{{$detail['quantity']}}/{{$detail['unit_purchase']}}</td>
-                     <td>{{$detail['DiscountNet']}} </td>
-                     <td>{{$detail['taxe']}} </td>
+                     <td>{{$detail['discount_net']}} </td>
+                     <td>{{$detail['tax']}} </td>
                      <td>{{$detail['total']}} </td>
                   </tr>
                   @endforeach
@@ -99,7 +99,7 @@
             <table>
                <tr>
                   <td>Order Tax</td>
-                  <td>{{$purchase['TaxNet']}} </td>
+                  <td>{{$purchase['tax_net']}} </td>
                </tr>
                <tr>
                   <td>Discount</td>
@@ -111,7 +111,7 @@
                </tr>
                <tr>
                   <td>Total</td>
-                  <td>{{$symbol}} {{$purchase['GrandTotal']}} </td>
+                  <td>{{$symbol}} {{$purchase['grand_total']}} </td>
                </tr>
 
                <tr>

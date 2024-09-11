@@ -8,7 +8,7 @@ use App\Models\PaymentSaleReturns;
 use App\Models\Role;
 use App\Models\SaleReturn;
 use App\Models\Setting;
-use App\utils\helpers;
+use App\utils\Helper;
 use Carbon\Carbon;
 use App\Models\Account;
 use Illuminate\Http\Request;
@@ -36,7 +36,7 @@ class PaymentSaleReturnsController extends BaseController
         $offSet = ($pageStart * $perPage) - $perPage;
         $order = $request->SortField;
         $dir = $request->SortType;
-        $helpers = new helpers();
+        $helpers = new Helper();
         $role = Auth::user()->roles()->first();
         $view_records = Role::findOrFail($role->id)->inRole('record_view');
         // Filter fields With Params to retriever
@@ -363,9 +363,9 @@ class PaymentSaleReturnsController extends BaseController
         $payment_data['date'] = $payment->date;
         $payment_data['Reglement'] = $payment->Reglement;
 
-        $helpers = new helpers();
+        $helpers = new Helper();
         $settings = Setting::where('deleted_at', '=', null)->first();
-        $symbol = $helpers->Get_Currency_Code();
+        $symbol = $helpers->getCurrencyCode();
 
         $Html = view('pdf.Payment_Sale_Return', [
             'symbol'  => $symbol,

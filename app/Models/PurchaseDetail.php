@@ -8,14 +8,14 @@ class PurchaseDetail extends Model
 {
 
     protected $fillable = [
-        'id', 'purchase_id','purchase_unit_id', 'quantity', 'product_id', 'total', 'product_variant_id',
-        'cost', 'TaxNet', 'discount', 'discount_method', 'tax_method',
+        'id', 'purchase_id', 'purchase_unit_id', 'quantity', 'product_id', 'total', 'product_variant_id',
+        'cost', 'tax_net', 'discount', 'discount_method', 'tax_method',
     ];
 
     protected $casts = [
         'total' => 'double',
         'cost' => 'double',
-        'TaxNet' => 'double',
+        'tax_net' => 'double',
         'discount' => 'double',
         'quantity' => 'double',
         'purchase_id' => 'integer',
@@ -26,12 +26,23 @@ class PurchaseDetail extends Model
 
     public function purchase()
     {
-        return $this->belongsTo('App\Models\Purchase');
+        return $this->belongsTo(Purchase::class);
     }
 
     public function product()
     {
-        return $this->belongsTo('App\Models\Product');
+        return $this->belongsTo(Product::class);
     }
+
+    public function productVariant()
+    {
+        return $this->belongsTo(ProductVariant::class);
+    }
+
+    public function purchaseUnit()
+    {
+        return $this->belongsTo(Unit::class, 'purchase_unit_id');
+    }
+
 
 }

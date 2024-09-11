@@ -21,9 +21,7 @@ const baseRoutes = [
                 path: "/app/dashboard",
                 name: "dashboard",
                 component: () =>
-                    import(
-                        /* webpackChunkName: "dashboard" */ "./views/app/dashboard/dashboard"
-                        )
+                    import(/* webpackChunkName: "dashboard" */ "./views/app/dashboard/dashboard")
 
             },
 
@@ -121,9 +119,7 @@ const baseRoutes = [
             {
                 path: "/app/adjustments",
                 component: () =>
-                    import(
-                        /* webpackChunkName: "adjustments" */ "./views/app/pages/adjustment"
-                        ),
+                    import(/* webpackChunkName: "adjustments" */ "./views/app/pages/adjustment"),
                 redirect: "/app/adjustments/list",
                 children: [
                     {
@@ -468,7 +464,22 @@ const baseRoutes = [
                             import(
                                 /* webpackChunkName: "shipment" */ "./views/app/pages/sales/shipments"
                                 )
-                    }
+                    },
+                    {
+                        name: "promotions",
+                        path: "promotions",
+                        component: () => import(/* webpackChunkName: "promotions" */"./views/app/pages/promotions/index_Promotions.vue")
+                    },
+                    {
+                        name: "create promotion",
+                        path: "promotions/create",
+                        component: () => import(/* webpackChunkName: "promotions" */"./views/app/pages/promotions/Create_Promotion.vue")
+                    },
+                    {
+                        name: "edit promotion",
+                        path: "promotions/:id/edit",
+                        component: () => import(/* webpackChunkName: "promotions" */"./views/app/pages/promotions/Edit_Promotion.vue")
+                    },
                 ]
             },
 
@@ -1216,6 +1227,13 @@ const baseRoutes = [
         component: () =>
             import(/* webpackChunkName: "pos" */ "./views/app/pages/pos")
     },
+    {
+        name: "simple pos",
+        path: "/app/simple_pos",
+        // beforeEnter: authenticate,
+        component: () =>
+            import(/* webpackChunkName: "pos" */ "./views/app/pages/simple_pos")
+    },
 
     {
         name: "pos_draft",
@@ -1268,22 +1286,18 @@ router.beforeEach((to, from, next) => {
         NProgress.start();
         NProgress.set(0.1);
     }
-    next();
 
     if (
         store.state.language.language &&
         store.state.language.language !== i18n.locale
     ) {
         i18n.locale = store.state.language.language;
-        next();
     } else if (!store.state.language.language) {
-        store.dispatch("language/setLanguage", navigator.languages).then(() => {
-            i18n.locale = store.state.language.language;
-            next();
-        });
-    } else {
-        next();
+        store.dispatch("language/setLanguage", navigator.languages)
+            .then(() => i18n.locale = store.state.language.language);
     }
+
+    next();
 });
 
 router.afterEach(() => {
@@ -1294,7 +1308,6 @@ router.afterEach(() => {
     }
     // Complete the animation of the route progress bar.
     setTimeout(() => NProgress.done(), 500);
-    // NProgress.done();
 
     if (window.innerWidth <= 1200) {
         store.dispatch("changeSidebarProperties");
@@ -1311,18 +1324,5 @@ router.afterEach(() => {
         }
     }
 });
-
-async function Check_Token(to, from, next) {
-    let token = to.params.token;
-    const res = await axios
-        .get("password/find/" + token)
-        .then(response => response.data);
-
-    if (!res.success) {
-        next("/app/sessions/signIn");
-    } else {
-        return next();
-    }
-}
 
 export default router;

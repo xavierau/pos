@@ -10,7 +10,7 @@ use App\Models\PaymentSaleReturns;
 use App\Models\Sale;
 use App\Models\SaleReturn;
 use App\Models\Setting;
-use App\utils\helpers;
+use App\utils\Helper;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Http\Request;
@@ -32,7 +32,7 @@ class ClientController extends BaseController
         $offSet = ($pageStart * $perPage) - $perPage;
         $order = $request->SortField;
         $dir = $request->SortType;
-        $helpers = new helpers();
+        $helpers = new Helper();
         // Filter fields With Params to retrieve
         $columns = array(0 => 'name', 1 => 'code', 2 => 'phone', 3 => 'email');
         $param = array(0 => 'like', 1 => 'like', 2 => 'like', 3 => 'like');
@@ -137,7 +137,7 @@ class ClientController extends BaseController
             ]
         );
 
-        Client::create([
+        $newClient = Client::create([
             'name' => $request['name'],
             'code' => $this->getNumberOrder(),
             'address' => $request['address'],
@@ -147,7 +147,7 @@ class ClientController extends BaseController
             'city' => $request['city'],
             'tax_number' => $request['tax_number'],
         ]);
-        return response()->json(['success' => true]);
+        return response()->json(['success' => true,'client_id' => $newClient->id]);
     }
 
     //------------ function show -----------\\
@@ -345,7 +345,7 @@ class ClientController extends BaseController
                 $payment_sale = new PaymentSale();
                 $payment_sale->sale_id = $client_sale->id;
                 $payment_sale->account_id = $request['account_id'] ? $request['account_id'] : NULL;
-                $payment_sale->Ref = app('App\Http\Controllers\PaymentSalesController')->getNumberOrder();
+                $payment_sale->Ref = PaymentSale::generateOrderNumber();
                 $payment_sale->date = Carbon::now();
                 $payment_sale->Reglement = $request['Reglement'];
                 $payment_sale->montant = $amount;

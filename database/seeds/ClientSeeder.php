@@ -23,7 +23,7 @@ class ClientSeeder extends Seeder
                 'country' => 'bangladesh',
                 'city' => 'dhaka',
                 'phone' => '123456780',
-                'Address' => 'N45 , Dhaka',
+                'address' => 'N45 , Dhaka',
                 'tax_number' => NULL,
             )
 

@@ -14,7 +14,7 @@ use DateTime;
 use Exception;
 use DB;
 use Illuminate\Support\Facades\Auth;
-use App\utils\helpers;
+use App\utils\Helper;
 
 class AttendancesController extends Controller
 {
@@ -77,7 +77,7 @@ class AttendancesController extends Controller
             $item['employee_id'] = $attendance['employee']->id;
             $item['company_name'] = $attendance['company']->name;
             $item['employee_username'] = $attendance['employee']->username;
-            
+
             $data[] = $item;
         }
 
@@ -131,9 +131,9 @@ class AttendancesController extends Controller
             return $e;
         }
 
-        
+
         $employee = Employee::with('office_shift')->findOrFail($employee_id);
-        
+
         $day_now = Carbon::parse($request->date)->format('l');
         $day_in_now = strtolower($day_now) . '_in';
         $day_out_now = strtolower($day_now) . '_out';
@@ -211,7 +211,7 @@ class AttendancesController extends Controller
 
     public function show($id){
         //
-        
+
     }
 
     //------------ function edit -----------\\
@@ -254,9 +254,9 @@ class AttendancesController extends Controller
         }
 
         $day_now = Carbon::parse($request->date)->format('l');
-    
+
         $employee = Employee::with('office_shift')->findOrFail($employee_id);
-        
+
         $day_in_now = strtolower($day_now) . '_in';
         $day_out_now = strtolower($day_now) . '_out';
 
@@ -358,6 +358,6 @@ class AttendancesController extends Controller
 
         return response()->json(['success' => true]);
     }
-    
+
 
 }

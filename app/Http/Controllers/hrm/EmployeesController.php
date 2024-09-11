@@ -19,7 +19,7 @@ use App\Models\Complaint;
 use App\Models\Project;
 use App\Models\Task;
 use App\Models\Training;
-use App\utils\helpers;
+use App\utils\Helper;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Support\Facades\Hash;
@@ -43,13 +43,13 @@ class EmployeesController extends Controller
         $offSet = ($pageStart * $perPage) - $perPage;
         $order = $request->SortField;
         $dir = $request->SortType;
-        $helpers = new helpers();
+        $helpers = new Helper();
         // Filter fields With Params to retrieve
         $param = array(
             0 => 'like',
             1 => 'like',
             2 => '=',
-           
+
         );
         $columns = array(
             0 => 'username',
@@ -91,7 +91,7 @@ class EmployeesController extends Controller
             $item['department_name'] = $employee['department']->department;
             $item['designation_name'] = $employee['designation']->designation;
             $item['office_shift_name'] = $employee['office_shift']->name;
-          
+
             $data[] = $item;
         }
 
@@ -109,11 +109,11 @@ class EmployeesController extends Controller
 
       public function create(Request $request)
       {
-  
+
           $this->authorizeForUser($request->user('api'), 'create', Employee::class);
-  
+
           $companies = Company::where('deleted_at', '=', null)->get(['id','name']);
-  
+
           return response()->json([
               'companies' => $companies,
           ]);
@@ -135,7 +135,7 @@ class EmployeesController extends Controller
                 'designation_id' => 'required',
                 'office_shift_id'=> 'required',
             ]);
-          
+
             $data = [];
             $data['firstname'] = $request['firstname'];
             $data['lastname'] = $request['lastname'];
@@ -150,13 +150,13 @@ class EmployeesController extends Controller
             $data['designation_id'] = $request['designation_id'];
             $data['office_shift_id'] = $request['office_shift_id'];
             $data['joining_date'] = $request['joining_date'];
-            
+
             Employee::create($data);
-            
+
             return response()->json(['success' => true]);
     }
 
-   
+
      //------------ function show -----------\\
 
      public function show(Request $request, $id)
@@ -176,8 +176,8 @@ class EmployeesController extends Controller
             'office_shifts' => $office_shifts,
             'departments' => $departments,
             'designations' => $designations,
-        ]);   
-    
+        ]);
+
     }
 
     public function edit(Request $request, $id)
@@ -189,23 +189,23 @@ class EmployeesController extends Controller
         $office_shifts = OfficeShift::where('company_id' , $employee->company_id)->where('deleted_at', '=', null)->get(['id','name']);
         $departments = Department::where('company_id' , $employee->company_id)->where('deleted_at', '=', null)->get(['id','department']);
         $designations = Designation::where('department_id' , $employee->department_id)->where('deleted_at', '=', null)->get(['id','designation']);
-        
+
         return response()->json([
             'employee' => $employee,
             'companies' => $companies,
             'office_shifts' => $office_shifts,
             'departments' => $departments,
             'designations' => $designations,
-        ]);     
+        ]);
     }
 
      //---------------- UPDATE Employee -------------\\
 
      public function update(Request $request, $id)
      {
- 
+
          $this->authorizeForUser($request->user('api'), 'update', Employee::class);
- 
+
          $this->validate($request, [
             'firstname'      => 'required|string',
             'lastname'       => 'required|string',
@@ -221,7 +221,7 @@ class EmployeesController extends Controller
             'hourly_rate'     => 'nullable|numeric',
         ]);
 
-       
+
         $data = [];
         $data['firstname'] = $request['firstname'];
         $data['lastname'] = $request['lastname'];
@@ -266,7 +266,7 @@ class EmployeesController extends Controller
             $data['total_leave'] = $request->total_leave;
             $data['remaining_leave'] = $employee_leave_info->remaining_leave;
         }
-        
+
         Employee::find($id)->update($data);
 
          return response()->json(['success' => true]);
@@ -344,19 +344,19 @@ class EmployeesController extends Controller
 
        public function get_experiences_by_employee(request $request)
        {
-   
+
            $this->authorizeForUser($request->user('api'), 'view', Employee::class);
            // How many items do you want to display.
            $perPage = $request->limit;
            $pageStart = \Request::get('page', 1);
            // Start displaying items from this number;
            $offSet = ($pageStart * $perPage) - $perPage;
-   
+
             $experiences = EmployeeExperience::where('employee_id' , $request->id)
             ->where('deleted_at', '=', null)
             ->orderBy('id', 'desc');
 
-   
+
            $totalRows = $experiences->count();
            if($perPage == "-1"){
                $perPage = $totalRows;
@@ -365,32 +365,32 @@ class EmployeesController extends Controller
                ->limit($perPage)
                ->orderBy('id', 'desc')
                ->get();
-   
-          
+
+
            return response()->json([
                'totalRows' => $totalRows,
                'experiences' => $experiences,
            ]);
-   
+
        }
 
          //-------------------- get_accounts_by_employee -------------\\
 
          public function get_accounts_by_employee(request $request)
          {
-     
+
              $this->authorizeForUser($request->user('api'), 'view', Employee::class);
              // How many items do you want to display.
              $perPage = $request->limit;
              $pageStart = \Request::get('page', 1);
              // Start displaying items from this number;
              $offSet = ($pageStart * $perPage) - $perPage;
-     
+
               $accounts_bank = EmployeeAccount::where('employee_id' , $request->id)
               ->where('deleted_at', '=', null)
               ->orderBy('id', 'desc');
-  
-     
+
+
              $totalRows = $accounts_bank->count();
              if($perPage == "-1"){
                  $perPage = $totalRows;
@@ -399,13 +399,13 @@ class EmployeesController extends Controller
                  ->limit($perPage)
                  ->orderBy('id', 'desc')
                  ->get();
-     
-            
+
+
              return response()->json([
                  'totalRows' => $totalRows,
                  'accounts_bank' => $accounts_bank,
              ]);
-     
+
          }
 
 

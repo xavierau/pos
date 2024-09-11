@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Client;
 use App\Models\EcommerceClient;
 use App\Models\Setting;
-use App\utils\helpers;
+use App\utils\Helper;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -29,7 +29,7 @@ class ClientsEcommerceController extends BaseController
         $offSet = ($pageStart * $perPage) - $perPage;
         $order = $request->SortField;
         $dir = $request->SortType;
-        $helpers = new helpers();
+        $helpers = new Helper();
         // Filter fields With Params to retrieve
         $columns = array(0 => 'name', 1 => 'code', 2 => 'phone', 3 => 'email');
         $param = array(0 => 'like', 1 => 'like', 2 => 'like', 3 => 'like');
@@ -72,7 +72,7 @@ class ClientsEcommerceController extends BaseController
         $clientsWithoutEcommerce = \App\Models\Client::whereNotIn('id', function($query){
             $query->select('client_id')->from('ecommerce_clients');
         })->count();
-        
+
         return response()->json([
             'clients' => $data,
             'totalRows' => $totalRows,
@@ -110,7 +110,7 @@ class ClientsEcommerceController extends BaseController
                     'password'  => Hash::make($request['password']),
                     'status'    => 1,
                 ]);
-    
+
             }, 10);
          }
 
@@ -123,7 +123,7 @@ class ClientsEcommerceController extends BaseController
 
     public function show($id){
         //
-        
+
     }
 
     //------------- Update Customer -------------\\
@@ -131,13 +131,13 @@ class ClientsEcommerceController extends BaseController
     public function update(Request $request, $id)
     {
         $this->authorizeForUser($request->user('api'), 'update', Client::class);
-        
+
         $client_exist = EcommerceClient::where('client_id', $id)->exists();
 
         if($client_exist){
             $client_ecommerce = EcommerceClient::where('client_id' , $id)->first();
         }
-      
+
         $this->validate($request, [
             'email' => [
                 'required',
@@ -163,7 +163,7 @@ class ClientsEcommerceController extends BaseController
                 }
 
             }
-                  
+
             EcommerceClient::where('client_id' , $id)->update([
                 'email' => $request['email'],
                 'password' => $pass,
@@ -174,7 +174,7 @@ class ClientsEcommerceController extends BaseController
             ]);
 
         }, 10);
-        
+
         return response()->json(['success' => true]);
 
     }

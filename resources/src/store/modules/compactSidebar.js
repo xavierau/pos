@@ -1,7 +1,6 @@
 const state = {
   compactSidebarToggleProperties: {
     isSideNavOpen: true,
-
     isActiveSecondarySideNav: false
   },
   compactLeftSideBarBgColor: "sidebar-dark-purple"

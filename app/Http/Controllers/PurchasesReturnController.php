@@ -12,7 +12,7 @@ use App\Models\ProductWarehouse;
 use App\Models\Provider;
 use App\Models\Purchase;
 use App\Models\PurchaseReturn;
-use App\Models\PurchaseReturnDetails;
+use App\Models\PurchaseReturnDetail;
 use App\Models\PurchaseDetail;
 use App\Models\Role;
 use App\Models\Setting;
@@ -20,7 +20,7 @@ use App\Models\Warehouse;
 use App\Models\User;
 use App\Models\UserWarehouse;
 use App\Models\sms_gateway;
-use App\utils\helpers;
+use App\utils\Helper;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -46,7 +46,7 @@ class PurchasesReturnController extends BaseController
         $offSet = ($pageStart * $perPage) - $perPage;
         $order = $request->SortField;
         $dir = $request->SortType;
-        $helpers = new helpers();
+        $helpers = new Helper();
         // Filter fields With Params to retrieve
         $param = array(
             0 => 'like',
@@ -245,7 +245,7 @@ class PurchasesReturnController extends BaseController
                 }
 
             }
-            PurchaseReturnDetails::insert($orderDetails);
+            PurchaseReturnDetail::insert($orderDetails);
         }, 10);
 
         return response()->json(['success' => true]);
@@ -268,7 +268,7 @@ class PurchasesReturnController extends BaseController
                 $this->authorizeForUser($request->user('api'), 'check_record', $current_PurchaseReturn);
             }
 
-            $old_Return_Details = PurchaseReturnDetails::where('purchase_return_id', $id)->get();
+            $old_Return_Details = PurchaseReturnDetail::where('purchase_return_id', $id)->get();
             $New_Return_Details = $request['details'];
             $length = sizeof($New_Return_Details);
 
@@ -331,7 +331,7 @@ class PurchasesReturnController extends BaseController
 
                     // Delete Detail
                     if (!in_array($old_products_id[$key], $new_products_id)) {
-                        $PurchaseReturnDetails = PurchaseReturnDetails::findOrFail($value->id);
+                        $PurchaseReturnDetails = PurchaseReturnDetail::findOrFail($value->id);
                         $PurchaseReturnDetails->delete();
                     }
                 }
@@ -392,9 +392,9 @@ class PurchasesReturnController extends BaseController
                     $orderDetails['imei_number'] = $product_detail['imei_number'];
 
                     if (!in_array($product_detail['id'], $old_products_id)) {
-                        PurchaseReturnDetails::Create($orderDetails);
+                        PurchaseReturnDetail::Create($orderDetails);
                     } else {
-                        PurchaseReturnDetails::where('id', $product_detail['id'])->update($orderDetails);
+                        PurchaseReturnDetail::where('id', $product_detail['id'])->update($orderDetails);
                     }
                 }
 
@@ -436,7 +436,7 @@ class PurchasesReturnController extends BaseController
             $role = Auth::user()->roles()->first();
             $view_records = Role::findOrFail($role->id)->inRole('record_view');
             $current_PurchaseReturn = PurchaseReturn::findOrFail($id);
-            $old_Return_Details = PurchaseReturnDetails::where('purchase_return_id', $id)->get();
+            $old_Return_Details = PurchaseReturnDetail::where('purchase_return_id', $id)->get();
 
             // Check If User Has Permission view All Records
             if (!$view_records) {
@@ -535,7 +535,7 @@ class PurchasesReturnController extends BaseController
 
             foreach ($selectedIds as $PurchaseReturn_id) {
                 $current_PurchaseReturn = PurchaseReturn::findOrFail($PurchaseReturn_id);
-                $old_Return_Details = PurchaseReturnDetails::where('purchase_return_id', $PurchaseReturn_id)->get();
+                $old_Return_Details = PurchaseReturnDetail::where('purchase_return_id', $PurchaseReturn_id)->get();
 
 
                 // Check If User Has Permission view All Records
@@ -1074,7 +1074,7 @@ class PurchasesReturnController extends BaseController
     {
 
         $details = array();
-        $helpers = new helpers();
+        $helpers = new Helper();
         $PurchaseReturn = PurchaseReturn::with('purchase','details.product.unitPurchase')
             ->where('deleted_at', '=', null)
             ->findOrFail($id);
@@ -1154,7 +1154,7 @@ class PurchasesReturnController extends BaseController
         }
 
         $settings = Setting::where('deleted_at', '=', null)->first();
-        $symbol = $helpers->Get_Currency_Code();
+        $symbol = $helpers->getCurrencyCode();
 
         $Html = view('pdf.Purchase_Return_pdf', [
             'symbol' => $symbol,

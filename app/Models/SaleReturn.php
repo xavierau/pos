@@ -3,20 +3,23 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class SaleReturn extends Model
 {
+    use SoftDeletes;
+
     protected $dates = ['deleted_at'];
 
     protected $fillable = [
-        'date', 'Ref', 'GrandTotal',
+        'date', 'ref', 'grand_total',
         'user_id', 'discount', 'shipping',
-        'warehouse_id', 'client_id','sale_id', 'notes', 'TaxNet', 'tax_rate', 'status',
+        'warehouse_id', 'client_id', 'sale_id', 'notes', 'tax_net', 'tax_rate', 'status',
         'paid_amount', 'payment_status', 'created_at', 'updated_at', 'deleted_at',
     ];
 
     protected $casts = [
-        'GrandTotal' => 'double',
+        'grand_total' => 'double',
         'user_id' => 'integer',
         'client_id' => 'integer',
         'sale_id' => 'integer',

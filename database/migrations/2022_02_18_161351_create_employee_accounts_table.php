@@ -15,15 +15,20 @@ class CreateEmployeeAccountsTable extends Migration {
 	{
 		Schema::create('employee_accounts', function(Blueprint $table)
 		{
-			$table->engine = 'InnoDB';
-			$table->integer('id', true);
-			$table->integer('employee_id')->index('employee_accounts_employee_id');
+			$table->id('id', true);
+
 			$table->string('bank_name', 192);
 			$table->string('bank_branch', 192);
 			$table->string('account_no', 192);
 			$table->text('note')->nullable();
+
+            $table->unsignedBigInteger('employee_id');
 			$table->timestamps(6);
 			$table->softDeletes();
+
+            $table->foreign('employee_id')->references('id')->on('employees');
+
+
 		});
 	}
 

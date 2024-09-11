@@ -13,7 +13,7 @@ class UserSeeder extends Seeder
      */
     public function run()
     {
-       // Insert some stuff
+        // Insert some stuff
         DB::table('users')->insert(
             array(
                 'id' => 1,
@@ -24,9 +24,8 @@ class UserSeeder extends Seeder
                 'password' => Hash::make("password"),
                 'avatar' => 'no_avatar.png',
                 'phone' => '0123456789',
-                'role_id' => 1,
-                'status' => 1,
-                'is_all_warehouses' => 1,
+                'is_active' => true,
+                'is_all_warehouses' => true,
             )
         );
     }

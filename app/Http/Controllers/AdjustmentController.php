@@ -10,7 +10,7 @@ use App\Models\ProductVariant;
 use App\Models\ProductWarehouse;
 use App\Models\Role;
 use App\Models\Warehouse;
-use App\utils\helpers;
+use App\utils\Helper;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Http\Request;
@@ -34,7 +34,7 @@ class AdjustmentController extends BaseController
         $offSet = ($pageStart * $perPage) - $perPage;
         $order = $request->SortField;
         $dir = $request->SortType;
-        $helpers = new helpers();
+        $helpers = new Helper();
         // Filter fields With Params to retrieve
         $columns = array(0 => 'Ref', 1 => 'warehouse_id', 2 => 'date');
         $param = array(0 => 'like', 1 => '=', 2 => '=');
@@ -137,7 +137,7 @@ class AdjustmentController extends BaseController
                             ->first();
 
                         if ($product_warehouse) {
-                            $product_warehouse->qte += $value['quantity'];
+                            $product_warehouse->qty += $value['quantity'];
                             $product_warehouse->save();
                         }
 
@@ -148,7 +148,7 @@ class AdjustmentController extends BaseController
                             ->first();
 
                         if ($product_warehouse) {
-                            $product_warehouse->qte += $value['quantity'];
+                            $product_warehouse->qty += $value['quantity'];
                             $product_warehouse->save();
                         }
                     }
@@ -162,7 +162,7 @@ class AdjustmentController extends BaseController
                             ->first();
 
                         if ($product_warehouse) {
-                            $product_warehouse->qte -= $value['quantity'];
+                            $product_warehouse->qty -= $value['quantity'];
                             $product_warehouse->save();
                         }
 
@@ -173,7 +173,7 @@ class AdjustmentController extends BaseController
                             ->first();
 
                         if ($product_warehouse) {
-                            $product_warehouse->qte -= $value['quantity'];
+                            $product_warehouse->qty -= $value['quantity'];
                             $product_warehouse->save();
                         }
                     }
@@ -238,7 +238,7 @@ class AdjustmentController extends BaseController
                             ->first();
 
                         if ($product_warehouse) {
-                            $product_warehouse->qte -= $value['quantity'];
+                            $product_warehouse->qty -= $value['quantity'];
                             $product_warehouse->save();
                         }
 
@@ -249,7 +249,7 @@ class AdjustmentController extends BaseController
                             ->first();
 
                         if ($product_warehouse) {
-                            $product_warehouse->qte -= $value['quantity'];
+                            $product_warehouse->qty -= $value['quantity'];
                             $product_warehouse->save();
                         }
                     }
@@ -262,7 +262,7 @@ class AdjustmentController extends BaseController
                             ->first();
 
                         if ($product_warehouse) {
-                            $product_warehouse->qte += $value['quantity'];
+                            $product_warehouse->qty += $value['quantity'];
                             $product_warehouse->save();
                         }
 
@@ -273,7 +273,7 @@ class AdjustmentController extends BaseController
                             ->first();
 
                         if ($product_warehouse) {
-                            $product_warehouse->qte += $value['quantity'];
+                            $product_warehouse->qty += $value['quantity'];
                             $product_warehouse->save();
                         }
                     }
@@ -299,7 +299,7 @@ class AdjustmentController extends BaseController
                             ->first();
 
                         if ($product_warehouse) {
-                            $product_warehouse->qte += $product_detail['quantity'];
+                            $product_warehouse->qty += $product_detail['quantity'];
                             $product_warehouse->save();
                         }
 
@@ -310,7 +310,7 @@ class AdjustmentController extends BaseController
                             ->first();
 
                         if ($product_warehouse) {
-                            $product_warehouse->qte += $product_detail['quantity'];
+                            $product_warehouse->qty += $product_detail['quantity'];
                             $product_warehouse->save();
                         }
                     }
@@ -323,7 +323,7 @@ class AdjustmentController extends BaseController
                             ->first();
 
                         if ($product_warehouse) {
-                            $product_warehouse->qte -= $product_detail['quantity'];
+                            $product_warehouse->qty -= $product_detail['quantity'];
                             $product_warehouse->save();
                         }
 
@@ -334,7 +334,7 @@ class AdjustmentController extends BaseController
                             ->first();
 
                         if ($product_warehouse) {
-                            $product_warehouse->qte -= $product_detail['quantity'];
+                            $product_warehouse->qty -= $product_detail['quantity'];
                             $product_warehouse->save();
                         }
                     }
@@ -396,7 +396,7 @@ class AdjustmentController extends BaseController
                             ->first();
 
                         if ($product_warehouse) {
-                            $product_warehouse->qte -= $value['quantity'];
+                            $product_warehouse->qty -= $value['quantity'];
                             $product_warehouse->save();
                         }
 
@@ -407,7 +407,7 @@ class AdjustmentController extends BaseController
                             ->first();
 
                         if ($product_warehouse) {
-                            $product_warehouse->qte -= $value['quantity'];
+                            $product_warehouse->qty -= $value['quantity'];
                             $product_warehouse->save();
                         }
                     }
@@ -420,7 +420,7 @@ class AdjustmentController extends BaseController
                             ->first();
 
                         if ($product_warehouse) {
-                            $product_warehouse->qte += $value['quantity'];
+                            $product_warehouse->qty += $value['quantity'];
                             $product_warehouse->save();
                         }
 
@@ -431,7 +431,7 @@ class AdjustmentController extends BaseController
                             ->first();
 
                         if ($product_warehouse) {
-                            $product_warehouse->qte += $value['quantity'];
+                            $product_warehouse->qty += $value['quantity'];
                             $product_warehouse->save();
                         }
                     }
@@ -481,7 +481,7 @@ class AdjustmentController extends BaseController
                                 ->first();
 
                             if ($product_warehouse) {
-                                $product_warehouse->qte -= $value['quantity'];
+                                $product_warehouse->qty -= $value['quantity'];
                                 $product_warehouse->save();
                             }
 
@@ -492,7 +492,7 @@ class AdjustmentController extends BaseController
                                 ->first();
 
                             if ($product_warehouse) {
-                                $product_warehouse->qte -= $value['quantity'];
+                                $product_warehouse->qty -= $value['quantity'];
                                 $product_warehouse->save();
                             }
                         }
@@ -505,7 +505,7 @@ class AdjustmentController extends BaseController
                                 ->first();
 
                             if ($product_warehouse) {
-                                $product_warehouse->qte += $value['quantity'];
+                                $product_warehouse->qty += $value['quantity'];
                                 $product_warehouse->save();
                             }
 
@@ -516,7 +516,7 @@ class AdjustmentController extends BaseController
                                 ->first();
 
                             if ($product_warehouse) {
-                                $product_warehouse->qte += $value['quantity'];
+                                $product_warehouse->qty += $value['quantity'];
                                 $product_warehouse->save();
                             }
                         }

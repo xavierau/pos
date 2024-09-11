@@ -8,6 +8,7 @@ use App\Models\ProductWarehouse;
 use App\Models\Warehouse;
 use Carbon\Carbon;
 use Gumlet\ImageResizeException;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
 class UpdateProductAction
@@ -16,6 +17,7 @@ class UpdateProductAction
     public function execute(Product $product, array $data)
     {
         DB::transaction(function () use ($product, $data) {
+
             $product = $this->updateProductBasicInfo($product, $data);
 
             switch ($data['type']) {
@@ -29,12 +31,14 @@ class UpdateProductAction
                     $product = $this->updateProduct($product, $data);
             }
 
+
             $filename = $this->updateProductImages($product, $data);
 
             $product->image = $filename;
             $product->save();
 
         });
+
 
         return $product->refresh();
 
@@ -49,16 +53,12 @@ class UpdateProductAction
         $product->type_barcode = $data['type_barcode'];
         $product->category_id = $data['category_id'];
         $product->brand_id = $data['brand_id'] == 'null' ? Null : $data['brand_id'];
-        $product->TaxNet = $data['TaxNet'];
+        $product->tax_net = $data['tax_net'];
         $product->tax_method = $data['tax_method'];
         $product->note = $data['note'];
 
         $product->is_imei = $data['is_imei'] == 'true' ? 1 : 0;
         $product->not_selling = $data['not_selling'] == 'true' ? 1 : 0;
-
-        $product->promotional_price = $data['promotional_price'];
-        $product->promotional_start_date = $data['promotional_price'] ? $data['promotional_start_date'] : null;
-        $product->promotional_end_date = $data['promotional_price'] ? $data['promotional_end_date'] : null;
 
         return $product;
 
@@ -95,6 +95,8 @@ class UpdateProductAction
 
         $this->updateOldVariants($product, $data, $manage_stock);
 
+        $this->updateDiscountedPrice($product, $data['discounted_price']);
+
         return $product;
     }
 
@@ -110,7 +112,7 @@ class UpdateProductAction
                 $var_old->deleted_at = Carbon::now();
                 $var_old->save();
 
-                $productWarehouse = ProductWarehouse::where('product_variant_id', $old_var['id'])
+                ProductWarehouse::where('product_variant_id', $old_var['id'])
                     ->update([
                         'deleted_at' => Carbon::now(),
                     ]);
@@ -132,7 +134,7 @@ class UpdateProductAction
         }
     }
 
-    private function updateVariantTypeProduct(Product $product, array $data): void
+    private function updateVariantTypeProduct(Product $product, array $data): Product
     {
         $product->price = 0;
         $product->cost = 0;
@@ -267,9 +269,11 @@ class UpdateProductAction
             }
 
         }
+
+        return $product;
     }
 
-    private function updateProduct(Product $product, array $data): void
+    private function updateProduct(Product $product, array $data): Product
     {
         $product->price = $data['price'];
         $product->cost = 0;
@@ -281,6 +285,8 @@ class UpdateProductAction
         $product->stock_alert = 0;
         $product->is_variant = 0;
         $manage_stock = 0;
+
+        $this->updateDiscountedPrice($product, $data['discounted_price']);
 
         list($oldVariants, $warehouses) = $this->getProductVariantAndWarehouses($product);
 
@@ -312,12 +318,14 @@ class UpdateProductAction
                 ProductWarehouse::insert($product_warehouse);
             }
         }
+
+        return $product;
     }
 
     /**
      * @throws \Gumlet\ImageResizeException
      */
-    private function updateProductImages(?Product $product, array $data): string
+    private function updateProductImages(Product $product, array $data): string
     {
         $this->removeProductImages($product);
 
@@ -377,6 +385,26 @@ class UpdateProductAction
                 }
             }
         }
+    }
+
+    private function updateDiscountedPrice(Model $model, array $discounted_price)
+    {
+
+        if ($discounted_price['id']) {
+            return $model->discountedPrices()->where('id', $discounted_price['id'])
+                ->update([
+                    'start_date' => $discounted_price['start_date'],
+                    'end_date' => $discounted_price['end_date'],
+                    'discounted_price' => $discounted_price['discounted_price'],
+                ]);
+        }
+
+        return $model->discountedPrices()->where('id', $discounted_price['id'])
+            ->create([
+                'start_date' => $discounted_price['start_date'],
+                'end_date' => $discounted_price['end_date'],
+                'discounted_price' => $discounted_price['discounted_price'],
+            ]);
     }
 
 }

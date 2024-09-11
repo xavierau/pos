@@ -1,7 +1,7 @@
 <template>
   <div class="main-content">
     <breadcumb :page="$t('productsList')" :folder="$t('Products')"/>
-    <div v-if="isLoading" class="loading_page spinner spinner-primary mr-3"></div>
+    <div v-if="is_loading" class="loading_page spinner spinner-primary mr-3"></div>
     <div v-else>
       <vue-good-table
         mode="remote"
@@ -325,7 +325,7 @@ export default {
       import_products: "",
       search: "",
       totalRows: "",
-      isLoading: true,
+      is_loading: true,
       spinner: false,
       limit: "10",
       Filter_brand: "",
@@ -656,13 +656,13 @@ export default {
 
           // Complete the animation of theprogress bar.
           NProgress.done();
-          this.isLoading = false;
+          this.is_loading = false;
         })
         .catch(response => {
           // Complete the animation of theprogress bar.
           NProgress.done();
           setTimeout(() => {
-            this.isLoading = false;
+            this.is_loading = false;
           }, 500);
         });
     },

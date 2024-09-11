@@ -2,58 +2,57 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Provider;
-use App\Models\Setting;
-use App\utils\helpers;
-use Carbon\Carbon;
 use App\Models\Account;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rule;
-use App\Models\Purchase;
 use App\Models\PaymentPurchase;
-use App\Models\PurchaseReturn;
 use App\Models\PaymentPurchaseReturns;
-use Illuminate\Support\Facades\Auth;
+use App\Models\Provider;
+use App\Models\Purchase;
+use App\Models\PurchaseReturn;
+use App\Models\Setting;
+use App\utils\Helper;
+use Carbon\Carbon;
 use DB;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class ProvidersController extends BaseController
 {
 
     //----------- Get ALL Suppliers-------\\
 
-    public function index(request $request)
+    public function index(Request $request)
     {
         $this->authorizeForUser($request->user('api'), 'view', Provider::class);
 
-        // How many items do you want to display.
         $perPage = $request->limit;
-        $pageStart = \Request::get('page', 1);
-        // Start displaying items from this number;
+        $pageStart = $request->get('page', 1);
         $offSet = ($pageStart * $perPage) - $perPage;
         $order = $request->SortField;
         $dir = $request->SortType;
-        $helpers = new helpers();
+        $helpers = new Helper();
         // Filter fields With Params to retrieve
-        $columns = array(0 => 'name', 1 => 'code', 2 => 'phone', 3 => 'email');
-        $param = array(0 => 'like', 1 => 'like', 2 => 'like', 3 => 'like');
+        $columns = array(0 => 'name', 1 => 'code', 2 => 'phone_1', 3 => 'phone_2', 4 => 'email');
+        $param = array(0 => 'like', 1 => 'like', 2 => 'like', 3 => 'like', 4 => 'like');
         $data = array();
+        $providers = Provider::where('deleted_at', '=', null)
+            ->filter(request()->query());
 
-        $providers = Provider::where('deleted_at', '=', null);
 
         //Multiple Filter
         $Filtred = $helpers->filter($providers, $columns, $param, $request)
-        // Search With Multiple Param
+            // Search With Multiple Param
             ->where(function ($query) use ($request) {
                 return $query->when($request->filled('search'), function ($query) use ($request) {
                     return $query->where('name', 'LIKE', "%{$request->search}%")
                         ->orWhere('code', 'LIKE', "%{$request->search}%")
-                        ->orWhere('phone', 'LIKE', "%{$request->search}%")
+                        ->orWhere('phone_1', 'LIKE', "%{$request->search}%")
+                        ->orWhere('phone_2', 'LIKE', "%{$request->search}%")
                         ->orWhere('email', 'LIKE', "%{$request->search}%");
                 });
             });
         $totalRows = $Filtred->count();
-        if($perPage == "-1"){
+        if ($perPage == "-1") {
             $perPage = $totalRows;
         }
         $providers = $Filtred->offset($offSet)
@@ -67,7 +66,7 @@ class ProvidersController extends BaseController
                 ->where('deleted_at', '=', null)
                 ->where('status', 'received')
                 ->where('provider_id', $provider->id)
-                ->sum('GrandTotal');
+                ->sum('grand_total');
 
             $item['total_paid'] = DB::table('purchases')
                 ->where('deleted_at', '=', null)
@@ -80,7 +79,7 @@ class ProvidersController extends BaseController
             $item['total_amount_return'] = DB::table('purchase_returns')
                 ->where('deleted_at', '=', null)
                 ->where('provider_id', $provider->id)
-                ->sum('GrandTotal');
+                ->sum('grand_total');
 
             $item['total_paid_return'] = DB::table('purchase_returns')
                 ->where('deleted_at', '=', null)
@@ -91,18 +90,19 @@ class ProvidersController extends BaseController
 
             $item['id'] = $provider->id;
             $item['name'] = $provider->name;
-            $item['phone'] = $provider->phone;
+            $item['phone_1'] = $provider->phone_1;
+            $item['phone_2'] = $provider->phone_2;
             $item['tax_number'] = $provider->tax_number;
             $item['code'] = $provider->code;
             $item['email'] = $provider->email;
             $item['country'] = $provider->country;
             $item['city'] = $provider->city;
-            $item['Address'] = $provider->Address;
+            $item['address'] = $provider->address;
             $data[] = $item;
         }
 
         $company_info = Setting::where('deleted_at', '=', null)->first();
-        $accounts = Account::where('deleted_at', '=', null)->orderBy('id', 'desc')->get(['id','account_name']);
+        $accounts = Account::where('deleted_at', '=', null)->orderBy('id', 'desc')->get(['id', 'account_name']);
 
         return response()->json([
             'providers' => $data,
@@ -118,14 +118,15 @@ class ProvidersController extends BaseController
     {
         $this->authorizeForUser($request->user('api'), 'create', Provider::class);
 
-        request()->validate([
+        $request->validate([
             'name' => 'required',
         ]);
         Provider::create([
             'name' => $request['name'],
-            'code' => $this->getNumberOrder(),
-            'Address' => $request['Address'],
-            'phone' => $request['phone'],
+            'code' => $request['code'] ?? $this->getNumberOrder(),
+            'address' => $request['address'],
+            'phone_1' => $request['phone_1'],
+            'phone_2' => $request['phone_2'],
             'email' => $request['email'],
             'country' => $request['country'],
             'city' => $request['city'],
@@ -137,10 +138,11 @@ class ProvidersController extends BaseController
 
     //------------ function show -----------\\
 
-    public function show($id){
+    public function show($id)
+    {
         //
 
-        }
+    }
 
     //----------- Update Supplier-------\\
 
@@ -148,14 +150,15 @@ class ProvidersController extends BaseController
     {
         $this->authorizeForUser($request->user('api'), 'update', Provider::class);
 
-        request()->validate([
+        $request->validate([
             'name' => 'required',
         ]);
 
         Provider::whereId($id)->update([
             'name' => $request['name'],
-            'Address' => $request['Address'],
-            'phone' => $request['phone'],
+            'address' => $request['address'],
+            'phone_1' => $request['phone_1'],
+            'phone_2' => $request['phone_2'],
             'email' => $request['email'],
             'country' => $request['country'],
             'city' => $request['city'],
@@ -201,12 +204,7 @@ class ProvidersController extends BaseController
     {
 
         $last = DB::table('providers')->latest('id')->first();
-
-        if ($last) {
-            $code = $last->code + 1;
-        } else {
-            $code = 1;
-        }
+        $code = $last ? $last->code + 1 : 1;
         return $code;
     }
 
@@ -254,13 +252,14 @@ class ProvidersController extends BaseController
 
                     Provider::create([
                         'name' => $value['name'],
-                        'code' => $this->getNumberOrder(),
-                        'Address' => $value['Address'] == '' ? null : $value['Address'],
-                        'phone' => $value['phone'] == '' ? null : $value['phone'],
-                        'email' => $value['email'] == '' ? null : $value['email'],
-                        'country' => $value['country'] == '' ? null : $value['country'],
-                        'city' => $value['city'] == '' ? null : $value['city'],
-                        'tax_number' => $value['tax_number'] == '' ? null : $value['tax_number'],
+                        'code' => $value['code'] ?? $this->getNumberOrder(),
+                        'address' => $value['address']?? null,
+                        'phone_1' => $value['phone_1'] ?? null,
+                        'phone_2' => $value['phone_2'] ?? null,
+                        'email' => $value['email'] ?? null,
+                        'country' => $value['country'] ?? null,
+                        'city' => $value['city'] ?? null,
+                        'tax_number' => $value['tax_number'] ?? null,
                     ]);
                 }
 
@@ -280,94 +279,94 @@ class ProvidersController extends BaseController
     {
         $this->authorizeForUser($request->user('api'), 'pay_supplier_due', Provider::class);
 
-        if($request['amount'] > 0){
-           $provider_purchases_due = Purchase::where('deleted_at', '=', null)
-           ->where('status', 'received')
-           ->where([
-               ['payment_status', '!=', 'paid'],
-               ['provider_id', $request->provider_id]
-           ])->get();
+        if ($request['amount'] > 0) {
+            $provider_purchases_due = Purchase::where('deleted_at', '=', null)
+                ->where('status', 'received')
+                ->where([
+                    ['payment_status', '!=', 'paid'],
+                    ['provider_id', $request->provider_id]
+                ])->get();
 
-           $paid_amount_total = $request->amount;
+            $paid_amount_total = $request->amount;
 
-           foreach($provider_purchases_due as $key => $provider_purchase){
-               if($paid_amount_total == 0)
-               break;
-               $due = $provider_purchase->GrandTotal  - $provider_purchase->paid_amount;
+            foreach ($provider_purchases_due as $key => $provider_purchase) {
+                if ($paid_amount_total == 0)
+                    break;
+                $due = $provider_purchase->grand_total - $provider_purchase->paid_amount;
 
-               if($paid_amount_total >= $due){
-                   $amount = $due;
-                   $payment_status = 'paid';
-               }else{
-                   $amount = $paid_amount_total;
-                   $payment_status = 'partial';
-               }
+                if ($paid_amount_total >= $due) {
+                    $amount = $due;
+                    $payment_status = 'paid';
+                } else {
+                    $amount = $paid_amount_total;
+                    $payment_status = 'partial';
+                }
 
-               $payment_purchase = new PaymentPurchase();
-               $payment_purchase->purchase_id = $provider_purchase->id;
-               $payment_purchase->account_id =  $request['account_id']?$request['account_id']:NULL;
-               $payment_purchase->Ref = app('App\Http\Controllers\PaymentPurchasesController')->getNumberOrder();
-               $payment_purchase->date = Carbon::now();
-               $payment_purchase->Reglement = $request['Reglement'];
-               $payment_purchase->montant = $amount;
-               $payment_purchase->change = 0;
-               $payment_purchase->notes = $request['notes'];
-               $payment_purchase->user_id = Auth::user()->id;
-               $payment_purchase->save();
+                $payment_purchase = new PaymentPurchase();
+                $payment_purchase->purchase_id = $provider_purchase->id;
+                $payment_purchase->account_id = $request['account_id'] ? $request['account_id'] : NULL;
+                $payment_purchase->Ref = app('App\Http\Controllers\PaymentPurchasesController')->getNumberOrder();
+                $payment_purchase->date = Carbon::now();
+                $payment_purchase->Reglement = $request['Reglement'];
+                $payment_purchase->montant = $amount;
+                $payment_purchase->change = 0;
+                $payment_purchase->notes = $request['notes'];
+                $payment_purchase->user_id = Auth::user()->id;
+                $payment_purchase->save();
 
-               $account = Account::where('id', $request['account_id'])->exists();
+                $account = Account::where('id', $request['account_id'])->exists();
 
-               if ($account) {
-                   // Account exists, perform the update
-                   $account = Account::find($request['account_id']);
-                   $account->update([
-                       'balance' => $account->balance - $amount,
-                   ]);
-               }
+                if ($account) {
+                    // Account exists, perform the update
+                    $account = Account::find($request['account_id']);
+                    $account->update([
+                        'balance' => $account->balance - $amount,
+                    ]);
+                }
 
-               $provider_purchase->paid_amount += $amount;
-               $provider_purchase->payment_status = $payment_status;
-               $provider_purchase->save();
+                $provider_purchase->paid_amount += $amount;
+                $provider_purchase->payment_status = $payment_status;
+                $provider_purchase->save();
 
-               $paid_amount_total -= $amount;
-           }
-       }
+                $paid_amount_total -= $amount;
+            }
+        }
 
         return response()->json(['success' => true]);
 
     }
 
-     //------------- pay_purchase_return_due -------------\\
+    //------------- pay_purchase_return_due -------------\\
 
     public function pay_purchase_return_due(Request $request)
     {
         $this->authorizeForUser($request->user('api'), 'pay_purchase_return_due', Provider::class);
 
-        if($request['amount'] > 0){
+        if ($request['amount'] > 0) {
             $supplier_purchase_return_due = PurchaseReturn::where('deleted_at', '=', null)
-            ->where([
-                ['payment_status', '!=', 'paid'],
-                ['provider_id', $request->provider_id]
-            ])->get();
+                ->where([
+                    ['payment_status', '!=', 'paid'],
+                    ['provider_id', $request->provider_id]
+                ])->get();
 
             $paid_amount_total = $request->amount;
 
-            foreach($supplier_purchase_return_due as $key => $supplier_purchase_return){
-                if($paid_amount_total == 0)
-                break;
-                $due = $supplier_purchase_return->GrandTotal  - $supplier_purchase_return->paid_amount;
+            foreach ($supplier_purchase_return_due as $key => $supplier_purchase_return) {
+                if ($paid_amount_total == 0)
+                    break;
+                $due = $supplier_purchase_return->grand_total - $supplier_purchase_return->paid_amount;
 
-                if($paid_amount_total >= $due){
+                if ($paid_amount_total >= $due) {
                     $amount = $due;
                     $payment_status = 'paid';
-                }else{
+                } else {
                     $amount = $paid_amount_total;
                     $payment_status = 'partial';
                 }
 
                 $payment_purchase_return = new PaymentPurchaseReturns();
                 $payment_purchase_return->purchase_return_id = $supplier_purchase_return->id;
-                $payment_purchase_return->account_id =  $request['account_id']?$request['account_id']:NULL;
+                $payment_purchase_return->account_id = $request['account_id'] ? $request['account_id'] : NULL;
                 $payment_purchase_return->Ref = app('App\Http\Controllers\PaymentPurchaseReturnsController')->getNumberOrder();
                 $payment_purchase_return->date = Carbon::now();
                 $payment_purchase_return->Reglement = $request['Reglement'];

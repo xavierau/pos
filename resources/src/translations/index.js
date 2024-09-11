@@ -15,26 +15,10 @@ import vn from './locales/vn';
 import kr from './locales/kr';
 import ba from './locales/ba';
 import br from './locales/br';
-import da from './locales/da';
 
 
 export default {
   en,
-  fr,
-  ar,
-  de,
-  es,
-  it,
-  Ind,
-  thai,
   tr_ch,
   sm_ch,
-  tur,
-  ru,
-  hn,
-  vn,
-  kr,
-  ba,
-  br,
-  da,
 };

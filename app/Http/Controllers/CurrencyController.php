@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Currency;
-use App\utils\helpers;
+use App\utils\Helper;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -22,7 +22,7 @@ class CurrencyController extends Controller
         $offSet = ($pageStart * $perPage) - $perPage;
         $order = $request->SortField;
         $dir = $request->SortType;
-        $helpers = new helpers();
+        $helpers = new Helper();
 
         $currencies = Currency::where('deleted_at', '=', null)
 
@@ -74,7 +74,7 @@ class CurrencyController extends Controller
 
     public function show($id){
         //
-        
+
         }
 
     //---------------- UPDATE Currency -------------\\

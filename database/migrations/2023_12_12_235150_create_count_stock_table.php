@@ -4,37 +4,39 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateCountStockTable extends Migration {
+class CreateCountStockTable extends Migration
+{
 
-	/**
-	 * Run the migrations.
-	 *
-	 * @return void
-	 */
-	public function up()
-	{
-		Schema::create('count_stock', function(Blueprint $table)
-		{
-			$table->engine = 'InnoDB';
-			$table->integer('id', true);
-			$table->integer('user_id')->index('count_stock_user_id');
-			$table->date('date');
-			$table->integer('warehouse_id')->index('count_stock_warehouse_id');
-			$table->string('file_stock', 192);
-			$table->timestamps(6);
-			$table->softDeletes();
-		});
-	}
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create('count_stock', function (Blueprint $table) {
+            $table->id('id');
+            $table->date('date');
+            $table->string('file_stock', 192);
+            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('warehouse_id');
+            $table->timestamps(6);
+            $table->softDeletes();
+
+            $table->foreign('user_id')->references('id')->on('users');
+            $table->foreign('warehouse_id')->references('id')->on('warehouses');
+        });
+    }
 
 
-	/**
-	 * Reverse the migrations.
-	 *
-	 * @return void
-	 */
-	public function down()
-	{
-		Schema::drop('count_stock');
-	}
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::drop('count_stock');
+    }
 
 }

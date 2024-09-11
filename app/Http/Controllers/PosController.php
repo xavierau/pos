@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\DTO\CreatePosSaleDTO;
+use App\DTO\PosGetProductsDTO;
 use App\Models\Account;
 use App\Models\Brand;
 use App\Models\Category;
@@ -11,8 +13,8 @@ use App\Models\DraftSaleDetail;
 use App\Models\PaymentSale;
 use App\Models\PaymentWithCreditCard;
 use App\Models\Product;
-use App\Models\ProductWarehouse;
 use App\Models\ProductVariant;
+use App\Models\ProductWarehouse;
 use App\Models\Role;
 use App\Models\Sale;
 use App\Models\SaleDetail;
@@ -20,7 +22,9 @@ use App\Models\Setting;
 use App\Models\Unit;
 use App\Models\UserWarehouse;
 use App\Models\Warehouse;
-use App\utils\helpers;
+use App\Services\pos\actions\CreatePosSale;
+use App\Services\pos\GetProducts as GetProductsService;
+use App\utils\Helper;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -32,7 +36,7 @@ class PosController extends BaseController
 
     //------------ Create New  POS --------------\\
 
-    public function CreatePOS(Request $request)
+    public function CreatePOS(Request $request, CreatePosSale $action)
     {
         $this->authorizeForUser($request->user('api'), 'Sales_pos', Sale::class);
 
@@ -42,239 +46,49 @@ class PosController extends BaseController
             'payment.amount' => 'required',
         ]);
 
-        $item = DB::transaction(function () use ($request) {
-            $helpers = new helpers();
-            $role = Auth::user()->roles()->first();
-            $view_records = Role::findOrFail($role->id)->inRole('record_view');
-            $order = new Sale;
-
-            $order->is_pos = 1;
-            $order->date = Carbon::now();
-            $order->Ref = app('App\Http\Controllers\SalesController')->getNumberOrder();
-            $order->client_id = $request->client_id;
-            $order->warehouse_id = $request->warehouse_id;
-            $order->tax_rate = $request->tax_rate;
-            $order->TaxNet = $request->TaxNet;
-            $order->discount = $request->discount;
-            $order->shipping = $request->shipping;
-            $order->GrandTotal = $request->GrandTotal;
-            $order->notes = $request->notes;
-            $order->status = 'completed';
-            $order->payment_status = 'unpaid';
-            $order->user_id = Auth::user()->id;
-
-            $order->save();
-
-            $data = $request['details'];
-            foreach ($data as $key => $value) {
-
-                $unit = Unit::where('id', $value['sale_unit_id'])
-                    ->first();
-                $orderDetails[] = [
-                    'date' => Carbon::now(),
-                    'sale_id' => $order->id,
-                    'sale_unit_id' => $value['sale_unit_id'],
-                    'quantity' => $value['quantity'],
-                    'product_id' => $value['product_id'],
-                    'product_variant_id' => $value['product_variant_id'],
-                    'total' => $value['subtotal'],
-                    'price' => $value['Unit_price'],
-                    'TaxNet' => $value['tax_percent'],
-                    'tax_method' => $value['tax_method'],
-                    'discount' => $value['discount'],
-                    'discount_method' => $value['discount_Method'],
-                    'imei_number' => $value['imei_number'],
-                ];
-
-                if ($value['product_variant_id'] !== null) {
-                    $product_warehouse = ProductWarehouse::where('warehouse_id', $order->warehouse_id)
-                        ->where('product_id', $value['product_id'])->where('product_variant_id', $value['product_variant_id'])
-                        ->first();
-
-                    if ($unit && $product_warehouse) {
-                        if ($unit->operator == '/') {
-                            $product_warehouse->qte -= $value['quantity'] / $unit->operator_value;
-                        } else {
-                            $product_warehouse->qte -= $value['quantity'] * $unit->operator_value;
-                        }
-                        $product_warehouse->save();
-                    }
-
-                } else {
-                    $product_warehouse = ProductWarehouse::where('warehouse_id', $order->warehouse_id)
-                        ->where('product_id', $value['product_id'])
-                        ->first();
-                    if ($unit && $product_warehouse) {
-                        if ($unit->operator == '/') {
-                            $product_warehouse->qte -= $value['quantity'] / $unit->operator_value;
-                        } else {
-                            $product_warehouse->qte -= $value['quantity'] * $unit->operator_value;
-                        }
-                        $product_warehouse->save();
-                    }
-                }
-            }
-
-            SaleDetail::insert($orderDetails);
-
-            $sale = Sale::findOrFail($order->id);
-            // Check If User Has Permission view All Records
-            if (!$view_records) {
-                // Check If User->id === sale->id
-                $this->authorizeForUser($request->user('api'), 'check_record', $sale);
-            }
-
-            try {
-
-                $total_paid = $sale->paid_amount + $request['amount'];
-                $due = $sale->GrandTotal - $total_paid;
-
-                if ($due === 0.0 || $due < 0.0) {
-                    $payment_status = 'paid';
-                } else if ($due != $sale->GrandTotal) {
-                    $payment_status = 'partial';
-                } else if ($due == $sale->GrandTotal) {
-                    $payment_status = 'unpaid';
-                }
-
-                if ($request['amount'] > 0) {
-                    if ($request->payment['Reglement'] == 'credit card') {
-                        $Client = Client::whereId($request->client_id)->first();
-                        Stripe\Stripe::setApiKey(config('app.STRIPE_SECRET'));
-
-                        // Check if the payment record exists
-                        $PaymentWithCreditCard = PaymentWithCreditCard::where('customer_id', $request->client_id)->first();
-                        if (!$PaymentWithCreditCard) {
-
-                            // Create a new customer and charge the customer with a new credit card
-                            $customer = \Stripe\Customer::create([
-                                'source' => $request->token,
-                                'email' => $Client->email,
-                                'name' => $Client->name,
-                            ]);
-
-                            // Charge the Customer instead of the card:
-                            $charge = \Stripe\Charge::create([
-                                'amount' => $request['amount'] * 100,
-                                'currency' => 'usd',
-                                'customer' => $customer->id,
-                            ]);
-                            $PaymentCard['customer_stripe_id'] = $customer->id;
-
-                            // Check if the payment record not exists
-                        } else {
-
-                            // Retrieve the customer ID and card ID
-                            $customer_id = $PaymentWithCreditCard->customer_stripe_id;
-                            $card_id = $request->card_id;
-
-                            // Charge the customer with the new credit card or the selected card
-                            if ($request->is_new_credit_card || $request->is_new_credit_card == 'true' || $request->is_new_credit_card === 1) {
-                                // Retrieve the customer
-                                $customer = \Stripe\Customer::retrieve($customer_id);
-
-                                // Create New Source
-                                $card = \Stripe\Customer::createSource(
-                                    $customer_id,
-                                    [
-                                        'source' => $request->token,
-                                    ]
-                                );
-
-                                $charge = \Stripe\Charge::create([
-                                    'amount' => $request['amount'] * 100,
-                                    'currency' => 'usd',
-                                    'customer' => $customer_id,
-                                    'source' => $card->id,
-                                ]);
-                                $PaymentCard['customer_stripe_id'] = $customer_id;
-
-                            } else {
-                                $charge = \Stripe\Charge::create([
-                                    'amount' => $request['amount'] * 100,
-                                    'currency' => 'usd',
-                                    'customer' => $customer_id,
-                                    'source' => $card_id,
-                                ]);
-                                $PaymentCard['customer_stripe_id'] = $customer_id;
-                            }
-                        }
-
-                        $PaymentSale = new PaymentSale();
-                        $PaymentSale->sale_id = $order->id;
-                        $PaymentSale->Ref = app('App\Http\Controllers\PaymentSalesController')->getNumberOrder();
-                        $PaymentSale->date = Carbon::now();
-                        $PaymentSale->Reglement = $request->payment['Reglement'];
-                        $PaymentSale->montant = $request['amount'];
-                        $PaymentSale->change = $request['change'];
-                        $PaymentSale->notes = $request->payment['notes'];
-                        $PaymentSale->user_id = Auth::user()->id;
-                        $PaymentSale->account_id = $request->payment['account_id'] ? $request->payment['account_id'] : NULL;
-
-                        $PaymentSale->save();
-
-                        $account = Account::where('id', $request->payment['account_id'])->exists();
-
-                        if ($account) {
-                            // Account exists, perform the update
-                            $account = Account::find($request->payment['account_id']);
-                            $account->update([
-                                'balance' => $account->balance + $request['amount'],
-                            ]);
-                        }
-
-                        $sale->update([
-                            'paid_amount' => $total_paid,
-                            'payment_status' => $payment_status,
-                        ]);
-
-                        $PaymentCard['customer_id'] = $request->client_id;
-                        $PaymentCard['payment_id'] = $PaymentSale->id;
-                        $PaymentCard['charge_id'] = $charge->id;
-                        PaymentWithCreditCard::create($PaymentCard);
-
-                        // Paying Method Cash
-                    } else {
-
-                        PaymentSale::create([
-                            'sale_id' => $order->id,
-                            'account_id' => $request->payment['account_id'] ? $request->payment['account_id'] : NULL,
-                            'Ref' => app('App\Http\Controllers\PaymentSalesController')->getNumberOrder(),
-                            'date' => Carbon::now(),
-                            'Reglement' => $request->payment['Reglement'],
-                            'montant' => $request['amount'],
-                            'change' => $request['change'],
-                            'notes' => $request->payment['notes'],
-                            'user_id' => Auth::user()->id,
-                        ]);
-
-                        $account = Account::where('id', $request->payment['account_id'])->exists();
-
-                        if ($account) {
-                            // Account exists, perform the update
-                            $account = Account::find($request->payment['account_id']);
-                            $account->update([
-                                'balance' => $account->balance + $request['amount'],
-                            ]);
-                        }
-
-                        $sale->update([
-                            'paid_amount' => $total_paid,
-                            'payment_status' => $payment_status,
-                        ]);
-                    }
-
-                }
-
-            } catch (Exception $e) {
-                return response()->json(['message' => $e->getMessage()], 500);
-            }
-
-            return $order->id;
-
-        }, 10);
+        $saleDto = CreatePosSaleDTO::fromRequest($request);
+        $item = $action->execute($saleDto, $request->user('api'));
 
         return response()->json(['success' => true, 'id' => $item]);
+
+//        $payment = $request->get('payment');
+
+
+//        $dto = new CreatePosSaleDTO(
+//            client_id: $request->get('client_id'),
+//            warehouse_id: $request->get('warehouse_id'),
+//            tax_rate: $request->get('tax_rate'),
+//            tax_net: $request->get('tax_net'),
+//            discount: $request->get('discount'),
+//            shipping: $request->get('shipping'),
+//            grand_total: $request->get('grand_total'),
+//            date: \Illuminate\Support\Carbon::parse($request->get('date')),
+//            amount: $request->get('amount'),
+//            change: $request->get('change'),
+//            payment: new PaymentDTO(
+//                type: PaymentType::from($payment['type']),
+//                notes: $payment['notes'] ?? null,
+//                account_id: $payment['account_id'] ?? null,
+//            ),
+//            details: collect($request->get('details', []))->map(fn($detail) => new SaleDetailDTO(
+//                sale_unit_id: $detail['sale_unit_id'],
+//                quantity: $detail['quantity'],
+//                product_id: $detail['product_id'],
+//                subtotal: $detail['subtotal'],
+//                unit_price: $detail['unit_price'],
+//                tax_percent: $detail['tax_percent'],
+//                tax_method: $detail['tax_method'],
+//                discount: $detail['discount'],
+//                discount_method: $detail['discount_method'],
+//                imei_number: $detail['imei_number'],
+//                product_variant_id: $detail['product_variant_id']
+//            ))->toArray(),
+//            notes: $request->get('notes'),
+//            ref: $request->get('ref'),
+//        );
+//
+//        $item = $action->execute($dto, $request->user('api'));
+
 
     }
 
@@ -293,7 +107,7 @@ class PosController extends BaseController
         $offSet = ($pageStart * $perPage) - $perPage;
         $order = 'id';
         $dir = 'DESC';
-        $helpers = new helpers();
+        $helpers = new Helper();
 
         $data = array();
 
@@ -321,10 +135,10 @@ class PosController extends BaseController
 
             $item['id'] = $draft['id'];
             $item['date'] = $draft['date'];
-            $item['Ref'] = $draft['Ref'];
+            $item['ref'] = $draft['ref'];
             $item['warehouse_name'] = $draft['warehouse']['name'];
             $item['client_name'] = $draft['client']['name'];
-            $item['GrandTotal'] = number_format($draft['GrandTotal'], 2, '.', '');
+            $item['grand_total'] = number_format($draft['grand_total'], 2, '.', '');
             $item['actions'] = '';
 
             $data[] = $item;
@@ -351,20 +165,20 @@ class PosController extends BaseController
         ]);
 
         \DB::transaction(function () use ($request) {
-            $helpers = new helpers();
+            $helpers = new Helper();
             $role = Auth::user()->roles()->first();
             $view_records = Role::findOrFail($role->id)->inRole('record_view');
             $order = new DraftSale;
 
             $order->date = Carbon::now();
-            $order->Ref = $this->getNumberOrderDraft();
+            $order->ref = $this->getNumberOrderDraft();
             $order->client_id = $request->client_id;
             $order->warehouse_id = $request->warehouse_id;
             $order->tax_rate = $request->tax_rate;
-            $order->TaxNet = $request->TaxNet;
+            $order->tax_net = $request->tax_net;
             $order->discount = $request->discount;
             $order->shipping = $request->shipping;
-            $order->GrandTotal = $request->GrandTotal;
+            $order->grand_total = $request->grand_total;
             $order->user_id = Auth::user()->id;
 
             $order->save();
@@ -381,8 +195,8 @@ class PosController extends BaseController
                     'product_id' => $value['product_id'],
                     'product_variant_id' => $value['product_variant_id'],
                     'total' => $value['subtotal'],
-                    'price' => $value['Unit_price'],
-                    'TaxNet' => $value['tax_percent'],
+                    'price' => $value['unit_price'],
+                    'tax_net' => $value['tax_percent'],
                     'tax_method' => $value['tax_method'],
                     'discount' => $value['discount'],
                     'discount_method' => $value['discount_Method'],
@@ -440,21 +254,21 @@ class PosController extends BaseController
         if ($draft) {
 
             $item = \DB::transaction(function () use ($request, $draft) {
-                $helpers = new helpers();
+                $helpers = new Helper();
                 $role = Auth::user()->roles()->first();
                 $view_records = Role::findOrFail($role->id)->inRole('record_view');
                 $order = new Sale;
 
                 $order->is_pos = 1;
                 $order->date = Carbon::now();
-                $order->Ref = app('App\Http\Controllers\SalesController')->getNumberOrder();
+                $order->ref = app('App\Http\Controllers\SalesController')->getNumberOrder();
                 $order->client_id = $request->client_id;
                 $order->warehouse_id = $request->warehouse_id;
                 $order->tax_rate = $request->tax_rate;
-                $order->TaxNet = $request->TaxNet;
+                $order->tax_net = $request->tax_net;
                 $order->discount = $request->discount;
                 $order->shipping = $request->shipping;
-                $order->GrandTotal = $request->GrandTotal;
+                $order->grand_total = $request->grand_total;
                 $order->notes = $request->notes;
                 $order->status = 'completed';
                 $order->payment_status = 'unpaid';
@@ -475,8 +289,8 @@ class PosController extends BaseController
                         'product_id' => $value['product_id'],
                         'product_variant_id' => $value['product_variant_id'],
                         'total' => $value['subtotal'],
-                        'price' => $value['Unit_price'],
-                        'TaxNet' => $value['tax_percent'],
+                        'price' => $value['unit_price'],
+                        'tax_net' => $value['tax_percent'],
                         'tax_method' => $value['tax_method'],
                         'discount' => $value['discount'],
                         'discount_method' => $value['discount_Method'],
@@ -524,18 +338,18 @@ class PosController extends BaseController
                 try {
 
                     $total_paid = $sale->paid_amount + $request['amount'];
-                    $due = $sale->GrandTotal - $total_paid;
+                    $due = $sale->grand_total - $total_paid;
 
                     if ($due === 0.0 || $due < 0.0) {
                         $payment_status = 'paid';
-                    } else if ($due != $sale->GrandTotal) {
+                    } else if ($due != $sale->grand_total) {
                         $payment_status = 'partial';
-                    } else if ($due == $sale->GrandTotal) {
+                    } else if ($due == $sale->grand_total) {
                         $payment_status = 'unpaid';
                     }
 
                     if ($request['amount'] > 0) {
-                        if ($request->payment['Reglement'] == 'credit card') {
+                        if ($request->payment['type'] == 'credit card') {
                             $Client = Client::whereId($request->client_id)->first();
                             Stripe\Stripe::setApiKey(config('app.STRIPE_SECRET'));
 
@@ -599,10 +413,10 @@ class PosController extends BaseController
 
                             $PaymentSale = new PaymentSale();
                             $PaymentSale->sale_id = $order->id;
-                            $PaymentSale->Ref = app('App\Http\Controllers\PaymentSalesController')->getNumberOrder();
+                            $PaymentSale->ref = PaymentSale::generateOrderNumber();
                             $PaymentSale->date = Carbon::now();
-                            $PaymentSale->Reglement = $request->payment['Reglement'];
-                            $PaymentSale->montant = $request['amount'];
+                            $PaymentSale->type = $request->payment['type'];
+                            $PaymentSale->amount = $request['amount'];
                             $PaymentSale->change = $request['change'];
                             $PaymentSale->notes = $request->payment['notes'];
                             $PaymentSale->user_id = Auth::user()->id;
@@ -636,10 +450,10 @@ class PosController extends BaseController
                             PaymentSale::create([
                                 'sale_id' => $order->id,
                                 'account_id' => $request->payment['account_id'] ? $request->payment['account_id'] : NULL,
-                                'Ref' => app('App\Http\Controllers\PaymentSalesController')->getNumberOrder(),
+                                'ref' => PaymentSale::generateOrderNumber(),
                                 'date' => Carbon::now(),
-                                'Reglement' => $request->payment['Reglement'],
-                                'montant' => $request['amount'],
+                                'type' => $request->payment['type'],
+                                'amount' => $request['amount'],
                                 'change' => $request['change'],
                                 'notes' => $request->payment['notes'],
                                 'user_id' => Auth::user()->id,
@@ -731,10 +545,10 @@ class PosController extends BaseController
         }
 
         $sale['tax_rate'] = $draft_sale_data->tax_rate;
-        $sale['TaxNet'] = $draft_sale_data->TaxNet;
+        $sale['tax_net'] = $draft_sale_data->tax_net;
         $sale['discount'] = $draft_sale_data->discount;
         $sale['shipping'] = $draft_sale_data->shipping;
-        $GrandTotal = $draft_sale_data->GrandTotal;
+        $grand_total = $draft_sale_data->grand_total;
 
         $detail_id = 0;
         foreach ($draft_sale_data['details'] as $detail) {
@@ -820,26 +634,26 @@ class PosController extends BaseController
             $data['subtotal'] = $detail->total;
 
             if ($detail->discount_method == '2') {
-                $data['DiscountNet'] = $detail->discount;
+                $data['discount_net'] = $detail->discount;
             } else {
-                $data['DiscountNet'] = $detail->price * $detail->discount / 100;
+                $data['discount_net'] = $detail->price * $detail->discount / 100;
             }
 
-            $tax_price = $detail->TaxNet * (($detail->price - $data['DiscountNet']) / 100);
-            $data['Unit_price'] = $detail->price;
+            $tax_price = $detail->tax_net * (($detail->price - $data['discount_net']) / 100);
+            $data['unit_price'] = $detail->price;
 
-            $data['tax_percent'] = $detail->TaxNet;
+            $data['tax_percent'] = $detail->tax_net;
             $data['tax_method'] = $detail->tax_method;
             $data['discount'] = $detail->discount;
             $data['discount_Method'] = $detail->discount_method;
 
             if ($detail->tax_method == '1') {
-                $data['Net_price'] = $detail->price - $data['DiscountNet'];
+                $data['Net_price'] = $detail->price - $data['discount_net'];
                 $data['taxe'] = $tax_price;
                 $data['Total_price'] = $data['Net_price'] + $data['taxe'];
             } else {
-                $data['Net_price'] = ($detail->price - $data['DiscountNet']) / (($detail->TaxNet / 100) + 1);
-                $data['taxe'] = $detail->price - $data['Net_price'] - $data['DiscountNet'];
+                $data['Net_price'] = ($detail->price - $data['discount_net']) / (($detail->tax_net / 100) + 1);
+                $data['taxe'] = $detail->price - $data['Net_price'] - $data['discount_net'];
                 $data['Total_price'] = $data['Net_price'] + $data['taxe'];
             }
 
@@ -861,7 +675,7 @@ class PosController extends BaseController
             'categories' => $categories,
             'accounts' => $accounts,
             'sale' => $sale,
-            'GrandTotal' => $GrandTotal,
+            'grand_total' => $grand_total,
             'details' => $details,
         ]);
     }
@@ -869,136 +683,30 @@ class PosController extends BaseController
 
     //------------ Get Products--------------\\
 
-    public function GetProductsByParametre(request $request)
+    public function GetProducts(Request $request, GetProductsService $service)
     {
         $this->authorizeForUser($request->user('api'), 'Sales_pos', Sale::class);
-        // How many items do you want to display.
-        $perPage = 8;
-        $pageStart = \Request::get('page', 1);
-        // Start displaying items from this number;
-        $offSet = ($pageStart * $perPage) - $perPage;
-        $data = array();
 
-        $product_warehouse_data = ProductWarehouse::where('warehouse_id', $request->warehouse_id)
-            ->with('product', 'product.unitSale')
-            ->whereNull('deleted_at')
-            ->where(function ($query) use ($request) {
-                return $query->whereHas('product', function ($q) use ($request) {
-                    $q->where('not_selling', '=', 0);
-                })
-                    ->where(function ($query) use ($request) {
-                        if ($request->stock == '1' && $request->product_service == '1') {
-                            return $query->where('qte', '>', 0)->orWhere('manage_stock', false);
-
-                        } elseif ($request->stock == '1' && $request->product_service == '0') {
-                            return $query->where('qte', '>', 0)->orWhere('manage_stock', true);
-
-                        } else {
-                            return $query->where('manage_stock', true);
-                        }
-                    });
-            })
-
-            // Filter
-            ->where(function ($query) use ($request) {
-                return $query->when($request->filled('category_id'), function ($query) use ($request) {
-                    return $query->whereHas('product', function ($q) use ($request) {
-                        $q->where('category_id', '=', $request->category_id);
-                    });
-                });
-            })
-            ->where(function ($query) use ($request) {
-                return $query->when($request->filled('brand_id'), function ($query) use ($request) {
-                    return $query->whereHas('product', function ($q) use ($request) {
-                        $q->where('brand_id', '=', $request->brand_id);
-                    });
-                });
-            });
-
-        $totalRows = $product_warehouse_data->count();
-
-        $product_warehouse_data = $product_warehouse_data
-            ->offset($offSet)
-            ->limit(8)
-            ->get();
-
-        foreach ($product_warehouse_data as $product_warehouse) {
-            if ($product_warehouse->product_variant_id) {
-                $productsVariants = ProductVariant::where('product_id', $product_warehouse->product_id)
-                    ->where('id', $product_warehouse->product_variant_id)
-                    ->where('deleted_at', null)
-                    ->first();
-
-                $item['product_variant_id'] = $product_warehouse->product_variant_id;
-                $item['Variant'] = '[' . $productsVariants->name . ']' . $product_warehouse['product']->name;
-                $item['name'] = '[' . $productsVariants->name . ']' . $product_warehouse['product']->name;
-
-                $item['code'] = $productsVariants->code;
-                $item['barcode'] = $productsVariants->code;
-
-                $product_price = $product_warehouse['productVariant']->price;
-
-            } else {
-                $item['product_variant_id'] = null;
-                $item['Variant'] = null;
-                $item['code'] = $product_warehouse['product']->code;
-                $item['name'] = $product_warehouse['product']->name;
-                $item['barcode'] = $product_warehouse['product']->code;
-
-                $product_price = $product_warehouse['product']->price;
-
-            }
-            $item['id'] = $product_warehouse->product_id;
-            $firstimage = explode(',', $product_warehouse['product']->image);
-            $item['image'] = $firstimage[0];
-
-            if ($product_warehouse['product']['unitSale']) {
-
-                if ($product_warehouse['product']['unitSale']->operator == '/') {
-                    $item['qte_sale'] = $product_warehouse->qte * $product_warehouse['product']['unitSale']->operator_value;
-                    $price = $product_price / $product_warehouse['product']['unitSale']->operator_value;
-
-                } else {
-                    $item['qte_sale'] = $product_warehouse->qte / $product_warehouse['product']['unitSale']->operator_value;
-                    $price = $product_price * $product_warehouse['product']['unitSale']->operator_value;
-
-                }
-
-            } else {
-                $item['qte_sale'] = $product_warehouse['product']->type != 'is_service' ? $product_warehouse->qte : '---';
-                $price = $product_price;
-            }
-
-            $item['unitSale'] = $product_warehouse['product']['unitSale'] ? $product_warehouse['product']['unitSale']->ShortName : '';
-            $item['qte'] = $product_warehouse['product']->type != 'is_service' ? $product_warehouse->qte : '---';
-            $item['product_type'] = $product_warehouse['product']->type;
-
-            if ($product_warehouse['product']->TaxNet !== 0.0) {
-
-                //Exclusive
-                if ($product_warehouse['product']->tax_method == '1') {
-                    $tax_price = $price * $product_warehouse['product']->TaxNet / 100;
-
-                    $item['Net_price'] = $price + $tax_price;
-
-                    // Inxclusive
-                } else {
-                    $item['Net_price'] = $price;
-                }
-            } else {
-                $item['Net_price'] = $price;
-            }
-
-            $data[] = $item;
+        if (!$request->filled('warehouse_id')) {
+            return response()->json(['products' => [],
+                'totalRows' => 0,]);
         }
 
-        return response()->json([
-            'products' => $data,
-            'totalRows' => $totalRows,
-        ]);
+        [$data, $totalRows] = $service->execute(new PosGetProductsDTO(
+            warehouse_id: $request->get('warehouse_id'),
+            stock: $request->get('stock') == "1",
+            product_service: $request->get('product_service') == "1",
+            category_id: $request->get('category_id'),
+            brand_id: $request->get('brand_id'),
+            page: $request->get('page', 1),
+            perPage: $request->get('perPage', 8),
+        ));
+
+        return response()->json(['products' => $data,
+            'totalRows' => $totalRows,]);
     }
 
-    //--------------------- Get Element POS ------------------------\\
+//--------------------- Get Element POS ------------------------\\
 
     public function GetElementPos(Request $request)
     {
@@ -1068,7 +776,7 @@ class PosController extends BaseController
     }
 
 
-    //------------- Reference Number Draft -----------\\
+//------------- reference Number Draft -----------\\
 
     public function getNumberOrderDraft()
     {
@@ -1076,7 +784,7 @@ class PosController extends BaseController
         $last = DB::table('draft_sales')->latest('id')->first();
 
         if ($last) {
-            $item = $last->Ref;
+            $item = $last->ref;
             $nwMsg = explode("_", $item);
             $inMsg = $nwMsg[1] + 1;
             $code = $nwMsg[0] . '_' . $inMsg;

@@ -1,8 +1,8 @@
 <template>
     <div class="pos_page">
         <div class="container-fluid p-0 app-admin-wrap layout-sidebar-large clearfix" id="pos">
-            <div v-if="isLoading" class="loading_page spinner spinner-primary mr-3"></div>
-            <b-row v-if="!isLoading">
+            <div v-if="is_loading" class="loading_page spinner spinner-primary mr-3"></div>
+            <b-row v-if="!is_loading">
                 <!-- Card Left Panel Details Sale-->
                 <b-col md="5">
                     <b-card no-body class="card-order">
@@ -16,122 +16,11 @@
 
                             <div class="header-part-right">
                                 <!-- Full screen toggle -->
-                                <i
-                                    class="i-Full-Screen header-icon d-none d-sm-inline-block"
-                                    @click="handleFullScreen"
+                                <i class="i-Full-Screen header-icon d-none d-sm-inline-block"
+                                   @click="handleFullScreen"
                                 ></i>
                                 <!-- Grid menu Dropdown -->
-
-                                <div class="dropdown">
-                                    <b-dropdown
-                                        id="dropdown"
-                                        text="Dropdown Button"
-                                        class="m-md-2"
-                                        toggle-class="text-decoration-none"
-                                        no-caret
-                                        right
-                                        variant="link"
-                                    >
-                                        <template slot="button-content">
-                                            <i
-                                                class="i-Globe text-muted header-icon"
-                                                role="button"
-                                                id="dropdownMenuButton"
-                                                data-toggle="dropdown"
-                                                aria-haspopup="true"
-                                                aria-expanded="false"
-                                            ></i>
-                                        </template>
-                                        <vue-perfect-scrollbar
-                                            :settings="{ suppressScrollX: true, wheelPropagation: false }"
-                                            ref="myData"
-                                            class="dropdown-menu-left rtl-ps-none notification-dropdown ps scroll"
-                                        >
-                                            <div class="menu-icon-grid">
-                                                <a @click="SetLocal('en')">
-                                                    <i title="en" class="flag-icon flag-icon-squared flag-icon-gb"></i>
-                                                    English
-                                                </a>
-                                                <a @click="SetLocal('fr')">
-                                                    <i title="fr" class="flag-icon flag-icon-squared flag-icon-fr"></i>
-                                                    <span class="title-lang">French</span>
-                                                </a>
-                                                <a @click="SetLocal('ar')">
-                                                    <i title="sa" class="flag-icon flag-icon-squared flag-icon-sa"></i>
-                                                    <span class="title-lang">Arabic</span>
-                                                </a>
-                                                <a @click="SetLocal('tur')">
-                                                    <i title="sa" class="flag-icon flag-icon-squared flag-icon-tr"></i>
-                                                    <span class="title-lang">Turkish</span>
-                                                </a>
-
-                                                <a @click="SetLocal('sm_ch')">
-                                                    <i title="sa" class="flag-icon flag-icon-squared flag-icon-cn"></i>
-                                                    <span class="title-lang">Simplified Chinese</span>
-                                                </a>
-
-                                                <a @click="SetLocal('thai')">
-                                                    <i title="sa" class="flag-icon flag-icon-squared flag-icon-th"></i>
-                                                    <span class="title-lang">Thaï</span>
-                                                </a>
-
-                                                <a @click="SetLocal('hn')">
-                                                    <i title="sa" class="flag-icon flag-icon-squared flag-icon-in"></i>
-                                                    <span class="title-lang">Hindi</span>
-                                                </a>
-
-                                                <a @click="SetLocal('de')">
-                                                    <i title="de" class="flag-icon flag-icon-squared flag-icon-de"></i>
-                                                    <span class="title-lang">German</span>
-                                                </a>
-                                                <a @click="SetLocal('es')">
-                                                    <i title="es" class="flag-icon flag-icon-squared flag-icon-es"></i>
-                                                    <span class="title-lang">Spanish</span>
-                                                </a>
-                                                <a @click="SetLocal('it')">
-                                                    <i title="it" class="flag-icon flag-icon-squared flag-icon-it"></i>
-                                                    <span class="title-lang">Italien</span>
-                                                </a>
-                                                <a @click="SetLocal('Ind')">
-                                                    <i title="sa" class="flag-icon flag-icon-squared flag-icon-id"></i>
-                                                    <span class="title-lang">Indonesian</span>
-                                                </a>
-
-                                                <a @click="SetLocal('tr_ch')">
-                                                    <i title="sa" class="flag-icon flag-icon-squared flag-icon-cn"></i>
-                                                    <span class="title-lang">Traditional Chinese</span>
-                                                </a>
-
-                                                <a @click="SetLocal('ru')">
-                                                    <i title="sa" class="flag-icon flag-icon-squared flag-icon-ru"></i>
-                                                    <span class="title-lang">Russian</span>
-                                                </a>
-
-                                                <a @click="SetLocal('vn')">
-                                                    <i title="sa" class="flag-icon flag-icon-squared flag-icon-vn"></i>
-                                                    <span class="title-lang">Vietnamese</span>
-                                                </a>
-
-                                                <a @click="SetLocal('kr')">
-                                                    <i title="sa" class="flag-icon flag-icon-squared flag-icon-kr"></i>
-                                                    <span class="title-lang">Korean</span>
-                                                </a>
-
-                                                <a @click="SetLocal('ba')">
-                                                    <i title="sa" class="flag-icon flag-icon-squared flag-icon-bd"></i>
-                                                    <span class="title-lang">Bangla</span>
-                                                </a>
-
-                                                <a @click="SetLocal('br')">
-                                                    <i title="pt" class="flag-icon flag-icon-squared flag-icon-pt"></i>
-                                                    <span class="title-lang">Portuguese</span>
-                                                </a>
-
-                                            </div>
-                                        </vue-perfect-scrollbar>
-                                    </b-dropdown>
-                                </div>
-
+                                <LanguageSwitcher/>
                                 <!-- User avatar dropdown -->
                                 <div class="dropdown">
                                     <b-dropdown
@@ -193,7 +82,7 @@
                                                         :options="clients.map(clients => ({label: clients.name, value: clients.id}))"
                                                     />
                                                     <b-input-group-append>
-                                                        <b-button variant="primary" @click="new_client()">
+                                                        <b-button variant="primary" @click="newClient()">
                               <span>
                                 <i class="i-Add-User"></i>
                               </span>
@@ -223,79 +112,7 @@
 
                                         <!-- Details Product  -->
                                         <b-col md="12" class="mt-2">
-                                            <div class="pos-detail">
-                                                <div class="table-responsive">
-                                                    <table class="table table-striped">
-                                                        <thead>
-                                                        <tr>
-                                                            <th scope="col">{{ $t('ProductName') }}</th>
-                                                            <th scope="col">{{ $t('Price') }}</th>
-                                                            <th scope="col" class="text-center">{{ $t('Qty') }}</th>
-                                                            <th scope="col" class="text-center">{{ $t('SubTotal') }}
-                                                            </th>
-                                                            <th scope="col" class="text-center">
-                                                                <i class="fa fa-trash"></i>
-                                                            </th>
-                                                        </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                        <tr v-if="details.length <= 0">
-                                                            <td colspan="5">{{ $t('NodataAvailable') }}</td>
-                                                        </tr>
-                                                        <tr v-for="(detail, index) in details" :key="index">
-                                                            <td>
-                                                                <span>{{ detail.code }}</span>
-                                                                <br>
-                                                                <span
-                                                                    class="badge badge-success">{{ detail.name }}</span>
-                                                                <i v-if="currentUserPermissions && currentUserPermissions.includes('edit_product_sale')"
-                                                                   @click="modal_update_detail(detail)"
-                                                                   class="i-Edit text-success cursor-pointer"></i>
-                                                            </td>
-                                                            <td>{{ currentUser.currency }}
-                                                                {{ formatNumber(detail.Total_price, 2) }}
-                                                            </td>
-                                                            <td>
-                                                                <div class="quantity">
-                                                                    <b-input-group>
-                                                                        <b-input-group-prepend>
-                                        <span
-                                            class="btn btn-primary btn-sm"
-                                            @click="decrement(detail ,detail.detail_id)"
-                                        >-</span>
-                                                                        </b-input-group-prepend>
-
-                                                                        <input
-                                                                            class="form-control"
-                                                                            @keyup="verifiedQty(detail,detail.detail_id)"
-                                                                            v-model.number="detail.quantity"
-                                                                        >
-
-                                                                        <b-input-group-append>
-                                        <span
-                                            class="btn btn-primary btn-sm"
-                                            @click="increment(detail.detail_id)"
-                                        >+</span>
-                                                                        </b-input-group-append>
-                                                                    </b-input-group>
-                                                                </div>
-                                                            </td>
-                                                            <td class="text-center">{{ currentUser.currency }}
-                                                                {{ detail.subtotal.toFixed(2) }}
-                                                            </td>
-                                                            <td>
-                                                                <a
-                                                                    @click="delete_Product_Detail(detail.detail_id)"
-                                                                    title="Delete"
-                                                                >
-                                                                    <i class="i-Close-Window text-25 text-danger cursor-pointer"></i>
-                                                                </a>
-                                                            </td>
-                                                        </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            </div>
+                                            <Cart :details="details"></Cart>
                                         </b-col>
                                     </b-row>
 
@@ -306,7 +123,7 @@
                                                 <div class="grandtotal">
                                                     <span>{{ $t("Total_Payable") }} : {{
                                                             currentUser.currency
-                                                        }} {{ GrandTotal.toFixed(2) }}</span>
+                                                        }} {{ grand_total.toFixed(2) }}</span>
                                                 </div>
                                             </b-col>
 
@@ -325,7 +142,7 @@
                                                                 aria-describedby="OrderTax-feedback"
                                                                 label="Order Tax"
                                                                 v-model.number="sale.tax_rate"
-                                                                @keyup="keyup_OrderTax()"
+                                                                @keyup="keyupUpdateSale('tax_rate')"
                                                             ></b-form-input>
                                                         </b-input-group>
                                                         <b-form-invalid-feedback
@@ -351,7 +168,7 @@
                                                                 aria-describedby="Discount-feedback"
                                                                 label="Discount"
                                                                 v-model.number="sale.discount"
-                                                                @keyup="keyup_Discount()"
+                                                                @keyup="keyupUpdateSale('discount')"
                                                             ></b-form-input>
                                                         </b-input-group>
                                                         <b-form-invalid-feedback
@@ -377,7 +194,7 @@
                                                                 aria-describedby="Shipping-feedback"
                                                                 label="Shipping"
                                                                 v-model.number="sale.shipping"
-                                                                @keyup="keyup_Shipping()"
+                                                                @keyup="keyupUpdateSale('shipping')"
                                                             ></b-form-input>
                                                         </b-input-group>
 
@@ -388,282 +205,35 @@
                                                     </b-form-group>
                                                 </validation-provider>
                                             </b-col>
-
-                                            <!-- <b-col md="6" sm="12">
-                        <b-button
-                          @click="Reset_Pos()"
-                          variant="danger ripple btn-rounded btn-block mt-1"
-                        >
-                          <i class="i-Power-2"></i>
-                          {{ $t("Reset") }}
-                        </b-button>
-                      </b-col>
-                      <b-col md="6" sm="12">
-                        <b-button type="submit" variant="success ripple mt-1 btn-rounded btn-block">
-                          <i class="i-Checkout"></i>
-                          {{ $t("payNow") }}
-                        </b-button>
-                      </b-col> -->
                                         </b-row>
                                     </div>
 
 
                                 </b-card-body>
-
-
                             </b-form>
                         </validation-observer>
 
                         <!-- Update Detail Product -->
-                        <validation-observer ref="Update_Detail">
-                            <b-modal hide-footer size="lg" id="form_Update_Detail" :title="detail.name">
-                                <b-form @submit.prevent="submitUpdateDetail">
-                                    <b-row>
-                                        <!-- Unit Price -->
-                                        <b-col lg="6" md="6" sm="12">
-                                            <validation-provider
-                                                name="Product Price"
-                                                :rules="{ required: true , regex: /^\d*\.?\d*$/}"
-                                                v-slot="validationContext"
-                                            >
-                                                <b-form-group :label="$t('ProductPrice') + ' ' + '*'" id="Price-input">
-                                                    <b-form-input
-                                                        label="Product Price"
-                                                        v-model="detail.Unit_price"
-                                                        :state="getValidationState(validationContext)"
-                                                        aria-describedby="Price-feedback"
-                                                    ></b-form-input>
-                                                    <b-form-invalid-feedback
-                                                        id="Price-feedback"
-                                                    >{{ validationContext.errors[0] }}
-                                                    </b-form-invalid-feedback>
-                                                </b-form-group>
-                                            </validation-provider>
-                                        </b-col>
-
-                                        <!-- Tax Method -->
-                                        <b-col lg="6" md="6" sm="12">
-                                            <validation-provider name="Tax Method" :rules="{ required: true}">
-                                                <b-form-group slot-scope="{ valid, errors }"
-                                                              :label="$t('TaxMethod') + ' ' + '*'">
-                                                    <v-select
-                                                        :class="{'is-invalid': !!errors.length}"
-                                                        :state="errors[0] ? false : (valid ? true : null)"
-                                                        v-model="detail.tax_method"
-                                                        :reduce="label => label.value"
-                                                        :placeholder="$t('Choose_Method')"
-                                                        :options="
-                           [
-                            {label: 'Exclusive', value: '1'},
-                            {label: 'Inclusive', value: '2'}
-                           ]"
-                                                    ></v-select>
-                                                    <b-form-invalid-feedback>{{ errors[0] }}</b-form-invalid-feedback>
-                                                </b-form-group>
-                                            </validation-provider>
-                                        </b-col>
-
-                                        <!-- Tax -->
-                                        <b-col lg="6" md="6" sm="12">
-                                            <validation-provider
-                                                name="Tax"
-                                                :rules="{ required: true , regex: /^\d*\.?\d*$/}"
-                                                v-slot="validationContext"
-                                            >
-                                                <b-form-group :label="$t('Tax') + ' ' + '*'">
-                                                    <b-input-group append="%">
-                                                        <b-form-input
-                                                            label="Tax"
-                                                            v-model="detail.tax_percent"
-                                                            :state="getValidationState(validationContext)"
-                                                            aria-describedby="Tax-feedback"
-                                                        ></b-form-input>
-                                                    </b-input-group>
-                                                    <b-form-invalid-feedback
-                                                        id="Tax-feedback"
-                                                    >{{ validationContext.errors[0] }}
-                                                    </b-form-invalid-feedback>
-                                                </b-form-group>
-                                            </validation-provider>
-                                        </b-col>
-
-                                        <!-- Discount Method -->
-                                        <b-col lg="6" md="6" sm="12">
-                                            <validation-provider name="Discount Method" :rules="{ required: true}">
-                                                <b-form-group slot-scope="{ valid, errors }"
-                                                              :label="$t('Discount_Method') + ' ' + '*'">
-                                                    <v-select
-                                                        v-model="detail.discount_Method"
-                                                        :reduce="label => label.value"
-                                                        :placeholder="$t('Choose_Method')"
-                                                        :class="{'is-invalid': !!errors.length}"
-                                                        :state="errors[0] ? false : (valid ? true : null)"
-                                                        :options="
-                              [
-                                {label: 'Percent %', value: '1'},
-                                {label: 'Fixed', value: '2'}
-                              ]"
-                                                    ></v-select>
-                                                    <b-form-invalid-feedback>{{ errors[0] }}</b-form-invalid-feedback>
-                                                </b-form-group>
-                                            </validation-provider>
-                                        </b-col>
-
-                                        <!-- Discount Rate -->
-                                        <b-col lg="6" md="6" sm="12">
-                                            <validation-provider
-                                                name="Discount Rate"
-                                                :rules="{ required: true , regex: /^\d*\.?\d*$/}"
-                                                v-slot="validationContext"
-                                            >
-                                                <b-form-group :label="$t('Discount') + ' ' + '*'">
-                                                    <b-form-input
-                                                        label="Discount"
-                                                        v-model="detail.discount"
-                                                        :state="getValidationState(validationContext)"
-                                                        aria-describedby="Discount-feedback"
-                                                    ></b-form-input>
-                                                    <b-form-invalid-feedback
-                                                        id="Discount-feedback"
-                                                    >{{ validationContext.errors[0] }}
-                                                    </b-form-invalid-feedback>
-                                                </b-form-group>
-                                            </validation-provider>
-                                        </b-col>
-
-                                        <!-- Unit Sale -->
-                                        <b-col lg="6" md="6" sm="12" v-if="detail.product_type != 'is_service'">
-                                            <validation-provider name="Unit Sale" :rules="{ required: true}">
-                                                <b-form-group slot-scope="{ valid, errors }"
-                                                              :label="$t('UnitSale') + ' ' + '*'">
-                                                    <v-select
-                                                        :class="{'is-invalid': !!errors.length}"
-                                                        :state="errors[0] ? false : (valid ? true : null)"
-                                                        v-model="detail.sale_unit_id"
-                                                        :placeholder="$t('Choose_Unit_Sale')"
-                                                        :reduce="label => label.value"
-                                                        :options="units.map(units => ({label: units.name, value: units.id}))"
-                                                    />
-                                                    <b-form-invalid-feedback>{{ errors[0] }}</b-form-invalid-feedback>
-                                                </b-form-group>
-                                            </validation-provider>
-                                        </b-col>
-
-                                        <!-- Imei or serial numbers -->
-                                        <b-col lg="12" md="12" sm="12" v-show="detail.is_imei">
-                                            <b-form-group :label="$t('Add_product_IMEI_Serial_number')">
-                                                <b-form-input
-                                                    label="Add_product_IMEI_Serial_number"
-                                                    v-model="detail.imei_number"
-                                                    :placeholder="$t('Add_product_IMEI_Serial_number')"
-                                                ></b-form-input>
-                                            </b-form-group>
-                                        </b-col>
-
-                                        <b-col md="12">
-                                            <b-form-group>
-                                                <b-button variant="primary" type="submit">{{ $t('submit') }}</b-button>
-                                            </b-form-group>
-                                        </b-col>
-                                    </b-row>
-                                </b-form>
-                            </b-modal>
-                        </validation-observer>
+                        <b-modal hide-footer size="lg"
+                                 id="POS:Modal:UpdateDetail"
+                                 :title="detail.name">
+                            <update-detail-form v-if="detail"
+                                                :units="units"
+                                                :detail="detail"
+                                                v-on:update-detail="updateDetail"
+                            ></update-detail-form>
+                        </b-modal>
                     </b-card>
                 </b-col>
 
                 <!-- Card right Of Products -->
                 <b-col md="7">
-                    <b-card class="list-grid">
-                        <b-row>
-                            <b-col md="6">
-                                <button v-b-toggle.sidebar-category class="btn btn-outline-info mt-1 btn-block">
-                                    <i class="i-Two-Windows"></i>
-                                    {{ $t('ListofCategory') }}
-                                </button>
-                            </b-col>
-                            <b-col md="6">
-                                <button v-b-toggle.sidebar-brand class="btn btn-outline-info mt-1 btn-block">
-                                    <i class="i-Library"></i>
-                                    {{ $t('ListofBrand') }}
-                                </button>
-                            </b-col>
-
-
-                            <!-- Product -->
-                            <b-col md="12" class="mt-2 mb-2">
-                                <div id="autocomplete" class="autocomplete">
-                                    <input
-                                        :placeholder="$t('Scan_Search_Product_by_Code_Name')"
-                                        @input='e => search_input = e.target.value'
-                                        @keyup="search(search_input)"
-                                        @focus="handleFocus"
-                                        @blur="handleBlur"
-                                        ref="product_autocomplete"
-                                        class="autocomplete-input"/>
-                                    <ul class="autocomplete-result-list" v-show="focused">
-                                        <li class="autocomplete-result" v-for="product_fil in product_filter"
-                                            @mousedown="SearchProduct(product_fil)">{{ getResultValue(product_fil) }}
-                                        </li>
-                                    </ul>
-                                </div>
-                            </b-col>
-
-                            <div class="col-md-12 d-flex flex-row flex-wrap bd-highlight list-item mt-2">
-                                <div
-                                    @click="Check_Product_Exist(product , product.id)"
-                                    v-for="product in products"
-                                    class="card o-hidden bd-highlight m-1"
-                                >
-                                    <div class="list-thumb d-flex">
-                                        <img alt :src="'/images/products/'+product.image">
-                                    </div>
-                                    <div class="flex-grow-1 d-bock">
-                                        <div
-                                            class="card-body align-self-center d-flex flex-column justify-content-between align-items-lg-center"
-                                        >
-                                            <div class="w-40 w-sm-100 item-title">{{ product.name }}</div>
-                                            <p class="text-muted text-small w-15 w-sm-100 mb-2">{{ product.code }}</p>
-
-                                            <span
-                                                class="badge badge-primary w-15 w-sm-100 mb-2"
-                                            >{{ currentUser.currency }} {{ formatNumber(product.Net_price, 2) }}</span>
-
-                                            <p v-if="product.product_type != 'is_service'"
-                                               class="m-0 text-muted text-small w-15 w-sm-100 d-none d-lg-block item-badges"
-                                            >
-                        <span
-                            class="badge badge-info"
-                        >{{ formatNumber(product.qte_sale, 2) }} {{ product.unitSale }}</span>
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </b-row>
-                        <b-row class="mb-3">
-                            <b-col md="12" class="mt-4">
-                                <b-pagination
-                                    @change="Product_onPageChanged"
-                                    :total-rows="product_totalRows"
-                                    :per-page="product_perPage"
-                                    v-model="product_currentPage"
-                                    class="my-0 gull-pagination align-items-center"
-                                    align="center"
-                                    first-text
-                                    last-text
-                                >
-                                    <p class="list-arrow m-0" slot="prev-text">
-                                        <i class="i-Arrow-Left text-40"></i>
-                                    </p>
-                                    <p class="list-arrow m-0" slot="next-text">
-                                        <i class="i-Arrow-Right text-40"></i>
-                                    </p>
-                                </b-pagination>
-                            </b-col>
-                        </b-row>
-
-                    </b-card>
+                    <ProductCardContainer
+                        :current-page="product_current_page"
+                        :per-page="product_per_page"
+                        :total-rows="product_total_rows"
+                        :products="products ?? []"
+                    ></ProductCardContainer>
                 </b-col>
 
                 <!-- Sidebar Brand -->
@@ -672,8 +242,8 @@
                         <b-row>
                             <div class="col-md-12 d-flex flex-row flex-wrap bd-highlight list-item mt-2">
                                 <div
-                                    @click="GetAllBrands()"
-                                    :class="{ 'brand-Active' : brand_id == ''}"
+                                    @click="productsByBrand()"
+                                    :class="{ 'brand-Active' : brand_id === ''}"
                                     class="card o-hidden bd-highlight m-1"
                                 >
                                     <div class="list-thumb d-flex">
@@ -689,16 +259,15 @@
                                 </div>
                                 <div
                                     class="card o-hidden bd-highlight m-1"
-                                    v-for="brand in paginated_Brands"
+                                    v-for="brand in paginated_brands"
                                     :key="brand.id"
-                                    @click="Products_by_Brands(brand.id)"
+                                    @click="productsByBrand(brand.id)"
                                     :class="{ 'brand-Active' : brand.id === brand_id}"
                                 >
                                     <img alt :src="'/images/brands/'+brand.image">
                                     <div class="flex-grow-1 d-bock">
                                         <div
-                                            class="card-body align-self-center d-flex flex-column justify-content-between align-items-lg-center"
-                                        >
+                                            class="card-body align-self-center d-flex flex-column justify-content-between align-items-lg-center">
                                             <div class="item-title">{{ brand.name }}</div>
                                         </div>
                                     </div>
@@ -711,8 +280,8 @@
                                 <b-pagination
                                     @change="BrandonPageChanged"
                                     :total-rows="numberOfBrands"
-                                    :per-page="brand_perPage"
-                                    v-model="brand_currentPage"
+                                    :per-page="brand_per_page"
+                                    v-model="brand_current_page"
                                     class="my-0 gull-pagination align-items-center"
                                     align="center"
                                     first-text
@@ -741,7 +310,7 @@
                     <div class="px-3 py-2">
                         <b-row>
                             <div class="col-md-12 d-flex flex-row flex-wrap bd-highlight list-item mt-2">
-                                <div @click="getAllCategory()"
+                                <div @click="getProductsByCategory()"
                                      :class="{ 'brand-Active' : category_id == ''}"
                                      class="card o-hidden bd-highlight m-1">
                                     <div class="list-thumb d-flex">
@@ -777,8 +346,8 @@
                                 <b-pagination
                                     @change="categoryOnPageChanged"
                                     :total-rows="numberOfCategories"
-                                    :per-page="category_perPage"
-                                    v-model="category_currentPage"
+                                    :per-page="category_per_page"
+                                    v-model="category_current_page"
                                     class="my-0 gull-pagination align-items-center"
                                     align="center"
                                     first-text
@@ -797,167 +366,10 @@
                 </b-sidebar>
 
                 <!-- Modal Show Invoice POS-->
-                <b-modal hide-footer size="sm" scrollable id="Show_invoice" :title="$t('Invoice_POS')">
-                    <div id="invoice-POS">
-                        <div style="max-width:400px;margin:0px auto">
-                            <div class="info">
-                                <div class="invoice_logo text-center mb-2">
-                                    <img :src="'/images/'+invoice_pos.setting.logo" alt width="60" height="60">
-                                </div>
-                                <p>
-                                    <span>{{ $t('date') }} : {{ invoice_pos.sale.date }} <br></span>
-                                    <span
-                                        v-show="pos_settings.show_address">{{
-                                            $t('Address')
-                                        }} : {{ invoice_pos.setting.CompanyAddress }} <br></span>
-                                    <span
-                                        v-show="pos_settings.show_email">{{
-                                            $t('Email')
-                                        }} : {{ invoice_pos.setting.email }} <br></span>
-                                    <span
-                                        v-show="pos_settings.show_phone">{{
-                                            $t('Phone')
-                                        }} : {{ invoice_pos.setting.CompanyPhone }} <br></span>
-                                    <span
-                                        v-show="pos_settings.show_customer">{{
-                                            $t('Customer')
-                                        }} : {{ invoice_pos.sale.client_name }} <br></span>
-                                    <span
-                                        v-show="pos_settings.show_Warehouse">{{
-                                            $t('warehouse')
-                                        }} : {{ invoice_pos.sale.warehouse_name }} <br></span>
-                                </p>
-                            </div>
-
-                            <table class="table_data">
-                                <tbody>
-                                <tr v-for="detail_invoice in invoice_pos.details">
-                                    <td colspan="3">
-                                        {{ detail_invoice.name }}
-                                        <br v-show="detail_invoice.is_imei && detail_invoice.imei_number !==null">
-                                        <span
-                                            v-show="detail_invoice.is_imei && detail_invoice.imei_number !==null ">{{
-                                                $t('IMEI_SN')
-                                            }} : {{ detail_invoice.imei_number }}</span>
-                                        <br>
-                                        <span>{{ formatNumber(detail_invoice.quantity, 2) }} {{
-                                                detail_invoice.unit_sale
-                                            }} x {{
-                                                formatNumber(detail_invoice.total / detail_invoice.quantity, 2)
-                                            }}</span>
-                                    </td>
-                                    <td
-                                        style="text-align:right;vertical-align:bottom"
-                                    >{{ formatNumber(detail_invoice.total, 2) }}
-                                    </td>
-                                </tr>
-
-                                <tr style="margin-top:10px" v-show="pos_settings.show_discount">
-                                    <td colspan="3" class="total">{{ $t('OrderTax') }}</td>
-                                    <td style="text-align:right;" class="total">{{ invoice_pos.symbol }}
-                                        {{ formatNumber(invoice_pos.sale.taxe, 2) }}
-                                        ({{ formatNumber(invoice_pos.sale.tax_rate, 2) }} %)
-                                    </td>
-                                </tr>
-
-                                <tr style="margin-top:10px" v-show="pos_settings.show_discount">
-                                    <td colspan="3" class="total">{{ $t('Discount') }}</td>
-                                    <td style="text-align:right;" class="total">{{ invoice_pos.symbol }}
-                                        {{ formatNumber(invoice_pos.sale.discount, 2) }}
-                                    </td>
-                                </tr>
-
-                                <tr style="margin-top:10px" v-show="pos_settings.show_discount">
-                                    <td colspan="3" class="total">{{ $t('Shipping') }}</td>
-                                    <td style="text-align:right;" class="total">{{ invoice_pos.symbol }}
-                                        {{ formatNumber(invoice_pos.sale.shipping, 2) }}
-                                    </td>
-                                </tr>
-
-                                <tr style="margin-top:10px">
-                                    <td colspan="3" class="total">{{ $t('Total') }}</td>
-                                    <td
-                                        style="text-align:right;"
-                                        class="total"
-                                    >{{ invoice_pos.symbol }} {{ formatNumber(invoice_pos.sale.GrandTotal, 2) }}
-                                    </td>
-                                </tr>
-
-                                <tr v-show="invoice_pos.sale.paid_amount < invoice_pos.sale.GrandTotal">
-                                    <td colspan="3" class="total">{{ $t('Paid') }}</td>
-                                    <td
-                                        style="text-align:right;"
-                                        class="total"
-                                    >{{ invoice_pos.symbol }} {{ formatNumber(invoice_pos.sale.paid_amount, 2) }}
-                                    </td>
-                                </tr>
-
-                                <tr v-show="invoice_pos.sale.paid_amount < invoice_pos.sale.GrandTotal">
-                                    <td colspan="3" class="total">{{ $t('Due') }}</td>
-                                    <td
-                                        style="text-align:right;"
-                                        class="total"
-                                    >{{ invoice_pos.symbol }}
-                                        {{
-                                            parseFloat(invoice_pos.sale.GrandTotal - invoice_pos.sale.paid_amount).toFixed(2)
-                                        }}
-                                    </td>
-                                </tr>
-                                </tbody>
-                            </table>
-
-                            <table
-                                class="change mt-3"
-                                style=" font-size: 10px;"
-                                v-show="invoice_pos.sale.paid_amount > 0"
-                            >
-                                <thead>
-                                <tr style="background: #eee; ">
-                                    <th style="text-align: left;" colspan="1">{{ $t('PayeBy') }}:</th>
-                                    <th style="text-align: center;" colspan="2">{{ $t('Amount') }}:</th>
-                                    <th style="text-align: right;" colspan="1">{{ $t('Change') }}:</th>
-                                </tr>
-                                </thead>
-
-                                <tbody>
-                                <tr v-for="payment_pos in payments">
-                                    <td style="text-align: left;" colspan="1">{{ payment_pos.Reglement }}</td>
-                                    <td
-                                        style="text-align: center;"
-                                        colspan="2"
-                                    >{{ formatNumber(payment_pos.montant, 2) }}
-                                    </td>
-                                    <td
-                                        style="text-align: right;"
-                                        colspan="1"
-                                    >{{ formatNumber(payment_pos.change, 2) }}
-                                    </td>
-                                </tr>
-                                </tbody>
-                            </table>
-
-                            <div id="legalcopy" class="ml-2">
-                                <p class="legal" v-show="pos_settings.show_note">
-                                    <strong>{{ pos_settings.note_customer }}</strong>
-                                </p>
-                                <div id="bar" v-show="pos_settings.show_barcode">
-                                    <barcode
-                                        class="barcode"
-                                        :format="barcodeFormat"
-                                        :value="invoice_pos.sale.Ref"
-                                        textmargin="0"
-                                        fontoptions="bold"
-                                        fontSize="15"
-                                        height="25"
-                                        width="1"
-                                    ></barcode>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <button @click="print_pos()" class="btn btn-outline-primary">
-                        <i class="i-Billing"></i>
-                        {{ $t('print') }}
+                <b-modal hide-footer size="sm" scrollable id="Show_invoice" :title="$t('invoice_pos')">
+                    <component ref="receipt" :is="invoice_template" :invoice-data="invoice_pos"></component>
+                    <button @click="printPos()" class="btn btn-outline-primary">
+                        <i class="i-Billing"></i>{{ $t('print') }}
                     </button>
                 </b-modal>
 
@@ -978,7 +390,7 @@
                                             >
                                                 <b-form-group :label="$t('Received_Amount') + ' ' + '*'">
                                                     <b-form-input
-                                                        @keyup="Verified_Received_Amount(payment.received_amount)"
+                                                        @keyup="verifiedReceivedAmount(payment.received_amount)"
                                                         label="Received_Amount"
                                                         :placeholder="$t('Received_Amount')"
                                                         v-model.number="payment.received_amount"
@@ -1003,7 +415,7 @@
                                                 <b-form-group :label="$t('Paying_Amount') + ' ' + '*'">
                                                     <b-form-input
                                                         label="Paying_Amount"
-                                                        @keyup="Verified_paidAmount(payment.amount)"
+                                                        @keyup="verifyPaidAmount(payment.amount)"
                                                         :placeholder="$t('Paying_Amount')"
                                                         v-model.number="payment.amount"
                                                         :state="getValidationState(validationContext)"
@@ -1036,14 +448,13 @@
                                                 {{ $t('TotalProducts') }}
                                                 <b-badge variant="primary" pill>{{ details.length }}</b-badge>
                                             </b-list-group-item>
-
                                             <b-list-group-item
                                                 class="d-flex justify-content-between align-items-center">
                                                 {{ $t('OrderTax') }}
                                                 <span
                                                     class="font-weight-bold"
                                                 >{{ currentUser.currency }} {{
-                                                        sale.TaxNet.toFixed(2)
+                                                        sale.tax_net.toFixed(2)
                                                     }} ({{ sale.tax_rate }} %)</span>
                                             </b-list-group-item>
                                             <b-list-group-item
@@ -1053,7 +464,6 @@
                                                     class="font-weight-bold"
                                                 >{{ currentUser.currency }} {{ sale.discount.toFixed(2) }}</span>
                                             </b-list-group-item>
-
                                             <b-list-group-item
                                                 class="d-flex justify-content-between align-items-center">
                                                 {{ $t('Shipping') }}
@@ -1061,13 +471,12 @@
                                                     class="font-weight-bold"
                                                 >{{ currentUser.currency }} {{ sale.shipping.toFixed(2) }}</span>
                                             </b-list-group-item>
-
                                             <b-list-group-item
                                                 class="d-flex justify-content-between align-items-center">
                                                 {{ $t('Total_Payable') }}
                                                 <span
                                                     class="font-weight-bold"
-                                                >{{ currentUser.currency }} {{ GrandTotal.toFixed(2) }}</span>
+                                                >{{ currentUser.currency }} {{ grand_total.toFixed(2) }}</span>
                                             </b-list-group-item>
                                         </b-list-group>
                                     </b-card>
@@ -1083,11 +492,11 @@
                                             <v-select
                                                 :class="{'is-invalid': !!errors.length}"
                                                 :state="errors[0] ? false : (valid ? true : null)"
-                                                v-model="payment.Reglement"
+                                                v-model="payment.type"
                                                 @input="selectedPaymentMethod"
                                                 :reduce="label => label.value"
                                                 :placeholder="$t('PleaseSelect')"
-                                                :options="availablePaymentMethods"
+                                                :options="supportedPaymentTypes"
                                             ></v-select>
                                             <b-form-invalid-feedback>{{ errors[0] }}</b-form-invalid-feedback>
                                         </b-form-group>
@@ -1112,14 +521,14 @@
                                 </b-col>
 
                                 <b-col md="12">
-                                    <b-card v-show="payment.Reglement == 'credit card'">
+                                    <b-card v-show="payment.type == 'credit card'">
                                         <div v-once class="typo__p" v-if="submit_showing_credit_card">
                                             <div class="spinner sm spinner-primary mt-3"></div>
                                         </div>
-                                        <div v-if="savedPaymentMethods && !submit_showing_credit_card">
+                                        <div v-if="saved_payment_methods && !submit_showing_credit_card">
                                             <div class="mt-3"><span
                                                 class="mr-3">Saved Credit Card Info For This Client </span>
-                                                <b-button variant="outline-info" @click="show_new_credit_card()">
+                                                <b-button variant="outline-info" @click="showNewCreditCard()">
                               <span>
                                 <i class="i-Two-Windows"></i>
                                 New Credit Card
@@ -1139,7 +548,7 @@
                                                 </thead>
 
                                                 <tbody>
-                                                <tr v-for="card in savedPaymentMethods"
+                                                <tr v-for="card in saved_payment_methods"
                                                     :class="{ 'bg-selected-card': isSelectedCard(card) }">
                                                     <td>**** {{ card.last4 }}</td>
                                                     <td>{{ card.type }}</td>
@@ -1164,8 +573,8 @@
                                             <form id="payment-form">
                                                 <label for="card-element" class="leading-7 text-sm text-gray-600">
                                                     {{ $t('Credit_Card_Info') }}
-                                                    <b-button variant="outline-info" @click="show_saved_credit_card()"
-                                                              v-if="savedPaymentMethods && savedPaymentMethods.length > 0">
+                                                    <b-button variant="outline-info" @click="showSavedCreditCard()"
+                                                              v-if="saved_payment_methods && saved_payment_methods.length > 0">
                                 <span>
                                       <i class="i-Two-Windows"></i>
                                       Use Saved Credit Card
@@ -1224,7 +633,7 @@
 
                 <validation-observer ref="Create_Customer">
                     <b-modal hide-footer size="lg" id="New_Customer" :title="$t('Add')">
-                        <b-form @submit.prevent="Submit_Customer">
+                        <b-form @submit.prevent="submitCustomer">
                             <b-row>
                                 <!-- Customer Name -->
                                 <b-col md="6" sm="12">
@@ -1312,7 +721,7 @@
                           label="Address"
                           class="form-control"
                           rows="4"
-                          v-model="client.Address"
+                          v-model="client.address"
                           :placeholder="$t('Address')"
                       ></textarea>
                                     </b-form-group>
@@ -1334,11 +743,10 @@
                     id="show_draft_sales"
                     title="Draft Sales"
                 >
-
                     <vue-good-table
                         mode="remote"
                         :columns="draft_sales_columns"
-                        :totalRows="numberOfDraftedSales"
+                        :totalRows="number_of_drafted_sales"
                         :rows="draft_sales"
                         @on-page-change="onPageChange"
                         @on-per-page-change="onPerPageChange"
@@ -1354,34 +762,30 @@
 
 
                         <template slot="table-row" slot-scope="props">
-          <span v-if="props.column.field == 'actions'">
-
-            <router-link
-                v-b-tooltip.hover
-                title="Edit"
-                :to="{ name:'pos_draft', params: { id: props.row.id } }"
-            >
-              <i class="i-Edit text-25 text-success"></i>
-            </router-link>
-            <a @click="removeDraftSale(props.row.id)"
-               v-b-tooltip.hover
-               title="Delete"
-               class="cursor-pointer"
-            >
-              <i class="i-Close-Window text-25 text-danger"></i>
-            </a>
-          </span>
-
+                            <span v-if="props.column.field == 'actions'">
+                                <router-link
+                                    v-b-tooltip.hover
+                                    title="Edit"
+                                    :to="{ name:'pos_draft', params: { id: props.row.id } }"
+                                >
+                                  <i class="i-Edit text-25 text-success"></i>
+                                </router-link>
+                                <a @click="removeDraftSale(props.row.id)"
+                                   v-b-tooltip.hover
+                                   title="Delete"
+                                   class="cursor-pointer"
+                                >
+                                  <i class="i-Close-Window text-25 text-danger"></i>
+                                </a>
+                              </span>
                         </template>
-
                     </vue-good-table>
-
                 </b-modal>
 
                 <div class="pos-button-actions"
                      style="display: flex;margin-top: 10px;bottom: 0px;margin-left: 29px;width: 100%; flex-wrap: wrap; ">
                     <b-button style="width: auto;margin-bottom: 8px;"
-                              @click="Reset_Pos()"
+                              @click="reset_Pos()"
                               variant="danger ripple btn-rounded mr-1"
                     >
                         <i class="i-Power-2"></i>
@@ -1395,8 +799,8 @@
                     </b-button>
 
                     <b-button style="width: auto;margin-bottom: 8px;"
-                              @click="Submit_Draft()"
-                              :disabled="DraftProcessing"
+                              @click="submitDraft()"
+                              :disabled="draft_processing"
                               variant="primary ripple mr-1 btn-rounded">
                         <i class="i-Sand-watch"></i>
                         Draft
@@ -1421,58 +825,50 @@ import {mapActions, mapGetters} from "vuex";
 import vueEasyPrint from "vue-easy-print";
 import VueBarcode from "vue-barcode";
 import FlagIcon from "vue-flag-icon";
-import Util from "./../../../utils";
+import Util, {randomString} from "./../../../utils";
 import {loadStripe} from "@stripe/stripe-js";
 import {posClient} from "../../../utils/client";
+import ProductCardContainer from "../../../components/pos/ProductCardContainer";
+import Cart from "../../../components/pos/Cart";
+import UpdateDetailForm from "../../../components/pos/UpdateDetailForm";
+import DefaultInvoiceTemplate from "../../../components/pos/invoices/templates/default/index";
+import LanguageSwitcher from "../../../components/LanguageSwitcher";
+import helperMixin from "../../../mixins/helperMethods";
 
 export default {
+    mixins: [helperMixin],
     components: {
+        Cart,
         vueEasyPrint,
         barcode: VueBarcode,
-        FlagIcon
+        FlagIcon,
+        ProductCardContainer,
+        UpdateDetailForm,
+        DefaultInvoiceTemplate,
+        LanguageSwitcher
     },
-    metaInfo: {
-        title: "POS"
-    },
+    metaInfo: {title: "POS"},
     data() {
         return {
-            langs: [
-                "en",
-                "fr",
-                "ar",
-                "de",
-                "es",
-                "it",
-                "Ind",
-                "thai",
-                "tr_ch",
-                "sm_ch",
-                "tur",
-                "ru",
-                "hn",
-                "vn",
-                "kr",
-                "ba",
-                "br",
-            ],
+            cart_id: null,
+            cart_created: false,
+            invoice_template: "DefaultInvoiceTemplate",
             stripe: {},
-            stripe_key: "",
-            cardElement: {},
-            paymentProcessing: false,
-            DraftProcessing: false,
-            savedPaymentMethods: [],
-            hasSavedPaymentMethod: false,
-            useSavedPaymentMethod: false,
-            selectedCard: null,
+            stripe_key: null,
+            card_element: {},
+            payment_processing: false,
+            draft_processing: false,
+            saved_payment_methods: [],
+            has_saved_payment_method: false,
+            use_saved_payment_method: false,
+            selected_card: null,
             card_id: '',
             is_new_credit_card: false,
             submit_showing_credit_card: false,
-
-            numberOfDraftedSales: "",
+            number_of_drafted_sales: "",
             draft_sales: [],
-            limit: "10",
-
-            serverParams: {
+            limit: 10,
+            server_params: {
                 sort: {
                     field: "id",
                     type: "desc"
@@ -1480,28 +876,26 @@ export default {
                 page: 1,
                 perPage: 10
             },
-
             client_name: '',
             payment: {
                 amount: "",
                 account_id: "",
                 received_amount: "",
-                Reglement: "",
+                type: "",
                 notes: ""
             },
             focused: false,
             timer: null,
             search_input: '',
             product_filter: [],
-            isLoading: true,
+            is_loading: true,
             load_product: true,
-            GrandTotal: 0,
+            grand_total: 0,
             total: 0,
-            Ref: "",
+            ref: "",
             clients: [],
             units: [],
             warehouses: [],
-            payments: [],
             products: [],
             products_pos: [],
             details: [],
@@ -1509,46 +903,24 @@ export default {
             categories: [],
             brands: [],
             accounts: [],
-            pos_settings: {},
-            product_currentPage: 1,
+            product_current_page: 1,
             paginated_products: "",
-            product_perPage: 8,
-            product_totalRows: "",
-            paginated_Brands: "",
-            brand_currentPage: 1,
-            brand_perPage: 3,
+            product_per_page: 8,
+            product_total_rows: "",
+            paginated_brands: "",
+            brand_current_page: 1,
+            brand_per_page: 3,
             paginated_categories: "",
-            category_currentPage: 1,
-            category_perPage: 3,
-            barcodeFormat: "CODE128",
-            invoice_pos: {
-                sale: {
-                    Ref: "",
-                    client_name: "",
-                    discount: "",
-                    taxe: "",
-                    date: "",
-                    tax_rate: "",
-                    shipping: "",
-                    GrandTotal: "",
-                    paid_amount: ""
-                },
-                details: [],
-                setting: {
-                    logo: "",
-                    CompanyName: "",
-                    CompanyAddress: "",
-                    email: "",
-                    CompanyPhone: ""
-                }
-            },
+            category_current_page: 1,
+            category_per_page: 3,
+            invoice_pos: null,
             sale: {
                 warehouse_id: "",
                 client_id: "",
                 tax_rate: 0,
                 shipping: 0,
                 discount: 0,
-                TaxNet: 0,
+                tax_net: 0,
                 notes: '',
             },
             client: {
@@ -1560,7 +932,7 @@ export default {
                 country: "",
                 tax_number: "",
                 city: "",
-                Address: ""
+                address: ""
             },
             category_id: "",
             brand_id: "",
@@ -1572,20 +944,20 @@ export default {
                 quantity: "",
                 check_qty: "",
                 discount: "",
-                DiscountNet: "",
-                discount_Method: "",
+                discount_net: "",
+                discount_method: "",
                 sale_unit_id: "",
                 fix_stock: "",
                 fix_price: "",
                 name: "",
                 unitSale: "",
-                Net_price: "",
-                Unit_price: "",
-                Total_price: "",
+                net_price: "",
+                unit_price: "",
+                total_price: "",
                 subtotal: "",
                 product_id: "",
                 detail_id: "",
-                taxe: "",
+                tax: "",
                 tax_percent: "",
                 tax_method: "",
                 product_variant_id: "",
@@ -1593,20 +965,11 @@ export default {
                 imei_number: "",
             },
             sound: "/audio/Beep.wav",
-            audio: new Audio("/audio/Beep.wav"),
-            availablePaymentMethods: [
-                {label: 'Cash', value: 'Cash'},
-                {label: 'credit card', value: 'credit card'},
-                {label: 'TPE', value: 'tpe'},
-                {label: 'cheque', value: 'cheque'},
-                {label: 'Western Union', value: 'Western Union'},
-                {label: 'bank transfer', value: 'bank transfer'},
-                {label: 'other', value: 'other'},
-            ],
+            audio: new Audio("/audio/Beep.wav")
         };
     },
     computed: {
-        ...mapGetters(["currentUser", "currentUserPermissions"]),
+        ...mapGetters(["currentUser", "currentUserPermissions", "supportedPaymentTypes", "supportedLanguages"]),
 
         numberOfBrands() {
             return this.brands.length;
@@ -1616,21 +979,12 @@ export default {
             return this.categories.length;
         },
 
-        savedPaymentMethods() {
-            return this.hasSavedPaymentMethod
-        },
-
         formNewCard() {
-            return !this.useSavedPaymentMethod
-            // if (this.useSavedPaymentMethod) {
-            //     return false;
-            // } else {
-            //     return true;
-            // }
+            return !this.use_saved_payment_method
         },
 
         isSelectedCard() {
-            return card => this.selectedCard === card;
+            return card => this.selected_card === card;
         },
 
         draft_sales_columns() {
@@ -1643,8 +997,8 @@ export default {
                     sortable: false
                 },
                 {
-                    label: this.$t("Reference"),
-                    field: "Ref",
+                    label: this.$t("reference"),
+                    field: "ref",
                     tdClass: "text-left",
                     thClass: "text-left",
                     sortable: false
@@ -1665,7 +1019,7 @@ export default {
                 },
                 {
                     label: this.$t("Total"),
-                    field: "GrandTotal",
+                    field: "grand_total",
                     tdClass: "text-left",
                     thClass: "text-left",
                     sortable: false
@@ -1682,140 +1036,186 @@ export default {
         }
 
     },
+    watch: {
+        details: {
+            handler: async function (val) {
+                console.log('details watcher trigger', val)
+
+                if (this.cart_created === false
+                    && this.sale.warehouse_id !== "") {
+                    await axios.post('/pos/cart', {
+                        id: this.cart_id,
+                        warehouseId: this.sale.warehouse_id,
+                        clientId: this.sale.client_id,
+                    })
+                        .then(response => {
+                            this.cart_created = true
+                        })
+                }
+
+                if (this.cart_created) {
+                    const url = `/promotions/check`
+                    axios.post(url, {
+                        cartId: this.cart_id,
+                        warehouseId: this.sale.warehouse_id,
+                        clientId: this.sale.client_id,
+                        details: val.map(d => ({
+                            product_id: d.product_id,
+                            quantity: d.quantity,
+                            product_variant_id: d.product_variant_id,
+                            promotion_id: d.promotion_id
+                        }))
+                    })
+                        .then(response => {
+                            console.log('check promotion: ', response.data)
+
+                            const promotion = response.data.promotion
+
+
+                            if (promotion.is_increment) {
+                                response.data.promotion.rewards.forEach(promotedItem => {
+                                    const promoted_product = this.findProductById(promotedItem.product_id, promotedItem.product_variant_id)
+                                    console.log("promoted_product:", promoted_product)
+                                    this.details.push({
+                                        ...promoted_product,
+                                        promotion_id: promotedItem.promotion_id,
+                                        promotion_type: promotedItem.type,
+                                        net_price: 0,
+                                        subtotal: 0,
+                                    })
+                                })
+                            }
+
+                        })
+                }
+            },
+            deep: true
+        }
+    },
     mounted() {
         this.changeSidebarProperties();
-        this.paginate_products(this.product_perPage, 0);
+        this.paginate_products(this.product_per_page, 0);
     },
     methods: {
-        ...mapActions(["changeSidebarProperties", "changeThemeMode", "logout"]),
-        // ...mapGetters(["currentUser"]),
-        // logoutUser() {
-        //     this.logout();
-        // },
-
+        ...mapActions(["changeSidebarProperties", "changeThemeMode", "logout",]),
+        findProductById(product_id, product_variant_id) {
+            return this.products_pos.find(product => {
+                if (product_id && product_variant_id) {
+                    if (product.id === product_id && product.product_variant_id === product_variant_id) {
+                        return product;
+                    }
+                }
+                return product.id === product_id
+            });
+        },
         handleFocus() {
             this.focused = true
         },
         handleBlur() {
             this.focused = false
         },
-
-
         async selectedPaymentMethod(value) {
             if (value === 'credit card') {
-                this.savedPaymentMethods = [];
+                this.saved_payment_methods = [];
                 this.submit_showing_credit_card = true;
-                this.selectedCard = null
+                this.selected_card = null
                 this.card_id = '';
                 // Check if the customer has saved payment methods
                 await axios.get(`/retrieve-customer?customerId=${this.sale.client_id}`)
                     .then(response => {
                         // If the customer has saved payment methods, display them
-                        this.savedPaymentMethods = response.data.data;
+                        this.saved_payment_methods = response.data.data;
                         this.card_id = response.data.customer_default_source;
-                        this.hasSavedPaymentMethod = true;
-                        this.useSavedPaymentMethod = true;
+                        this.has_saved_payment_method = true;
+                        this.use_saved_payment_method = true;
                         this.is_new_credit_card = false;
                         this.submit_showing_credit_card = false;
                     })
                     .catch(error => {
                         // If the customer does not have saved payment methods, show the card element for them to enter their payment information
-                        this.hasSavedPaymentMethod = false;
-                        this.useSavedPaymentMethod = false;
+                        this.has_saved_payment_method = false;
+                        this.use_saved_payment_method = false;
                         this.is_new_credit_card = true;
                         this.card_id = '';
 
                         setTimeout(() => {
-                            this.loadStripe_payment();
+                            this.loadStripePayment();
                         }, 1000);
                         this.submit_showing_credit_card = false;
                     });
 
 
             } else {
-                this.hasSavedPaymentMethod = false;
-                this.useSavedPaymentMethod = false;
+                this.has_saved_payment_method = false;
+                this.use_saved_payment_method = false;
                 this.is_new_credit_card = false;
             }
 
         },
 
-        show_saved_credit_card() {
-            this.hasSavedPaymentMethod = true;
-            this.useSavedPaymentMethod = true;
+        showSavedCreditCard() {
+            this.has_saved_payment_method = true;
+            this.use_saved_payment_method = true;
             this.is_new_credit_card = false;
             this.selectedPaymentMethod('credit card');
         },
 
-        show_new_credit_card() {
-            this.selectedCard = null;
+        showNewCreditCard() {
+            this.selected_card = null;
             this.card_id = '';
-            this.useSavedPaymentMethod = false;
-            this.hasSavedPaymentMethod = false;
+            this.use_saved_payment_method = false;
+            this.has_saved_payment_method = false;
             this.is_new_credit_card = true;
 
             setTimeout(() => {
-                this.loadStripe_payment();
+                this.loadStripePayment();
             }, 500);
         },
 
         selectCard(card) {
-            this.selectedCard = card;
+            this.selected_card = card;
             this.card_id = card.card_id;
         },
 
-        async loadStripe_payment() {
-            this.stripe = await loadStripe(`${this.stripe_key}`);
+        async loadStripePayment() {
+            this.stripe = await loadStripe(`${this.stripe_key || ""}`);
             const elements = this.stripe.elements();
-            this.cardElement = elements.create("card", {
+            this.card_element = elements.create("card", {
                 classes: {
                     base:
                         "bg-gray-100 rounded border border-gray-300 focus:border-indigo-500 text-base outline-none text-gray-700 p-3 leading-8 transition-colors duration-200 ease-in-out"
                 }
             });
-            this.cardElement.mount("#card-element");
+            this.card_element.mount("#card-element");
         },
 
-
-        SetLocal(locale) {
-            this.$i18n.locale = locale;
-            this.$store.dispatch("language/setLanguage", locale);
-            Fire.$emit("ChangeLanguage");
-        },
         handleFullScreen() {
             Util.toggleFullScreen();
         },
 
         // ------------------------ Paginate Products --------------------\\
         paginate_products(pageSize = null, pageNumber = 0) {
-            const ps = pageSize || this.product_perPage;
+            const ps = pageSize || this.product_per_page;
             let itemsToParse = this.products;
             this.paginated_products = itemsToParse.slice(
                 pageNumber * ps,
                 (pageNumber + 1) * ps
             );
         },
-        Product_onPageChanged(page) {
-            this.paginate_products(this.product_perPage, page - 1);
-            this.getProducts(page);
-        },
         // ------------------------ Paginate Brands --------------------\\
-        BrandpaginatePerPage() {
-            this.paginate_Brands(this.brand_perPage, 0);
-        },
         paginate_Brands(pageSize, pageNumber) {
             let itemsToParse = this.brands;
-            this.paginated_Brands = itemsToParse.slice(
+            this.paginated_brands = itemsToParse.slice(
                 pageNumber * pageSize,
                 (pageNumber + 1) * pageSize
             );
         },
         BrandonPageChanged(page) {
-            this.paginate_Brands(this.brand_perPage, page - 1);
+            this.paginate_Brands(this.brand_per_page, page - 1);
         },
         // ------------------------ Paginate Categories --------------------\\
         paginateCategories(pageNumber, pageSize = null) {
-            const ps = pageSize || this.category_perPage;
+            const ps = pageSize || this.category_per_page;
             let itemsToParse = this.categories;
             this.paginated_categories = itemsToParse.slice(
                 pageNumber * ps,
@@ -1823,7 +1223,7 @@ export default {
             );
         },
         categoryOnPageChanged(page) {
-            this.paginateCategories(page - 1, this.category_perPage);
+            this.paginateCategories(page - 1, this.category_per_page);
         },
         //--- Submit Validate Create Sale
         submitPos() {
@@ -1833,14 +1233,14 @@ export default {
             this.$refs.create_pos.validate().then(success => {
                 if (!success) {
                     NProgress.done();
-                    if (this.sale.client_id == "" || this.sale.client_id === null) {
+                    if (this.sale.client_id === "" || this.sale.client_id === null) {
                         this.makeToast(
                             "danger",
                             this.$t("Choose_Customer"),
                             this.$t("Failed")
                         );
                     } else if (
-                        this.sale.warehouse_id == "" ||
+                        this.sale.warehouse_id === "" ||
                         this.sale.warehouse_id === null
                     ) {
                         this.makeToast(
@@ -1866,21 +1266,21 @@ export default {
         },
 
         //--- Submit Validate Draft
-        Submit_Draft() {
+        submitDraft() {
             // Start the progress bar.
             NProgress.start();
             NProgress.set(0.1);
             this.$refs.create_pos.validate().then(success => {
                 if (!success) {
                     NProgress.done();
-                    if (this.sale.client_id == "" || this.sale.client_id === null) {
+                    if (this.sale.client_id === "" || this.sale.client_id === null) {
                         this.makeToast(
                             "danger",
                             this.$t("Choose_Customer"),
                             this.$t("Failed")
                         );
                     } else if (
-                        this.sale.warehouse_id == "" ||
+                        this.sale.warehouse_id === "" ||
                         this.sale.warehouse_id === null
                     ) {
                         this.makeToast(
@@ -1907,73 +1307,56 @@ export default {
 
         //---------------------------------- Create Draft ------------------------------\\
         create_draft() {
-            NProgress.start();
-            NProgress.set(0.1);
-            this.DraftProcessing = true;
-            axios
-                .post("pos/create_draft", {
+            this.execute(() => {
+                this.draft_processing = true;
+                posClient.createDraft({
                     client_id: this.sale.client_id,
                     warehouse_id: this.sale.warehouse_id,
                     tax_rate: this.sale.tax_rate ? this.sale.tax_rate : 0,
-                    TaxNet: this.sale.TaxNet ? this.sale.TaxNet : 0,
+                    tax_net: this.sale.tax_net ? this.sale.tax_net : 0,
                     discount: this.sale.discount ? this.sale.discount : 0,
                     shipping: this.sale.shipping ? this.sale.shipping : 0,
                     notes: this.sale.notes,
                     details: this.details,
-                    GrandTotal: this.GrandTotal,
+                    grand_total: this.grand_total,
                 })
-                .then(response => {
-                    if (response.data.success === true) {
-                        // Complete the animation of theprogress bar.
-                        this.makeToast(
-                            "success",
-                            this.$t("Draft_Created_successfully"),
-                            this.$t("Success")
-                        );
-                        NProgress.done();
-                        this.DraftProcessing = false;
-                        this.Reset_Pos();
-                    }
-                })
-                .catch(error => {
-                    // Complete the animation of theprogress bar.
-                    NProgress.done();
-                    this.DraftProcessing = false;
-                    this.makeToast("danger", this.$t("InvalidData"), this.$t("Failed"));
-                });
+                    .then(response => {
+                        if (response.data.success === true) {
+                            // Complete the animation of the progress bar.
+                            this.makeToast(
+                                "success",
+                                this.$t("Draft_Created_successfully"),
+                                this.$t("Success")
+                            );
+                            this.reset_Pos();
+                        }
+                    })
+                    .catch(error => {
+                        // Complete the animation of the progress bar.
+                        this.makeToast("danger", this.$t("InvalidData"), this.$t("Failed"));
+                    })
+                    .finally(() => {
+                        this.draft_processing = false;
+                    });
+
+            })
+
         },
 
         showDraftSales() {
-
             this.getDraftSales(1);
-
             setTimeout(() => {
                 this.$bvModal.show("show_draft_sales");
             }, 1000);
-
         },
 
         getDraftSales(page) {
-
-            NProgress.start();
-            NProgress.set(0.1);
-
-            axios
-                .get("get_draft_sales?page=" +
-                    page +
-                    "&limit=" +
-                    this.limit
-                )
+            axios.get("get_draft_sales?page=" + page + "&limit=" + this.limit)
                 .then(response => {
                     this.draft_sales = response.data.draft_sales;
-                    this.numberOfDraftedSales = response.data.totalRows;
-
-                    NProgress.done();
-
+                    this.number_of_drafted_sales = response.data.totalRows;
                 })
-                .catch(response => {
-                    NProgress.done();
-                });
+                .catch(err => console.error('getDraftSales', err))
 
         },
 
@@ -2021,14 +1404,14 @@ export default {
 
         //---- update Params Table
         updateParams(newProps) {
-            this.serverParams = Object.assign({}, this.serverParams, newProps);
+            this.server_params = Object.assign({}, this.server_params, newProps);
         },
 
         //---- Event Page Change
         onPageChange({currentPage}) {
-            if (this.serverParams.page !== currentPage) {
+            if (this.server_params.page !== currentPage) {
                 this.updateParams({page: currentPage});
-                this.getDraftSales(currentPage);
+
             }
         },
 
@@ -2037,111 +1420,97 @@ export default {
             if (this.limit !== currentPerPage) {
                 this.limit = currentPerPage;
                 this.updateParams({page: 1, perPage: currentPerPage});
-                this.getDraftSales(1);
+                this.execute(() => this.getDraftSales(currentPage));
             }
         },
 
-
-        //---Submit Validation Update Detail
-        submitUpdateDetail() {
-            this.$refs.Update_Detail.validate().then(success => {
-                if (!success) {
-                    return;
-                } else {
-                    this.Update_Detail();
-                }
-            });
-        },
         //------ Validate Form submitPayment
         submitPayment() {
             // Start the progress bar.
             NProgress.start();
             NProgress.set(0.1);
-            this.$refs.Add_payment.validate().then(success => {
-                if (!success) {
-                    // Complete the animation of theprogress bar.
-                    NProgress.done();
-                    this.makeToast(
-                        "danger",
-                        this.$t("Please_fill_the_form_correctly"),
-                        this.$t("Failed")
-                    );
-                } else {
-                    if (this.payment.amount > this.payment.received_amount) {
-                        this.makeToast(
-                            "warning",
-                            this.$t("Paying_amount_is_greater_than_Received_amount"),
-                            this.$t("Warning")
-                        );
-                        this.payment.received_amount = 0;
-                        NProgress.done();
-                    } else if (this.payment.amount > this.GrandTotal) {
-                        this.makeToast(
-                            "warning",
-                            this.$t("Paying_amount_is_greater_than_Grand_Total"),
-                            this.$t("Warning")
-                        );
-                        this.payment.amount = 0;
-                        NProgress.done();
-                    } else {
-                        this.CreatePOS();
-                    }
 
-                }
-            });
+            this.execute(() => {
+                this.$refs.Add_payment.validate()
+                    .then(success => {
+                        if (!success) {
+                            // Complete the animation of theprogress bar.
+                            this.makeToast(
+                                "danger",
+                                this.$t("Please_fill_the_form_correctly"),
+                                this.$t("Failed")
+                            );
+                        } else {
+                            if (this.payment.amount > this.payment.received_amount) {
+                                this.makeToast(
+                                    "warning",
+                                    this.$t("Paying_amount_is_greater_than_Received_amount"),
+                                    this.$t("Warning")
+                                );
+                                this.payment.received_amount = 0;
+                            } else if (this.payment.amount > this.grand_total) {
+                                this.makeToast(
+                                    "warning",
+                                    this.$t("Paying_amount_is_greater_than_Grand_Total"),
+                                    this.$t("Warning")
+                                );
+                                this.payment.amount = 0;
+                            } else {
+                                this.createPos();
+                            }
+
+                        }
+                    });
+            })
+
         },
         //------------- Submit Validation Create & Edit Customer
-        Submit_Customer() {
+        submitCustomer() {
             // Start the progress bar.
-            NProgress.start();
-            NProgress.set(0.1);
-            this.$refs.Create_Customer.validate().then(success => {
-                if (!success) {
-                    NProgress.done();
-                    this.makeToast(
-                        "danger",
-                        this.$t("Please_fill_the_form_correctly"),
-                        this.$t("Failed")
-                    );
-                } else {
-                    this.create_client();
-                }
-            });
+            this.$refs.Create_Customer.validate()
+                .then(success => {
+                    if (!success) {
+                        this.makeToast(
+                            "danger",
+                            this.$t("Please_fill_the_form_correctly"),
+                            this.$t("Failed")
+                        );
+                    } else {
+                        this.createClient();
+                    }
+                });
         },
         //---------------------------------------- Create new Customer -------------------------------\\
-        create_client() {
-            axios
-                .post("clients", {
-                    name: this.client.name,
-                    email: this.client.email,
-                    phone: this.client.phone,
-                    tax_number: this.client.tax_number,
-                    country: this.client.country,
-                    city: this.client.city,
-                    Address: this.client.Address
-                })
+        createClient() {
+            axios.post("clients", {
+                name: this.client.name,
+                email: this.client.email,
+                phone: this.client.phone,
+                tax_number: this.client.tax_number,
+                country: this.client.country,
+                city: this.client.city,
+                address: this.client.address
+            })
                 .then(response => {
-                    NProgress.done();
                     this.makeToast(
                         "success",
                         this.$t("Create.TitleCustomer"),
                         this.$t("Success")
                     );
-                    this.get_all_clients();
+                    this.getAllClients();
                     this.$bvModal.hide("New_Customer");
                 })
                 .catch(error => {
-                    NProgress.done();
                     this.makeToast("danger", this.$t("InvalidData"), this.$t("Failed"));
                 });
         },
         //------------------------------ New Model (create Customer) -------------------------------\\
-        new_client() {
-            this.reset_form_client();
+        newClient() {
+            // this.resetFormClient();
             this.$bvModal.show("New_Customer");
         },
         //-------------------------------- reset Form -------------------------------\\
-        reset_form_client() {
+        resetFormClient() {
             this.client = {
                 id: "",
                 name: "",
@@ -2154,22 +1523,9 @@ export default {
             };
         },
         //------------------------------------ Get Clients Without Paginate -------------------------\\
-        get_all_clients() {
-            axios
-                .get("get_clients_without_paginate")
+        getAllClients() {
+            axios.get("get_clients_without_paginate")
                 .then(({data}) => (this.clients = data));
-        },
-        //---Validate State Fields
-        getValidationState({dirty, validated, valid = null}) {
-            return dirty || validated ? valid : null;
-        },
-        //------ Toast
-        makeToast(variant, msg, title) {
-            this.$root.$bvToast.toast(msg, {
-                title: title,
-                variant: variant,
-                solid: true
-            });
         },
         //---------------------- Event Select Warehouse ------------------------------\\
         selectedWarehouse(value) {
@@ -2191,88 +1547,86 @@ export default {
         //------------------------------------ Get Products By Warehouse -------------------------\\
         getProductsByWarehouse(id) {
             // Start the progress bar.
-            NProgress.start();
-            NProgress.set(0.1);
-            axios
-                .get("get_Products_by_warehouse/" + id + "?stock=" + 1 + "&is_sale=" + 1 + "&product_service=" + 1)
-                .then(response => {
-                    this.products_pos = response.data;
-                    NProgress.done();
-                })
-                .catch(error => {
-                });
+            this.execute(() => {
+                axios.get("get_products_by_warehouse/" + id + "?stock=" + 1 + "&is_sale=" + 1 + "&product_service=" + 1)
+                    .then(response => {
+                        this.products_pos = response.data;
+                    })
+                    .catch(error => {
+                        console.error('getProductsByWarehouse', error)
+                    })
+                    .finally(() => console.log('in callable finally'));
+
+
+            })
         },
         //----------------------------------------- Add Detail of Sale -------------------------\\
-        add_product(code) {
+        addProduct(code) {
             this.audio.play();
-            if (this.details.some(detail => detail.code === code)) {
-                this.increment_qty_scanner(code);
+            if (this.details.some(detail => detail.code === code && !this.product.is_imei)) {
+                this.incrementQtyScanner(code);
             } else {
                 if (this.details.length > 0) {
-                    this.order_detail_id();
+                    this.orderDetailId();
                 } else if (this.details.length === 0) {
                     this.product.detail_id = 1;
                 }
                 this.details.push(this.product);
-                setTimeout(() => {
-                    this.load_product = true;
-                }, 300);
+                this.load_product = true;
                 if (this.product.is_imei) {
-                    this.modal_update_detail(this.product);
+                    this.showUpdateDetailModal(this.product);
                 }
             }
         },
         //-------------------------------- order detail id -------------------------\\
-        order_detail_id() {
-            this.product.detail_id = 0;
+        orderDetailId() {
             var len = this.details.length;
             this.product.detail_id = this.details[len - 1].detail_id + 1;
         },
         //---------------------- get_units ------------------------------\\
-        get_units(value) {
-            axios
-                .get("get_units?id=" + value)
+        getUnits(value) {
+            axios.get("get_units?id=" + value)
                 .then(({data}) => (this.units = data));
         },
         //------ Show Modal Update Detail Product
-        modal_update_detail(detail) {
+        showUpdateDetailModal(detail) {
             this.detail = {};
-            this.get_units(detail.product_id);
+            this.getUnits(detail.product_id);
             this.detail.detail_id = detail.detail_id;
             this.detail.sale_unit_id = detail.sale_unit_id;
             this.detail.name = detail.name;
             this.detail.product_type = detail.product_type;
-            this.detail.Unit_price = detail.Unit_price;
+            this.detail.unit_price = detail.unit_price;
             this.detail.fix_price = detail.fix_price;
             this.detail.fix_stock = detail.fix_stock;
             this.detail.current = detail.current;
             this.detail.tax_method = detail.tax_method;
-            this.detail.discount_Method = detail.discount_Method;
+            this.detail.discount_method = detail.discount_method;
             this.detail.discount = detail.discount;
             this.detail.quantity = detail.quantity;
             this.detail.tax_percent = detail.tax_percent;
             this.detail.is_imei = detail.is_imei;
             this.detail.imei_number = detail.imei_number;
             setTimeout(() => {
-                this.$bvModal.show("form_Update_Detail");
-            }, 1000);
+                this.$bvModal.show("POS:Modal:UpdateDetail");
+            }, 100);
         },
 
 
         //------ Submit Update Detail Product
-        Update_Detail() {
+        updateDetail(detail) {
             for (var i = 0; i < this.details.length; i++) {
-                if (this.details[i].detail_id === this.detail.detail_id) {
+                if (this.details[i].detail_id === detail.detail_id) {
                     // this.convert_unit();
                     for (var k = 0; k < this.units.length; k++) {
-                        if (this.units[k].id == this.detail.sale_unit_id) {
+                        if (this.units[k].id == detail.sale_unit_id) {
                             if (this.units[k].operator == "/") {
                                 this.details[i].current =
-                                    this.detail.fix_stock * this.units[k].operator_value;
+                                    detail.fix_stock * this.units[k].operator_value;
                                 this.details[i].unitSale = this.units[k].short_name;
                             } else {
                                 this.details[i].current =
-                                    this.detail.fix_stock / this.units[k].operator_value;
+                                    detail.fix_stock / this.units[k].operator_value;
                                 this.details[i].unitSale = this.units[k].short_name;
                             }
                         }
@@ -2282,59 +1636,57 @@ export default {
                     } else {
                         this.details[i].quantity = 1;
                     }
-                    this.details[i].Unit_price = this.detail.Unit_price;
-                    this.details[i].tax_percent = this.detail.tax_percent;
-                    this.details[i].tax_method = this.detail.tax_method;
-                    this.details[i].discount_Method = this.detail.discount_Method;
-                    this.details[i].discount = this.detail.discount;
-                    this.details[i].sale_unit_id = this.detail.sale_unit_id;
-                    this.details[i].imei_number = this.detail.imei_number;
-                    this.details[i].product_type = this.detail.product_type;
+                    this.details[i].unit_price = detail.unit_price;
+                    this.details[i].tax_percent = detail.tax_percent;
+                    this.details[i].tax_method = detail.tax_method;
+                    this.details[i].discount_method = detail.discount_method;
+                    this.details[i].discount = detail.discount;
+                    this.details[i].sale_unit_id = detail.sale_unit_id;
+                    this.details[i].imei_number = detail.imei_number;
+                    this.details[i].product_type = detail.product_type;
 
-                    if (this.details[i].discount_Method == "2") {
+                    if (this.details[i].discount_method == "2") {
                         //Fixed
-                        this.details[i].DiscountNet = this.details[i].discount;
+                        this.details[i].discount_net = this.details[i].discount;
                     } else {
                         //Percentage %
-                        this.details[i].DiscountNet = parseFloat(
-                            (this.details[i].Unit_price * this.details[i].discount) / 100
+                        this.details[i].discount_net = parseFloat(
+                            (this.details[i].unit_price * this.details[i].discount) / 100
                         );
                     }
                     if (this.details[i].tax_method == "1") {
                         //Exclusive
-                        this.details[i].Net_price = parseFloat(
-                            this.details[i].Unit_price - this.details[i].DiscountNet
+                        this.details[i].net_price = parseFloat(
+                            this.details[i].unit_price - this.details[i].discount_net
                         );
-                        this.details[i].taxe = parseFloat(
+                        this.details[i].tax = parseFloat(
                             (this.details[i].tax_percent *
-                                (this.details[i].Unit_price - this.details[i].DiscountNet)) /
+                                (this.details[i].unit_price - this.details[i].discount_net)) /
                             100
                         );
-                        this.details[i].Total_price = parseFloat(
-                            this.details[i].Net_price + this.details[i].taxe
+                        this.details[i].total_price = parseFloat(
+                            this.details[i].net_price + this.details[i].tax
                         );
                     } else {
                         //Inclusive
-                        this.details[i].Net_price = parseFloat(
-                            (this.details[i].Unit_price - this.details[i].DiscountNet) /
+                        this.details[i].net_price = parseFloat(
+                            (this.details[i].unit_price - this.details[i].discount_net) /
                             (this.details[i].tax_percent / 100 + 1)
                         );
-                        this.details[i].taxe = parseFloat(
-                            this.details[i].Unit_price -
-                            this.details[i].Net_price -
-                            this.details[i].DiscountNet
+                        this.details[i].tax = parseFloat(
+                            this.details[i].unit_price -
+                            this.details[i].net_price -
+                            this.details[i].discount_net
                         );
-                        this.details[i].Total_price = parseFloat(
-                            this.details[i].Net_price + this.details[i].taxe
+                        this.details[i].total_price = parseFloat(
+                            this.details[i].net_price + this.details[i].tax
                         );
                     }
-                    this.$forceUpdate();
                 }
             }
+            console.log('complete update')
             this.calculateTotal();
-            setTimeout(() => {
-                this.$bvModal.hide("form_Update_Detail");
-            }, 1000);
+            this.$nextTick(() => this.$bvModal.hide("POS:Modal:UpdateDetail"))
         },
         //-- check Qty of  details order if Null or zero
         verifiedForm() {
@@ -2369,221 +1721,184 @@ export default {
             }
         },
         //------------------------------ Print -------------------------\\
-        print_pos() {
-            var divContents = document.getElementById("invoice-POS").innerHTML;
-            var a = window.open("", "", "height=500, width=500");
-            a.document.write(
-                '<link rel="stylesheet" href="/css/pos_print.css"><html>'
-            );
-            a.document.write("<body >");
-            a.document.write(divContents);
-            a.document.write("</body></html>");
-            a.document.close();
-
-            setTimeout(() => {
-                a.print();
-            }, 1000);
-
+        printPos() {
+            this.$refs.receipt.getPrintInfo()
+                .then(({html, css_path}) => {
+                    var a = window.open("", "", "height=500, width=500");
+                    a.document.write(`<link rel="stylesheet" href="${css_path}"><html>`);
+                    a.document.write("<body >");
+                    a.document.write(html);
+                    a.document.write("</body></html>");
+                    a.document.close();
+                    a.print();
+                })
         },
         //-------------------------------- Invoice POS ------------------------------\\
-        Invoice_POS(id) {
+        invoicePos(id) {
             // Start the progress bar.
             NProgress.start();
             NProgress.set(0.1);
-            axios
-                .get("sales_print_invoice/" + id)
+            axios.get("sales_print_invoice/" + id)
                 .then(response => {
                     this.invoice_pos = response.data;
-                    this.payments = response.data.payments;
-                    this.pos_settings = response.data.pos_settings;
-                    setTimeout(() => {
-                        // Complete the animation of the  progress bar.
-                        NProgress.done();
+                    // Complete the animation of the  progress bar.
+                    this.$nextTick(() => {
                         this.$bvModal.show("Show_invoice");
-                    }, 500);
-
-                    if (response.data.pos_settings.is_printable) {
-                        setTimeout(() => this.print_pos(), 1000);
-                    }
+                        this.$nextTick(() => {
+                            if (response.data.pos_settings.is_printable) {
+                                this.printPos()
+                            }
+                        })
+                    })
                 })
-                .catch(() => {
+                .catch((error) => {
+                    console.error('invoicePos', error)
+                })
+                .finally(() => {
                     // Complete the animation of the  progress bar.
                     setTimeout(() => NProgress.done(), 500);
                 });
         },
         //----------------------------------Process Payment ------------------------------\\
         async processPayment() {
-            this.paymentProcessing = true;
-            const {token, error} = await this.stripe.createToken(this.cardElement);
+            this.payment_processing = true;
+            const {token, error} = await this.stripe.createToken(this.card_element);
             if (error) {
-                this.paymentProcessing = false;
+                this.payment_processing = false;
                 NProgress.done();
                 this.makeToast("danger", this.$t("InvalidData"), this.$t("Failed"));
             } else {
-
-                axios
-                    .post("pos/create_pos", {
-                        client_id: this.sale.client_id,
-                        warehouse_id: this.sale.warehouse_id,
-                        tax_rate: this.sale.tax_rate ? this.sale.tax_rate : 0,
-                        TaxNet: this.sale.TaxNet ? this.sale.TaxNet : 0,
-                        discount: this.sale.discount ? this.sale.discount : 0,
-                        shipping: this.sale.shipping ? this.sale.shipping : 0,
-                        details: this.details,
-                        GrandTotal: this.GrandTotal,
-                        payment: this.payment,
-                        account_id: this.payment.account_id,
-                        amount: parseFloat(this.payment.amount).toFixed(2),
-                        received_amount: parseFloat(this.payment.received_amount).toFixed(2),
-                        change: parseFloat(this.payment.received_amount - this.payment.amount).toFixed(2),
-                        token: token.id,
-                        is_new_credit_card: this.is_new_credit_card,
-                        selectedCard: this.selectedCard,
-                        card_id: this.card_id,
-                    })
+                axios.post("pos/create_pos", this.createPaymentData(token.id))
                     .then(response => {
-                        this.paymentProcessing = false;
                         if (response.data.success === true) {
-                            // Complete the animation of theprogress bar.
-                            NProgress.done();
-                            this.Invoice_POS(response.data.id);
+                            // Complete the animation of the progress bar.
+                            this.invoicePos(response.data.id);
                             this.$bvModal.hide("Add_Payment");
-                            this.Reset_Pos();
+                            this.reset_Pos();
                         }
                     })
                     .catch(error => {
-                        this.paymentProcessing = false;
                         // Complete the animation of theprogress bar.
-                        NProgress.done();
                         this.makeToast("danger", this.$t("InvalidData"), this.$t("Failed"));
-                    });
+                    })
+                    .finally(() => {
+                        this.payment_processing = false;
+                        NProgress.done();
+                    })
+            }
+        },
+
+        createPaymentData(token = null) {
+            return {
+                client_id: this.sale.client_id,
+                warehouse_id: this.sale.warehouse_id,
+                tax_rate: this.sale.tax_rate || 0,
+                tax_net: this.sale.tax_net || 0,
+                discount: this.sale.discount || 0,
+                shipping: this.sale.shipping || 0,
+                notes: this.notes,
+                details: this.details,
+                grand_total: this.grand_total,
+                payment: this.payment,
+                account_id: this.payment.account_id,
+                amount: parseFloat(this.payment.amount).toFixed(2),
+                received_amount: parseFloat(this.payment.received_amount).toFixed(2),
+                change: parseFloat(this.payment.received_amount - this.payment.amount).toFixed(2),
+                token: token?.id,
+                is_new_credit_card: this.is_new_credit_card,
+                selected_card: this.selected_card,
+                card_id: this.card_id,
             }
         },
 
         //----------------------------------Create POS ------------------------------\\
-        CreatePOS() {
-            NProgress.start();
-            NProgress.set(0.1);
-            if (this.payment.Reglement == "credit card" && this.is_new_credit_card) {
-                if (this.stripe_key != "") {
-                    this.processPayment();
+        createPos() {
+            this.execute(() => {
+                if (this.payment.type === "credit card" && this.is_new_credit_card) {
+                    if (this.stripe_key !== "") {
+                        this.processPayment();
+                    } else {
+                        this.makeToast(
+                            "danger",
+                            this.$t("credit_card_account_not_available"),
+                            this.$t("Failed")
+                        );
+                    }
                 } else {
-                    this.makeToast(
-                        "danger",
-                        this.$t("credit_card_account_not_available"),
-                        this.$t("Failed")
-                    );
-                    NProgress.done();
-                }
-            } else {
-                this.paymentProcessing = true;
-                axios
-                    .post("pos/create_pos", {
-                        client_id: this.sale.client_id,
-                        warehouse_id: this.sale.warehouse_id,
-                        tax_rate: this.sale.tax_rate ? this.sale.tax_rate : 0,
-                        TaxNet: this.sale.TaxNet ? this.sale.TaxNet : 0,
-                        discount: this.sale.discount ? this.sale.discount : 0,
-                        shipping: this.sale.shipping ? this.sale.shipping : 0,
-                        notes: this.sale.notes,
-                        details: this.details,
-                        GrandTotal: this.GrandTotal,
-                        payment: this.payment,
-                        amount: parseFloat(this.payment.amount).toFixed(2),
-                        received_amount: parseFloat(this.payment.received_amount).toFixed(2),
-                        change: parseFloat(this.payment.received_amount - this.payment.amount).toFixed(2),
-                        is_new_credit_card: this.is_new_credit_card,
-                        selectedCard: this.selectedCard,
-                        card_id: this.card_id,
-                    })
-                    .then(response => {
-                        if (response.data.success === true) {
+                    this.payment_processing = true;
+                    axios.post("pos/create_pos", this.createPaymentData())
+                        .then(response => {
+                            if (response.data.success === true) {
+                                // Complete the animation of the progress bar.
+                                this.invoicePos(response.data.id);
+                                this.$bvModal.hide("Add_Payment");
+                                this.reset_Pos();
+                            }
+                        })
+                        .catch(error => {
                             // Complete the animation of theprogress bar.
-                            NProgress.done();
-                            this.paymentProcessing = false;
-                            this.Invoice_POS(response.data.id);
-                            this.$bvModal.hide("Add_Payment");
-                            this.Reset_Pos();
-                        }
-                    })
-                    .catch(error => {
-                        // Complete the animation of theprogress bar.
-                        NProgress.done();
-                        this.paymentProcessing = false;
-                        this.makeToast("danger", this.$t("InvalidData"), this.$t("Failed"));
-                    });
-            }
+                            this.makeToast("danger", this.$t("InvalidData"), this.$t("Failed"));
+                        })
+                        .finally(() => {
+                            this.payment_processing = false;
+                        });
+                }
+            })
+
         },
 
-
-        //------------------------------Formetted Numbers -------------------------\\
-        formatNumber(number, dec) {
-            const value = (typeof number === "string"
-                    ? number
-                    : number.toString()
-            ).split(".");
-            if (dec <= 0) return value[0];
-            let formated = value[1] || "";
-            if (formated.length > dec)
-                return `${value[0]}.${formated.substr(0, dec)}`;
-            while (formated.length < dec) formated += "0";
-            return `${value[0]}.${formated}`;
-        },
         //---------------------------------Get Product Details ------------------------\\
         getProductDetails(product_id, variant_id) {
-            axios.get("/show_product_data/" + product_id + "/" + variant_id).then(response => {
-                this.product.discount = 0;
-                this.product.DiscountNet = 0;
-                this.product.discount_Method = "2";
-                this.product.product_id = response.data.id;
-                this.product.product_type = response.data.product_type;
-                this.product.name = response.data.name;
-                this.product.Net_price = response.data.Net_price;
-                this.product.Total_price = response.data.Total_price;
-                this.product.Unit_price = response.data.Unit_price;
-                this.product.taxe = response.data.tax_price;
-                this.product.tax_method = response.data.tax_method;
-                this.product.tax_percent = response.data.tax_percent;
-                this.product.unitSale = response.data.unitSale;
-                this.product.product_variant_id = variant_id;
-                this.product.code = response.data.code;
-                this.product.fix_price = response.data.fix_price;
-                this.product.sale_unit_id = response.data.sale_unit_id;
-                this.product.is_imei = response.data.is_imei;
-                this.product.imei_number = '';
+            this.execute(() => axios.get("/show_product_data/" + product_id + "/" + variant_id)
+                .then(({data}) => {
+                    this.setProduct(data, variant_id);
+                    this.addProduct(data.code);
+                    this.calculateTotal();
+                }))
 
-                this.add_product(response.data.code);
-                this.calculateTotal();
-                // Complete the animation of theprogress bar.
-                NProgress.done();
-            });
         },
-        //----------- Calcul Total
+
+        //----------- Set Product --------------------
+        setProduct(data, variant_id) {
+            this.product.discount = 0;
+            this.product.discount_net = 0;
+            this.product.discount_method = "2";
+            this.product.product_id = data.id;
+            this.product.product_type = data.product_type;
+            this.product.name = data.name;
+            this.product.net_price = data.net_price;
+            this.product.total_price = data.total_price;
+            this.product.unit_price = data.unit_price;
+            this.product.discounted_price = data.discounted_price;
+            this.product.tax = data.tax_price;
+            this.product.tax_method = data.tax_method;
+            this.product.tax_percent = data.tax_percent;
+            this.product.unitSale = data.unitSale;
+            this.product.product_variant_id = variant_id;
+            this.product.code = data.code;
+            this.product.fix_price = data.fix_price;
+            this.product.sale_unit_id = data.sale_unit_id;
+            this.product.is_imei = data.is_imei;
+            this.product.imei_number = '';
+
+        },
+        //----------- Calculate Total ----------------
         calculateTotal() {
-            this.total = 0;
-            for (var i = 0; i < this.details.length; i++) {
-                var tax = this.details[i].taxe * this.details[i].quantity;
-                this.details[i].subtotal = parseFloat(
-                    this.details[i].quantity * this.details[i].Net_price + tax
-                );
-                this.total = parseFloat(this.total + this.details[i].subtotal);
+            this.total = 0
+            for (const detail of this.details) {
+                const tax = detail.tax * detail.quantity;
+                detail.subtotal = detail.quantity * detail.net_price + tax;
+                this.total += detail.subtotal;
             }
-            const total_without_discount = parseFloat(
-                this.total - this.sale.discount
-            );
-            this.sale.TaxNet = parseFloat(
-                (total_without_discount * this.sale.tax_rate) / 100
-            );
-            this.GrandTotal = parseFloat(
-                total_without_discount + this.sale.TaxNet + this.sale.shipping
-            );
-            var grand_total = this.GrandTotal.toFixed(2);
-            this.GrandTotal = parseFloat(grand_total);
+            const totalWithoutDiscount = this.total - this.sale.discount;
+            this.sale.tax_net = (totalWithoutDiscount * this.sale.tax_rate) / 100;
+            this.grand_total = totalWithoutDiscount + this.sale.tax_net + this.sale.shipping;
+            this.grand_total = Number(this.grand_total.toFixed(2));
         },
         //-------Verified QTY
-        verifiedQty(detail, id) {
+        verifiedQty(detail) {
             for (var i = 0; i < this.details.length; i++) {
-                if (this.details[i].detail_id === id) {
+                if (this.details[i].detail_id === detail.id) {
                     if (isNaN(detail.quantity)) {
                         this.details[i].quantity = detail.current;
                     }
@@ -2599,42 +1914,40 @@ export default {
             this.calculateTotal();
         },
         //----------------------------------- Increment QTY with barcode scanner ------------------------------\\
-        increment_qty_scanner(code) {
-            for (var i = 0; i < this.details.length; i++) {
-                if (this.details[i].code === code) {
-                    if (this.details[i].quantity + 1 > this.details[i].current) {
-                        this.makeToast("warning", this.$t("LowStock"), this.$t("Warning"));
-                    } else {
-                        this.details[i].quantity++;
-                    }
-                }
-            }
+        incrementQtyScanner(code) {
+            this.incrementDetailBy('code', code)
             this.calculateTotal();
             this.$forceUpdate();
-
-            NProgress.done();
-            setTimeout(() => {
-                this.load_product = true;
-            }, 300);
+            this.$nextTick(() => this.load_product = true)
         },
-        //----------------------------------- Increment QTY ------------------------------\\
-        increment(id) {
-            for (var i = 0; i < this.details.length; i++) {
-                if (this.details[i].detail_id == id) {
-                    if (this.details[i].quantity + 1 > this.details[i].current) {
+
+        checkDetailQty(detail) {
+            return detail.quantity + 1 > detail.current
+        },
+
+        incrementDetailBy(field, value) {
+            this.details = this.details.map(detail => {
+                if (detail[field] === value) {
+                    if (this.checkDetailQty(this.detail)) {
                         this.makeToast("warning", this.$t("LowStock"), this.$t("Warning"));
                     } else {
-                        this.details[i].quantity++;
+                        return {...detail, quantity: detail.quantity + 1};
                     }
                 }
-            }
+
+                return detail;
+            });
+        },
+        //----------------------------------- Increment QTY ------------------------------\\
+        increment(detail) {
+            this.incrementDetailBy('detail_id', detail.detail_id)
             this.calculateTotal();
             this.$forceUpdate();
         },
         //----------------------------------- decrement QTY ------------------------------\\
-        decrement(detail, id) {
+        decrement(detail) {
             for (var i = 0; i < this.details.length; i++) {
-                if (this.details[i].detail_id == id) {
+                if (this.details[i].detail_id == detail.detail_id) {
                     if (detail.quantity - 1 > detail.current || detail.quantity - 1 < 1) {
                         this.makeToast("warning", this.$t("LowStock"), this.$t("Warning"));
                     } else {
@@ -2646,41 +1959,19 @@ export default {
             this.$forceUpdate();
         },
 
-        //---------- keyup OrderTax
-        keyup_OrderTax() {
-            if (isNaN(this.sale.tax_rate)) {
-                this.sale.tax_rate = 0;
-            } else if (this.sale.tax_rate == '') {
-                this.sale.tax_rate = 0;
-                this.calculateTotal();
-            } else {
-                this.calculateTotal();
+        //---------- keyup update sale entry
+
+        keyupUpdateSale(entry) {
+            if (isNaN(this.sale[entry]) ||
+                !this.sale[entry] ||
+                this.sale[entry] === '') {
+                this.sale[entry] = 0;
             }
+            this.calculateTotal();
         },
-        //---------- keyup Discount
-        keyup_Discount() {
-            if (isNaN(this.sale.discount)) {
-                this.sale.discount = 0;
-            } else if (this.sale.discount == '') {
-                this.sale.discount = 0;
-                this.calculateTotal();
-            } else {
-                this.calculateTotal();
-            }
-        },
-        //---------- keyup Shipping
-        keyup_Shipping() {
-            if (isNaN(this.sale.shipping)) {
-                this.sale.shipping = 0;
-            } else if (this.sale.shipping == '') {
-                this.sale.shipping = 0;
-                this.calculateTotal();
-            } else {
-                this.calculateTotal();
-            }
-        },
+
         //---------- keyup paid Amount
-        Verified_paidAmount() {
+        verifyPaidAmount() {
             if (isNaN(this.payment.amount)) {
                 this.payment.amount = 0;
             } else {
@@ -2691,7 +1982,7 @@ export default {
                         this.$t("Warning")
                     );
                     this.payment.amount = 0;
-                } else if (this.payment.amount > this.GrandTotal) {
+                } else if (this.payment.amount > this.grand_total) {
                     this.makeToast(
                         "warning",
                         this.$t("Paying_amount_is_greater_than_Grand_Total"),
@@ -2702,44 +1993,42 @@ export default {
             }
         },
         //---------- keyup Received Amount
-        Verified_Received_Amount() {
+        verifiedReceivedAmount() {
             if (isNaN(this.payment.received_amount)) {
                 this.payment.received_amount = 0;
             }
         },
         //-----------------------------------Delete Detail Product ------------------------------\\
-        delete_Product_Detail(id) {
-            for (var i = 0; i < this.details.length; i++) {
-                if (id === this.details[i].detail_id) {
-                    this.details.splice(i, 1);
-                    this.calculateTotal();
-                }
+        deleteProductDetail(detail) {
+            const index = this.details.findIndex(d => d.detail_id === detail.detail_id);
+            if (index > -1) {
+                this.details.splice(index, 1);
+                this.calculateTotal();
             }
         },
         //----------Reset Pos
-        Reset_Pos() {
+        reset_Pos() {
             this.details = [];
             this.product = {};
             this.payment = {
                 amount: "",
                 received_amount: "",
-                Reglement: "",
+                type: "",
                 notes: "",
             };
 
-            this.savedPaymentMethods = [],
-                this.hasSavedPaymentMethod = false,
-                this.useSavedPaymentMethod = false,
-                this.selectedCard = null,
+            this.saved_payment_methods = [],
+                this.has_saved_payment_method = false,
+                this.use_saved_payment_method = false,
+                this.selected_card = null,
                 this.card_id = '',
                 this.is_new_credit_card = false,
                 this.submit_showing_credit_card = false,
-
                 this.sale.tax_rate = 0;
-            this.sale.TaxNet = 0;
+            this.sale.tax_net = 0;
             this.sale.shipping = 0;
             this.sale.discount = 0;
-            this.GrandTotal = 0;
+            this.grand_total = 0;
             this.total = 0;
             this.category_id = "";
             this.brand_id = "";
@@ -2757,7 +2046,7 @@ export default {
                 this.load_product = false;
                 this.product = {};
 
-                if (result.product_type == 'is_service') {
+                if (result.product_type === 'is_service') {
                     this.product.quantity = 1;
                     this.product.code = result.code;
 
@@ -2776,7 +2065,7 @@ export default {
                 this.getProductDetails(result.id, result.product_variant_id);
 
                 this.search_input = '';
-                this.$refs.product_autocomplete.value = "";
+
                 this.product_filter = [];
 
             } else {
@@ -2798,11 +2087,11 @@ export default {
             if (this.search_input.length < 2) {
                 return this.product_filter = [];
             }
-            if (this.sale.warehouse_id != "" && this.sale.warehouse_id != null) {
+            if (this.sale.warehouse_id !== "" && this.sale.warehouse_id != null) {
                 this.timer = setTimeout(() => {
                     const product_filter = this.products_pos.filter(product => product.code === this.search_input || product.barcode.includes(this.search_input));
                     if (product_filter.length === 1) {
-                        this.Check_Product_Exist(product_filter[0], product_filter[0].id);
+                        this.checkProductExist(product_filter[0]);
                     } else {
                         this.product_filter = this.products_pos.filter(product => {
                             return (
@@ -2823,95 +2112,48 @@ export default {
         },
 
         //---------------------------------- Check if Product Exist in Order List ---------------------\\
-        Check_Product_Exist(product, id) {
-
-            if (this.load_product) {
+        checkProductExist(product) {
+            console.log('checkProductExist', product)
+            this.execute(() => {
                 this.load_product = false;
-                NProgress.start();
-                NProgress.set(0.1);
                 this.product = {};
-
-                if (product.product_type == 'is_service') {
+                if (product.product_type === 'is_service') {
                     this.product.quantity = 1;
-
                 } else {
-
                     this.product.current = product.qte_sale;
                     this.product.fix_stock = product.qte;
-                    if (product.qte_sale < 1) {
-                        this.product.quantity = product.qte_sale;
-                    } else {
-                        this.product.quantity = 1;
-                    }
+                    this.product.quantity = product.qte_sale < 1 ? product.qte_sale : 1
                 }
-                this.getProductDetails(id, product.product_variant_id);
-                NProgress.done();
+                this.getProductDetails(product.id, product.product_variant_id);
                 this.search_input = '';
-                this.$refs.product_autocomplete.value = "";
                 this.product_filter = [];
-
-            } else {
-                this.makeToast(
-                    "warning",
-                    this.$t("Please_wait_until_the_product_is_loaded"),
-                    this.$t("Warning")
-                );
-            }
-
+            })
         },
 
 
         //--- Get Products by Category
-        getProductsByCategory(id) {
+        getProductsByCategory(id = "") {
             this.category_id = id;
             this.getProducts(1);
         },
+
         //--- Get Products by Brand
-        Products_by_Brands(id) {
+        productsByBrand(id = "") {
             this.brand_id = id;
             this.getProducts(1);
         },
-        //--- Get All Category
-        getAllCategory() {
-            this.category_id = "";
-            this.getProducts(1);
-        },
-        //--- Get All Brands
-        GetAllBrands() {
-            this.brand_id = "";
-            this.getProducts(1);
-        },
+
         //------------------------------- Get Products with Filters ------------------------------\\
         getProducts(page = 1) {
-            // Start the progress bar.
-            NProgress.start();
-            NProgress.set(0.1);
-
-            posClient.getProducts(this.category_id, this.brand_id, this.sale.warehouse_id, page)
-                .then(response => {
-                    this.products = response.data.products;
-                    this.product_totalRows = response.data.totalRows;
-                    this.paginate_products();
-                    // Complete the animation of theprogress bar.
-                    NProgress.done();
-                })
-                .catch(response => {
-                    // Complete the animation of theprogress bar.
-                    NProgress.done();
-                });
-            // axios
-            //     .get(
-            //         "pos/get_products_pos?page=" +
-            //         page +
-            //         "&category_id=" +
-            //          +
-            //         "&brand_id=" +
-            //         this.brand_id +
-            //         "&warehouse_id=" +
-            //         this.sale.warehouse_id +
-            //         "&stock=" + 1 +
-            //         "&product_service=" + 1
-            //     )
+            this.execute(() => {
+                posClient.getProducts(this.category_id, this.brand_id, this.sale.warehouse_id, page)
+                    .then(response => {
+                        this.products = response.data.products;
+                        this.product_totalRows = response.data.totalRows;
+                        this.paginate_products();
+                    })
+                    .catch(error => console.error('getProducts', error))
+            })
 
         },
         //---------------------------------------Get Elements ------------------------------\\
@@ -2925,40 +2167,43 @@ export default {
             this.sale.client_id = serverResponse.data.defaultClient;
             this.client_name = serverResponse.data.default_client_name;
             this.getProducts();
-            if (serverResponse.data.defaultWarehouse != "") {
+            if (serverResponse.data.defaultWarehouse !== "") {
                 this.getProductsByWarehouse(serverResponse.data.defaultWarehouse);
             }
-            this.paginate_Brands(this.brand_perPage, 0);
-            this.paginateCategories(this.category_perPage, 0);
+            this.paginate_Brands(this.brand_per_page, 0);
+            this.paginateCategories(this.category_per_page, 0);
             this.stripe_key = serverResponse.data.stripe_key;
 
         }
     },
-    //-------------------- Created Function -----\\
+//-------------------- Created Function -----\\
     created() {
+
+        this.cart_id = randomString(10);
+
         posClient.getPosElements()
             .then(this.init)
             .catch((error) => console.error(error))
-            .finally(response => {
-                this.isLoading = false;
-            });
+            .finally(response => this.is_loading = false);
 
         Fire.$on("pay_now", () => {
-            setTimeout(() => {
-                this.payment.amount = this.formatNumber(this.GrandTotal, 2);
-                this.payment.received_amount = this.formatNumber(this.GrandTotal, 2);
-                this.payment.Reglement = "Cash";
-                this.$bvModal.show("Add_Payment");
-                // Complete the animation of theprogress bar.
-                NProgress.done();
-            }, 500);
+            this.$nextTick(() => {
+                this.payment.amount = this.formatNumber(this.grand_total, 2);
+                this.payment.received_amount = this.formatNumber(this.grand_total, 2);
+                this.payment.type = "cash";
+                this.$nextTick(() => this.$bvModal.show("Add_Payment"));
+            })
         });
 
-        Fire.$on("event_delete_draft_sale", () => {
-            this.getDraftSales(this.serverParams.page);
-            // Complete the animation of theprogress bar.
-            setTimeout(() => NProgress.done(), 500);
-        });
+        Fire.$on("event_delete_draft_sale",
+            () => this.execute(() => this.getDraftSales(this.server_params.page)));
+
+        Fire.$on("POS:Product:Select", this.checkProductExist);
+        Fire.$on("POS:Detail:Update", this.showUpdateDetailModal);
+        Fire.$on("POS:Detail:Increment", this.increment);
+        Fire.$on("POS:Detail:Decrement", this.decrement);
+        Fire.$on("POS:Detail:VerifyQty", this.verifiedQty);
+        Fire.$on("POS:Detail:Delete", this.deleteProductDetail);
 
     }
 };

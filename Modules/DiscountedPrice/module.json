@@ -1,0 +1,13 @@
+{
+    "name": "DiscountedPrice",
+    "alias": "discountedprice",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\DiscountedPrice\\Providers\\DiscountedPriceServiceProvider"
+    ],
+    "aliases": {},
+    "files": [],
+    "requires": []
+}

@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
-use App\utils\helpers;
+use App\utils\Helper;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Http\Request;
@@ -25,7 +25,7 @@ class PermissionsController extends BaseController
         $offSet = ($pageStart * $perPage) - $perPage;
         $order = $request->SortField;
         $dir = $request->SortType;
-        $helpers = new helpers();
+        $helpers = new Helper();
 
         $roles = Role::where('deleted_at', '=', null)
         // Search With Multiple Param
@@ -101,7 +101,7 @@ class PermissionsController extends BaseController
 
     public function show($id){
         //
-        
+
         }
 
     //----------- Update Role --------------\\
@@ -206,7 +206,7 @@ class PermissionsController extends BaseController
                 'permissions' => $data,
                 'role' => $item,
             ]);
-            
+
         }else{
             return response()->json([
                 'success' => false,

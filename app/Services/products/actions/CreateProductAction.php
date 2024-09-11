@@ -82,10 +82,9 @@ class CreateProductAction
             }
 
             //--Store Product Warehouse
-            $warehouses = Warehouse::whereNull('deleted_at')->pluck('id')->toArray();
+            $warehouses = Warehouse::pluck('id')->toArray();
             if ($warehouses) {
                 $product_variants = ProductVariant::where('product_id', $product->id)
-                    ->whereNull('deleted_at')
                     ->get();
                 foreach ($warehouses as $warehouse) {
                     if ($data['is_variant'] == 'true') {
@@ -171,11 +170,8 @@ class CreateProductAction
         $product->category_id = $data['category_id'];
         $product->brand_id = $data['brand_id'];
         $product->note = $data['note'];
-        $product->TaxNet = $data['TaxNet'] ? $data['TaxNet'] : 0;
+        $product->tax_net = $data['tax_net'] ? $data['tax_net'] : 0;
         $product->tax_method = $data['tax_method'];
-        $product->promotional_price = $data['promotional_price'];
-        $product->promotional_start_date = $data['promotional_price'] ? $data['promotional_start_date'] : null;;
-        $product->promotional_end_date = $data['promotional_price'] ? $data['promotional_end_date'] : null;;
         $product->is_variant = $data['is_variant'] == 'true' ? 1 : 0;
         $product->is_imei = $data['is_imei'] == 'true' ? 1 : 0;
         $product->not_selling = $data['not_selling'] == 'true' ? 1 : 0;

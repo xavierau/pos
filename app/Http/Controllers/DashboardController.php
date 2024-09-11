@@ -14,7 +14,6 @@ use App\Models\Role;
 use App\Models\Sale;
 use App\Models\SaleDetail;
 use App\Models\SaleReturn;
-use App\Models\UserWarehouse;
 use App\Models\Warehouse;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -30,19 +29,15 @@ class DashboardController extends Controller
     {
         $user_auth = auth()->user();
         if ($user_auth->is_all_warehouses) {
-            $array_warehouses_id = Warehouse::where('deleted_at', '=', null)->pluck('id')->toArray();
-            $warehouses = Warehouse::where('deleted_at', '=', null)->get(['id', 'name']);
+            $warehouses = Warehouse::get(['id', 'name']);
+            $array_warehouses_id = $warehouses->pluck('id')->toArray();
         } else {
-            $array_warehouses_id = UserWarehouse::where('user_id', $user_auth->id)->pluck('warehouse_id')->toArray();
-            $warehouses = Warehouse::where('deleted_at', '=', null)->whereIn('id', $array_warehouses_id)->get(['id', 'name']);
+            $warehouses = Warehouse::whereIn('id',
+                fn($q) => $q->select('warehouse_id')->from('user_warehouse')->where('user_id', auth()->id()))
+                ->get(['id', 'name']);
         }
 
-        if (empty($request->warehouse_id)) {
-            $warehouse_id = 0;
-        } else {
-            $warehouse_id = $request->warehouse_id;
-        }
-
+        $warehouse_id = empty($request->warehouse_id) ? 0 : $request->warehouse_id;
 
         $dataSales = $this->SalesChart($warehouse_id, $array_warehouses_id);
         $datapurchases = $this->PurchasesChart($warehouse_id, $array_warehouses_id);
@@ -80,20 +75,15 @@ class DashboardController extends Controller
         $date_range = \Carbon\Carbon::today()->subDays(6);
         // Get the sales counts
         $sales = Sale::where('date', '>=', $date_range)
-            ->where('deleted_at', '=', null)
-            ->where(function ($query) use ($view_records) {
-                if (!$view_records) {
-                    return $query->where('user_id', '=', Auth::user()->id);
-                }
-            })
-            ->where(fn($query) => ($warehouse_id !== 0) ?
-                $query->where('warehouse_id', $warehouse_id) :
-                $query->whereIn('warehouse_id', $array_warehouses_id))
+            ->when($view_records, fn($query) => $query->where('user_id', Auth::user()->id))
+            ->when($warehouse_id !== 0,
+                fn($query) => $query->where('warehouse_id', $warehouse_id),
+                fn($query) => $query->whereIn('warehouse_id', $array_warehouses_id))
             ->groupBy(DB::raw("DATE_FORMAT(date,'%Y-%m-%d')"))
             ->orderBy('date', 'asc')
             ->get([
                 DB::raw(DB::raw("DATE_FORMAT(date,'%Y-%m-%d') as date")),
-                DB::raw('SUM(GrandTotal) AS count'),
+                DB::raw('SUM(grand_total) AS count'),
             ])
             ->pluck('count', 'date');
 
@@ -143,7 +133,7 @@ class DashboardController extends Controller
             ->orderBy('date', 'asc')
             ->get([
                 DB::raw(DB::raw("DATE_FORMAT(date,'%Y-%m-%d') as date")),
-                DB::raw('SUM(GrandTotal) AS count'),
+                DB::raw('SUM(grand_total) AS count'),
             ])
             ->pluck('count', 'date');
 
@@ -255,7 +245,7 @@ class DashboardController extends Controller
             ->select(
                 DB::raw('products.name as name'),
                 DB::raw('count(*) as total_sales'),
-                DB::raw('sum(total) as total'),
+                DB::raw('sum(sale_details.quantity * sale_details.price - sale_details.discount) as total'),
             )
             ->groupBy('products.name')
             ->orderBy('total_sales', 'desc')
@@ -277,7 +267,7 @@ class DashboardController extends Controller
             ->where(fn($query) => ($warehouse_id !== 0) ?
                 $query->where('warehouse_id', $warehouse_id) :
                 $query->whereIn('warehouse_id', $array_warehouses_id))
-            ->get(DB::raw('SUM(GrandTotal)  As sum'))
+            ->get(DB::raw('SUM(grand_total)  As sum'))
             ->first()->sum;
 
         $data['today_sales'] = number_format($data['today_sales'], 2, '.', ',');
@@ -295,7 +285,7 @@ class DashboardController extends Controller
             ->where(fn($query) => ($warehouse_id !== 0) ?
                 $query->where('warehouse_id', $warehouse_id) :
                 $query->whereIn('warehouse_id', $array_warehouses_id))
-            ->get(DB::raw('SUM(GrandTotal)  As sum'))
+            ->get(DB::raw('SUM(grand_total)  As sum'))
             ->first()->sum;
 
         $data['return_sales'] = number_format($data['return_sales'], 2, '.', ',');
@@ -312,7 +302,7 @@ class DashboardController extends Controller
             ->where(fn($query) => ($warehouse_id !== 0) ?
                 $query->where('warehouse_id', $warehouse_id) :
                 $query->whereIn('warehouse_id', $array_warehouses_id))
-            ->get(DB::raw('SUM(GrandTotal)  As sum'))
+            ->get(DB::raw('SUM(grand_total)  As sum'))
             ->first()->sum;
 
         $data['today_purchases'] = number_format($data['today_purchases'], 2, '.', ',');
@@ -329,7 +319,7 @@ class DashboardController extends Controller
             ->where(fn($query) => ($warehouse_id !== 0) ?
                 $query->where('warehouse_id', $warehouse_id) :
                 $query->whereIn('warehouse_id', $array_warehouses_id))
-            ->get(DB::raw('SUM(GrandTotal)  As sum'))
+            ->get(DB::raw('SUM(grand_total)  As sum'))
             ->first()->sum;
 
         $data['return_purchases'] = number_format($data['return_purchases'], 2, '.', ',');
@@ -357,9 +347,9 @@ class DashboardController extends Controller
             $item_sale['status'] = $Sale['status'];
             $item_sale['client_name'] = $Sale['client']['name'];
             $item_sale['warehouse_name'] = $Sale['warehouse']['name'];
-            $item_sale['GrandTotal'] = $Sale['GrandTotal'];
+            $item_sale['grand_total'] = $Sale['grand_total'];
             $item_sale['paid_amount'] = $Sale['paid_amount'];
-            $item_sale['due'] = $Sale['GrandTotal'] - $Sale['paid_amount'];
+            $item_sale['due'] = $Sale['grand_total'] - $Sale['paid_amount'];
             $item_sale['payment_status'] = $Sale['payment_status'];
 
             $last_sales[] = $item_sale;
@@ -404,7 +394,7 @@ class DashboardController extends Controller
             ->orderBy('date', 'asc')
             ->get([
                 DB::raw(DB::raw("DATE_FORMAT(date,'%Y-%m-%d') as date")),
-                DB::raw('SUM(montant) AS count'),
+                DB::raw('SUM(amount) AS count'),
             ])
             ->pluck('count', 'date');
 
@@ -421,7 +411,7 @@ class DashboardController extends Controller
             ->orderBy('date', 'asc')
             ->get([
                 DB::raw(DB::raw("DATE_FORMAT(date,'%Y-%m-%d') as date")),
-                DB::raw('SUM(montant) AS count'),
+                DB::raw('SUM(amount) AS count'),
             ])
             ->pluck('count', 'date');
 
@@ -438,7 +428,7 @@ class DashboardController extends Controller
             ->orderBy('date', 'asc')
             ->get([
                 DB::raw(DB::raw("DATE_FORMAT(date,'%Y-%m-%d') as date")),
-                DB::raw('SUM(montant) AS count'),
+                DB::raw('SUM(amount) AS count'),
             ])
             ->pluck('count', 'date');
 
@@ -455,7 +445,7 @@ class DashboardController extends Controller
             ->orderBy('date', 'asc')
             ->get([
                 DB::raw(DB::raw("DATE_FORMAT(date,'%Y-%m-%d') as date")),
-                DB::raw('SUM(montant) AS count'),
+                DB::raw('SUM(amount) AS count'),
             ])
             ->pluck('count', 'date');
 

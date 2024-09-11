@@ -1,7 +1,7 @@
 <?php
 
+use App\Models\Warehouse as WarehouseModel;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 
 class Warehouse extends Seeder
 {
@@ -12,17 +12,31 @@ class Warehouse extends Seeder
      */
     public function run()
     {
-        // Insert some stuff
-        DB::table('warehouses')->insert(
-            array(
-                'id'      => 1,
-                'name'    => 'Default Warehouse',
-                'city'    => NULL,
-                'mobile'  => NULL,
-                'zip'     => NULL,
-                'email'   => NULL,
+
+        $warehouses = [
+            [
+                'name' => 'HQ',
+                'city' => NULL,
+                'mobile' => NULL,
+                'zip' => NULL,
+                'email' => NULL,
                 'country' => NULL,
-            )
-        );
+            ]
+        ];
+
+        for ($i = 1; $i <= 3; $i++) {
+            $warehouses[] = [
+                'name' => 'Shop' . $i,
+                'city' => "Hong Kong",
+                'country' => "Hong Kong",
+                'mobile' => NULL,
+                'zip' => NULL,
+                'email' => NULL,
+            ];
+        }
+
+        WarehouseModel::insert($warehouses);
+
+
     }
 }

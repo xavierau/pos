@@ -2,15 +2,19 @@
 
 namespace App\Models;
 
+use App\Enums\PaymentStatus;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Purchase extends Model
 {
+    use SoftDeletes;
+
     protected $dates = ['deleted_at'];
 
     protected $fillable = [
-        'date', 'Ref', 'provider_id', 'warehouse_id', 'GrandTotal',
-        'discount', 'shipping', 'status', 'notes', 'TaxNet', 'tax_rate', 'paid_amount',
+        'date', 'ref', 'provider_id', 'warehouse_id', 'grand_total',
+        'discount', 'shipping', 'status', 'notes', 'tax_net', 'tax_rate', 'paid_amount',
         'payment_status', 'created_at', 'updated_at', 'deleted_at',
     ];
 
@@ -18,37 +22,38 @@ class Purchase extends Model
         'user_id' => 'integer',
         'provider_id' => 'integer',
         'warehouse_id' => 'integer',
-        'GrandTotal' => 'double',
+        'grand_total' => 'double',
         'discount' => 'double',
         'shipping' => 'double',
-        'TaxNet' => 'double',
+        'tax_net' => 'double',
         'tax_rate' => 'double',
         'paid_amount' => 'double',
+        'payment_status' => PaymentStatus::class
     ];
 
     public function details()
     {
-        return $this->hasMany('App\Models\PurchaseDetail');
+        return $this->hasMany(PurchaseDetail::class);
     }
 
     public function provider()
     {
-        return $this->belongsTo('App\Models\Provider');
+        return $this->belongsTo(Provider::class);
     }
 
     public function facture()
     {
-        return $this->hasMany('App\Models\PaymentPurchase');
+        return $this->hasMany(PaymentPurchase::class);
     }
 
     public function warehouse()
     {
-        return $this->belongsTo('App\Models\Warehouse');
+        return $this->belongsTo(Warehouse::class);
     }
 
     public function user()
     {
-        return $this->belongsTo('App\Models\User');
+        return $this->belongsTo(User::class);
     }
 
 }

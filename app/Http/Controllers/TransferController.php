@@ -12,7 +12,7 @@ use App\Models\TransferDetail;
 use App\Models\Warehouse;
 use App\Models\User;
 use App\Models\UserWarehouse;
-use App\utils\helpers;
+use App\utils\Helper;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Http\Request;
@@ -36,7 +36,7 @@ class TransferController extends BaseController
         $offSet = ($pageStart * $perPage) - $perPage;
         $order = $request->SortField;
         $dir = $request->SortType;
-        $helpers = new helpers();
+        $helpers = new Helper();
         // Filter fields With Params to retrieve
         $columns = array(0 => 'Ref', 1 => 'from_warehouse_id', 2 => 'to_warehouse_id', 3 => 'status');
         $param = array(0 => 'like', 1 => '=', 2 => '=', 3 => 'like');

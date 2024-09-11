@@ -15,18 +15,26 @@ class CreateExpensesTable extends Migration {
 	{
 		Schema::create('expenses', function(Blueprint $table)
 		{
-			$table->engine = 'InnoDB';
-			$table->integer('id', true);
+			$table->id('id');
 			$table->date('date');
-			$table->string('Ref', 192);
-			$table->integer('user_id')->index('expense_user_id');
-			$table->integer('expense_category_id')->index('expense_category_id');
-			$table->integer('warehouse_id')->index('expense_warehouse_id');
+			$table->string('ref', 192);
+
 			$table->string('details', 192);
 			$table->float('amount', 10, 0);
+
+            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('expense_category_id');
+            $table->unsignedBigInteger('warehouse_id');
+            $table->unsignedBigInteger('account_id')->nullable();
 			$table->timestamps(6);
 			$table->softDeletes();
-		});
+
+            $table->foreign('expense_category_id', 'expense_category_id')->references('id')->on('expense_categories');
+            $table->foreign('user_id', 'expense_user_id')->references('id')->on('users');
+            $table->foreign('warehouse_id', 'expense_warehouse_id')->references('id')->on('warehouses');
+            $table->foreign('account_id')->references('id')->on('accounts');
+
+        });
 	}
 
 

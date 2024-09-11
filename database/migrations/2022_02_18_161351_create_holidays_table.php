@@ -15,15 +15,18 @@ class CreateHolidaysTable extends Migration {
 	{
 		Schema::create('holidays', function(Blueprint $table)
 		{
-			$table->engine = 'InnoDB';
-			$table->integer('id', true);
+			$table->id('id');
 			$table->string('title', 192);
-			$table->integer('company_id')->index('holidays_company_id');
 			$table->date('start_date');
 			$table->date('end_date');
 			$table->text('description')->nullable();
+
+            $table->unsignedBigInteger('company_id');
+
 			$table->timestamps(6);
 			$table->softDeletes();
+
+            $table->foreign('company_id', 'holidays_company_id')->references('id')->on('companies');
 		});
 	}
 

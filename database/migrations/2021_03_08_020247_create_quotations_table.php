@@ -15,13 +15,9 @@ class CreateQuotationsTable extends Migration {
 	{
 		Schema::create('quotations', function(Blueprint $table)
 		{
-			$table->engine = 'InnoDB';
-			$table->integer('id', true);
-			$table->integer('user_id')->index('user_id_quotation');
+			$table->id('id');
 			$table->date('date');
 			$table->string('Ref', 192);
-			$table->integer('client_id')->index('client_id_quotation');
-			$table->integer('warehouse_id')->index('warehouse_id_quotation');
 			$table->float('tax_rate', 10, 0)->nullable()->default(0);
 			$table->float('TaxNet', 10, 0)->nullable()->default(0);
 			$table->float('discount', 10, 0)->nullable()->default(0);
@@ -29,8 +25,18 @@ class CreateQuotationsTable extends Migration {
 			$table->float('GrandTotal', 10, 0);
 			$table->string('status', 192);
 			$table->text('notes')->nullable();
+
+            $table->unsignedBigInteger('user_id')->index('user_id_quotation');
+            $table->unsignedBigInteger('client_id')->index('client_id_quotation');
+            $table->unsignedBigInteger('warehouse_id')->index('warehouse_id_quotation');
+
 			$table->timestamps(6);
 			$table->softDeletes();
+
+            $table->foreign('user_id')->references('id')->on('users');
+            $table->foreign('client_id')->references('id')->on('clients');
+            $table->foreign('warehouse_id')->references('id')->on('warehouses');
+
 		});
 	}
 

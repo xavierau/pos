@@ -6,7 +6,7 @@ use App\Models\Account;
 use App\Models\Deposit;
 use App\Models\DepositCategory;
 use App\Models\Role;
-use App\utils\helpers;
+use App\utils\Helper;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Http\Request;
@@ -28,7 +28,7 @@ class DepositsController extends BaseController
         $offSet = ($pageStart * $perPage) - $perPage;
         $order = $request->SortField;
         $dir = $request->SortType;
-        $helpers = new helpers();
+        $helpers = new Helper();
         $role = Auth::user()->roles()->first();
         $view_records = Role::findOrFail($role->id)->inRole('record_view');
         // Filter fields With Params to retrieve
@@ -137,7 +137,7 @@ class DepositsController extends BaseController
 
     public function show($id){
         //
-        
+
         }
 
     //-------------- Update  Deposit -----------\\
@@ -157,7 +157,7 @@ class DepositsController extends BaseController
                 // Check If User->id === deposit->id
                 $this->authorizeForUser($request->user('api'), 'check_record', $deposit);
             }
-       
+
             request()->validate([
                 'deposit.date' => 'required',
                 'deposit.category_id' => 'required',
@@ -255,7 +255,7 @@ class DepositsController extends BaseController
             Deposit::whereId($deposit_id)->update([
                 'deleted_at' => Carbon::now(),
             ]);
-            
+
         }
         return response()->json(['success' => true]);
     }

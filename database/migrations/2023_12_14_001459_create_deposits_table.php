@@ -4,40 +4,43 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateDepositsTable extends Migration {
+class CreateDepositsTable extends Migration
+{
 
-	/**
-	 * Run the migrations.
-	 *
-	 * @return void
-	 */
-	public function up()
-	{
-		Schema::create('deposits', function(Blueprint $table)
-		{
-			$table->engine = 'InnoDB';
-			$table->integer('id', true);
-			$table->integer('user_id')->index('deposit_user_id');
-			$table->date('date');
-			$table->string('deposit_ref', 192);
-			$table->integer('account_id')->nullable()->index('deposit_account_id');
-			$table->integer('deposit_category_id')->index('deposit_category_id');
-			$table->float('amount', 10, 0);
-			$table->text('description')->nullable();
-			$table->timestamps(6);
-			$table->softDeletes();
-		});
-	}
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create('deposits', function (Blueprint $table) {
+            $table->id('id');
+            $table->date('date');
+            $table->string('deposit_ref', 192);
+            $table->float('amount', 10, 0);
+            $table->text('description')->nullable();
+            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('account_id')->nullable();
+            $table->unsignedBigInteger('deposit_category_id');
+            $table->timestamps(6);
+            $table->softDeletes();
+
+            $table->foreign('account_id')->references('id')->on('accounts');
+            $table->foreign('deposit_category_id')->references('id')->on('deposit_categories');
+            $table->foreign('user_id')->references('id')->on('users');
+        });
+    }
 
 
-	/**
-	 * Reverse the migrations.
-	 *
-	 * @return void
-	 */
-	public function down()
-	{
-		Schema::drop('deposits');
-	}
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::drop('deposits');
+    }
 
 }

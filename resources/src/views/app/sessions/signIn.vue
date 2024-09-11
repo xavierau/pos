@@ -128,7 +128,6 @@ export default {
           baseURL: '',
         })
         .then(response => {
-
             this.makeToast(
               "success",
               this.$t("Successfully_Logged_In"),

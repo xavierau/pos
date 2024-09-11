@@ -2,7 +2,6 @@
     <div class="main-content">
         <breadcumb :page="'Update Product'" :folder="$t('Products')"/>
         <div v-if="isLoading" class="loading_page spinner spinner-primary mr-3"></div>
-
         <validation-observer ref="Edit_Product" v-if="!isLoading">
             <b-form @submit.prevent="Submit_Product" enctype="multipart/form-data">
                 <b-row>
@@ -25,7 +24,7 @@
                                                 v-model="product.name"
                                             ></b-form-input>
                                             <b-form-invalid-feedback id="Name-feedback">{{
-                                                validationContext.errors[0]
+                                                    validationContext.errors[0]
                                                 }}
                                             </b-form-invalid-feedback>
                                         </b-form-group>
@@ -82,7 +81,7 @@
                           </span>
                                                 </div>
                                                 <b-form-invalid-feedback id="CodeProduct-feedback">{{
-                                                    errors[0]
+                                                        errors[0]
                                                     }}
                                                 </b-form-invalid-feedback>
                                             </div>
@@ -369,72 +368,19 @@
                                     </validation-provider>
                                 </b-col>
 
-                                <!-- promotion price start date  -->
-                                <b-col lg="6" md="6" sm="12">
-                                    <validation-provider
-                                        name="date"
-                                        :rules="{ required: true}"
-                                        v-slot="validationContext"
-                                    >
-                                        <b-form-group :label="$t('promotional_start_date') + ' ' + '*'">
-                                            <b-form-input
-                                                :state="getValidationState(validationContext)"
-                                                aria-describedby="date-feedback"
-                                                type="date"
-                                                v-model="product.promotional_start_date"
-                                            ></b-form-input>
-                                            <b-form-invalid-feedback
-                                                id="OrderTax-feedback"
-                                            >{{ validationContext.errors[0] }}
-                                            </b-form-invalid-feedback>
-                                        </b-form-group>
-                                    </validation-provider>
-                                </b-col>
-                                <!-- promotion price end date  -->
-                                <b-col lg="6" md="6" sm="12">
-                                    <validation-provider
-                                        name="date"
-                                        v-slot="validationContext"
-                                    >
-                                        <b-form-group :label="$t('promotional_end_date') + ' ' + '*'">
-                                            <b-form-input
-                                                :state="getValidationState(validationContext)"
-                                                aria-describedby="date-feedback"
-                                                type="date"
-                                                v-model="product.promotional_end_date"
-                                            ></b-form-input>
-                                            <b-form-invalid-feedback
-                                                id="OrderTax-feedback"
-                                            >{{ validationContext.errors[0] }}
-                                            </b-form-invalid-feedback>
-                                        </b-form-group>
-                                    </validation-provider>
-                                </b-col>
-                                <!-- Promotional Price -->
-                                <b-col md="6" class="mb-2"
-                                       v-if="product.type == 'is_single' || product.type == 'is_service'">
-                                    <validation-provider
-                                        name="Promotional Price"
-                                        :rules="{ regex: /^\d*\.?\d*$/}"
-                                        v-slot="validationContext"
-                                    >
-                                        <b-form-group :label="$t('promotional_price')">
-                                            <b-form-input
-                                                :state="getValidationState(validationContext)"
-                                                aria-describedby="ProductPromotionalPrice-feedback"
-                                                label="Price"
-                                                type="number"
-                                                min="0"
-                                                :placeholder="$t('Enter_Promotional_Price')"
-                                                v-model="product.promotional_price"
-                                            ></b-form-input>
+                                <!-- Create Promotional Price -->
+                                <b-col md="6" class="mb-2" v-if="product.type != 'is_variant'">
+                                    <b-form-group :label="$t('Promotional Price')">
+                                        <button v-if="!product.discounted_price"
+                                                @click.prevent="addDiscountedPrice"
+                                                type="button" class="btn btn-sm btn-block btn-primary"
+                                        >Create
+                                        </button>
+                                        <button v-else @click.prevent="editDiscountedPrice" type="button"
+                                                class="btn btn-sm btn-block btn-primary">{{ $t("Edit") }}
+                                        </button>
+                                    </b-form-group>
 
-                                            <b-form-invalid-feedback
-                                                id="ProductPrice-feedback"
-                                            >{{ validationContext.errors[0] }}
-                                            </b-form-invalid-feedback>
-                                        </b-form-group>
-                                    </validation-provider>
                                 </b-col>
 
                                 <div class="col-md-9 mb-3 mt-3" v-if="product.type == 'is_variant'">
@@ -455,7 +401,7 @@
                                     </div>
                                 </div>
 
-                                <div class="col-md-9 mb-2" v-if="product.type == 'is_variant'">
+                                <div class="col-md-12 mb-2" v-if="product.type == 'is_variant'">
                                     <div class="table-responsive">
                                         <table class="table table-hover table-sm">
                                             <thead class="bg-gray-300">
@@ -488,11 +434,16 @@
                                                     <a
                                                         style="color: #ffff;"
                                                         @click="delete_variant(variant.var_id)"
-                                                        class="btn btn-sm btn-danger"
+                                                        class="btn btn-xs btn-danger d-inline"
                                                         title="Delete"
                                                     >
                                                         <i class="i-Close-Window"></i>
                                                     </a>
+                                                    <button
+                                                        @click.prevent="updateOrCreateProVariantDiscountPrice(variant)"
+                                                        class="btn btn-xs btn-primary d-inline">
+                                                        DP
+                                                    </button>
                                                 </td>
                                             </tr>
                                             </tbody>
@@ -577,6 +528,34 @@
                 </b-row>
             </b-form>
         </validation-observer>
+
+        <validation-observer ref="create_discounted_price">
+            <b-modal hide-footer size="md" id="new_discounted_price" :title="$t('Create Discounted Price')"
+                     @hidden="resetDiscountedPrice">
+                <DiscountedPriceForm :discountedPrice="discountedPrice"
+                                     :can-submit="!SubmitProcessing"
+                                     v-on:confirm="create_discounted_price"/>
+            </b-modal>
+        </validation-observer>
+
+        <validation-observer ref="update_discounted_price">
+            <b-modal hide-footer size="md" id="edit_discounted_price" :title="$t('Edit')">
+                <DiscountedPriceForm :discountedPrice="product.discounted_price"
+                                     :can-submit="!SubmitProcessing"
+                                     v-on:confirm="update_discounted_price"/>
+            </b-modal>
+        </validation-observer>
+
+        <validation-observer ref="create_product_variant_discounted_price">
+            <b-modal hide-footer size="md"
+                     id="new_product_variant_discounted_price"
+                     @hidden="resetDiscountedPrice"
+                     :title="$t('Create Discounted Price')">
+                <DiscountedPriceForm :discountedPrice="discountedPrice"
+                                     :can-submit="!SubmitProcessing"
+                                     v-on:confirm="create_product_variant_discounted_price"/>
+            </b-modal>
+        </validation-observer>
     </div>
 </template>
 
@@ -584,6 +563,7 @@
 import VueUploadMultipleImage from "vue-upload-multiple-image";
 import VueTagsInput from "@johmun/vue-tags-input";
 import NProgress from "nprogress";
+import DiscountedPriceForm from "../../../../components/DiscountedPriceForm.vue";
 
 export default {
     metaInfo: {
@@ -591,6 +571,13 @@ export default {
     },
     data() {
         return {
+            selectedVariant: null,
+            discountedPrice: {
+                'discounted_price_id': null,
+                'start_date': null,
+                'end_date': null,
+                'discounted_price': null,
+            },
             tag: "",
             len: 8,
             images: [],
@@ -620,9 +607,7 @@ export default {
                 unit_id: "",
                 unit_sale_id: "",
                 unit_purchase_id: "",
-                promotional_price: null,
-                promotional_start_date: null,
-                promotional_end_date: null,
+                discounted_price: {},
                 stock_alert: "",
                 image: "",
                 note: "",
@@ -636,7 +621,8 @@ export default {
 
     components: {
         VueUploadMultipleImage,
-        VueTagsInput
+        VueTagsInput,
+        DiscountedPriceForm
     },
 
     methods: {
@@ -723,7 +709,12 @@ export default {
             }
         },
 
-
+        addDiscountedPrice() {
+            this.$bvModal.show("new_discounted_price");
+        },
+        editDiscountedPrice() {
+            this.$bvModal.show("edit_discounted_price");
+        },
         //------ event upload Image Success
         uploadImageSuccess(formData, index, fileList, imageArray) {
             this.images = fileList;
@@ -737,6 +728,175 @@ export default {
                 done();
             } else {
             }
+        },
+        resetDiscountedPrice() {
+            this.discountedPrice = {
+                'discounted_price_id': null,
+                'start_date': null,
+                'end_date': null,
+                'discounted_price': null
+            }
+        },
+        updateOrCreateProVariantDiscountPrice(variant) {
+            if (variant.discounted_price) {
+                this.discountedPrice = {
+                    'discounted_price_id': variant.discounted_price.id,
+                    'start_date': variant.discounted_price.start_date,
+                    'end_date': variant.discounted_price.end_date,
+                    'discounted_price': variant.discounted_price.discounted_price,
+                }
+            }
+
+            this.selectedVariant = variant
+
+            this.$bvModal.show("new_product_variant_discounted_price");
+
+        },
+        create_discounted_price(formData) {
+            NProgress.start();
+            NProgress.set(0.1);
+            self.SubmitProcessing = true;
+            const submitData = {
+                'product_id': this.product.id,
+                'start_date': formData.start_date,
+                'end_date': formData.end_date,
+                'discounted_price': formData.discounted_price,
+            }
+
+            //send Data with axios
+            axios.post(`products/${this.product.id}/discounted_prices`, submitData)
+                .then(response => {
+                    this.$bvModal.hide("new_discounted_price");
+                    this.makeToast(
+                        "success",
+                        this.$t("Successfully_Updated"),
+                        this.$t("Success")
+                    );
+
+                    this.resetDiscountedPrice()
+                    this.product.discounted_price = response.data.discounted_price
+                })
+                .catch(error => {
+                    if (error.errors.code && error.errors.code.length > 0) {
+                        self.code_exist = error.errors.code[0];
+                        this.makeToast("danger", error.errors.code[0], this.$t("Failed"));
+                    } else if (error.errors.variants && error.errors.variants.length > 0) {
+                        this.makeToast("danger", error.errors.variants[0], this.$t("Failed"));
+                    } else {
+                        this.makeToast("danger", this.$t("InvalidData"), this.$t("Failed"));
+                    }
+                })
+                .finally(() => {
+                    self.SubmitProcessing = false;
+                    NProgress.done();
+                });
+
+        },
+        update_discounted_price(formData) {
+            if (this.SubmitProcessing) {
+                return
+            }
+            NProgress.start();
+            NProgress.set(0.1);
+            this.SubmitProcessing = true;
+            const submitData = {
+                'product_id': this.product.id,
+                'discounted_price_id': formData.id,
+                'start_date': formData.start_date,
+                'end_date': formData.end_date,
+                'discounted_price': formData.discounted_price,
+            }
+
+            //send Data with axios
+            axios.put(`products/${this.product.id}/discounted_prices/${this.product.discounted_price.id}`, submitData)
+                .then(response => {
+                    this.$bvModal.hide("edit_discounted_price");
+                    this.makeToast(
+                        "success",
+                        this.$t("Successfully_Updated"),
+                        this.$t("Success")
+                    );
+                })
+                .catch(error => {
+                    if (error.errors.code && error.errors.code.length > 0) {
+                        self.code_exist = error.errors.code[0];
+                        this.makeToast("danger", error.errors.code[0], this.$t("Failed"));
+                    } else if (error.errors.variants && error.errors.variants.length > 0) {
+                        this.makeToast("danger", error.errors.variants[0], this.$t("Failed"));
+                    } else {
+                        this.makeToast("danger", this.$t("InvalidData"), this.$t("Failed"));
+                    }
+                })
+                .finally(() => {
+                    this.SubmitProcessing = false;
+                    NProgress.done();
+                });
+        },
+        create_product_variant_discounted_price(formData) {
+            NProgress.start();
+            NProgress.set(0.1);
+            self.SubmitProcessing = true;
+            const submitData = {
+                'start_date': formData.start_date,
+                'end_date': formData.end_date,
+                'discounted_price': formData.discounted_price,
+            }
+
+            if (this.selectedVariant.discounted_price) {
+                axios.put(`productVariants/${this.selectedVariant.id}/discounted_prices/${this.selectedVariant.discounted_price.id}`, submitData)
+                    .then(response => {
+                        this.$bvModal.hide("new_product_variant_discounted_price");
+                        this.makeToast(
+                            "success",
+                            this.$t("Successfully_Updated"),
+                            this.$t("Success")
+                        );
+                        this.selectedVariant.discounted_price = response.data.discounted_price
+                    })
+                    .catch(error => {
+                        if (error.errors.code && error.errors.code.length > 0) {
+                            self.code_exist = error.errors.code[0];
+                            this.makeToast("danger", error.errors.code[0], this.$t("Failed"));
+                        } else if (error.errors.variants && error.errors.variants.length > 0) {
+                            this.makeToast("danger", error.errors.variants[0], this.$t("Failed"));
+                        } else {
+                            this.makeToast("danger", this.$t("InvalidData"), this.$t("Failed"));
+                        }
+                    })
+                    .finally(() => {
+                        self.SubmitProcessing = false;
+                        NProgress.done();
+                        this.selectedVariant = null
+                    });
+            } else {
+                axios.post(`productVariants/${this.selectedVariant.id}/discounted_prices`, submitData)
+                    .then(response => {
+                        this.$bvModal.hide("new_product_variant_discounted_price");
+                        this.makeToast(
+                            "success",
+                            this.$t("Successfully_Updated"),
+                            this.$t("Success")
+                        );
+                        this.selectedVariant.discounted_price = response.data.discounted_price
+                    })
+                    .catch(error => {
+                        if (error.errors.code && error.errors.code.length > 0) {
+                            self.code_exist = error.errors.code[0];
+                            this.makeToast("danger", error.errors.code[0], this.$t("Failed"));
+                        } else if (error.errors.variants && error.errors.variants.length > 0) {
+                            this.makeToast("danger", error.errors.variants[0], this.$t("Failed"));
+                        } else {
+                            this.makeToast("danger", this.$t("InvalidData"), this.$t("Failed"));
+                        }
+                    })
+                    .finally(() => {
+                        self.SubmitProcessing = false;
+                        NProgress.done();
+                        this.selectedVariant = null
+                    });
+            }
+
+
         },
 
         //---------------------------------------Get Product Elements ------------------------------\\
@@ -797,6 +957,12 @@ export default {
             Object.entries(self.product).forEach(([key, value]) => {
                 console.log('appending object: ', key, value);
                 self.data.append(key, value === null ? '' : value);
+
+                if (key === 'discounted_price') {
+                    Object.entries(value).forEach(([key, value]) => {
+                        self.data.append("discounted_price[" + key + "]", value === null ? '' : value);
+                    });
+                }
             });
 
             //append array variants

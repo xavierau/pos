@@ -22,7 +22,7 @@ use App\Models\Purchase;
 use App\Models\Setting;
 use App\Models\PurchaseDetail;
 use App\Models\PurchaseReturn;
-use App\Models\PurchaseReturnDetails;
+use App\Models\PurchaseReturnDetail;
 use App\Models\Quotation;
 use App\Models\QuotationDetail;
 use App\Models\Role;
@@ -33,7 +33,7 @@ use App\Models\SaleReturnDetails;
 use App\Models\User;
 use App\Models\UserWarehouse;
 use App\Models\Warehouse;
-use App\utils\helpers;
+use App\utils\Helper;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Http\Request;
@@ -514,7 +514,7 @@ class ReportController extends BaseController
         $offSet = ($pageStart * $perPage) - $perPage;
         $order = $request->SortField;
         $dir = $request->SortType;
-        $helpers = new helpers();
+        $helpers = new Helper();
         // Filter fields With Params to retrieve
         $param = array(
             0 => 'like',
@@ -625,7 +625,7 @@ class ReportController extends BaseController
         $offSet = ($pageStart * $perPage) - $perPage;
         $order = $request->SortField;
         $dir = $request->SortType;
-        $helpers = new helpers();
+        $helpers = new Helper();
         // Filter fields With Params to retrieve
 
         $param = array(
@@ -3225,7 +3225,7 @@ class ReportController extends BaseController
         $Role = Auth::user()->roles()->first();
         $ShowRecord = Role::findOrFail($Role->id)->inRole('record_view');
 
-        $purchase_return_details_data = PurchaseReturnDetails::with('product','PurchaseReturn','PurchaseReturn.provider','PurchaseReturn.warehouse')
+        $purchase_return_details_data = PurchaseReturnDetail::with('product','PurchaseReturn','PurchaseReturn.provider','PurchaseReturn.warehouse')
             ->where(function ($query) use ($ShowRecord) {
                 if (!$ShowRecord) {
                     return $query->whereHas('PurchaseReturn', function ($q) use ($request) {
@@ -3595,7 +3595,7 @@ class ReportController extends BaseController
 
         $this->authorizeForUser($request->user('api'), 'Reports_customers', Client::class);
 
-        $helpers = new helpers();
+        $helpers = new Helper();
         $client = Client::where('deleted_at', '=', null)->findOrFail($id);
 
         $Sales = Sale::where('deleted_at', '=', null)
@@ -3670,7 +3670,7 @@ class ReportController extends BaseController
 
         $this->authorizeForUser($request->user('api'), 'Reports_suppliers', Provider::class);
 
-         $helpers = new helpers();
+         $helpers = new Helper();
          $provider = Provider::where('deleted_at', '=', null)->findOrFail($id);
 
          $purchases = Purchase::where('deleted_at', '=', null)
@@ -4118,7 +4118,7 @@ class ReportController extends BaseController
          $offSet = ($pageStart * $perPage) - $perPage;
          $order = $request->SortField;
          $dir = $request->SortType;
-         $helpers = new helpers();
+         $helpers = new Helper();
          // Filter fields With Params to retrieve
          $param = array(
              0 => '=',
@@ -4274,7 +4274,7 @@ class ReportController extends BaseController
          $offSet = ($pageStart * $perPage) - $perPage;
          $order = $request->SortField;
          $dir = $request->SortType;
-         $helpers = new helpers();
+         $helpers = new Helper();
          // Filter fields With Params to retrieve
          $param = array(
              0 => '=',
@@ -4429,8 +4429,8 @@ class ReportController extends BaseController
         $dir = $request->SortType;
         $data = array();
 
-        $helpers = new helpers();
-        $currency_code = $helpers->Get_Currency_Code();
+        $helpers = new Helper();
+        $currency_code = $helpers->getCurrencyCode();
 
         //get warehouses assigned to user
         $user_auth = auth()->user();
@@ -4683,7 +4683,7 @@ class ReportController extends BaseController
         $dir = $request->SortType;
         $data = array();
 
-        $helpers = new helpers();
+        $helpers = new Helper();
 
         //get warehouses assigned to user
         $user_auth = auth()->user();
@@ -4769,7 +4769,7 @@ class ReportController extends BaseController
          $dir = $request->SortType;
          $data = array();
 
-         $helpers = new helpers();
+         $helpers = new Helper();
 
          $deposits_data = Deposit::join('deposit_categories', 'deposits.deposit_category_id', '=', 'deposit_categories.id')
          ->where('deposits.deleted_at', '=', null)

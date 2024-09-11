@@ -9,21 +9,21 @@ class PurchaseReturn extends Model
     protected $dates = ['deleted_at'];
 
     protected $fillable = [
-        'date', 'Ref', 'GrandTotal',
+        'date', 'ref', 'grand_total',
         'user_id', 'discount', 'shipping',
-        'warehouse_id','purchase_id', 'provider_id', 'notes', 'TaxNet', 'tax_rate', 'status',
+        'warehouse_id', 'purchase_id', 'provider_id', 'notes', 'tax_net', 'tax_rate', 'status',
         'paid_amount', 'payment_status', 'created_at', 'updated_at', 'deleted_at',
     ];
 
     protected $casts = [
-        'GrandTotal' => 'double',
+        'grand_total' => 'double',
         'user_id' => 'integer',
         'purchase_id' => 'integer',
         'provider_id' => 'integer',
         'warehouse_id' => 'integer',
         'discount' => 'double',
         'shipping' => 'double',
-        'TaxNet' => 'double',
+        'tax_net' => 'double',
         'tax_rate' => 'double',
         'paid_amount' => 'double',
     ];
@@ -35,7 +35,7 @@ class PurchaseReturn extends Model
 
     public function details()
     {
-        return $this->hasMany('App\Models\PurchaseReturnDetails');
+        return $this->hasMany('App\Models\PurchaseReturnDetail');
     }
 
     public function product()

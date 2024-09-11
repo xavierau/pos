@@ -9,7 +9,7 @@ use App\Models\Setting;
 use App\Models\User;
 use App\Models\UserWarehouse;
 use App\Models\Warehouse;
-use App\utils\helpers;
+use App\utils\Helper;
 use Config;
 use File;
 use Illuminate\Http\Request;
@@ -35,7 +35,7 @@ class UserController extends BaseController
         $offSet = ($pageStart * $perPage) - $perPage;
         $order = $request->SortField;
         $dir = $request->SortType;
-        $helpers = new helpers();
+        $helpers = new Helper();
         // Filter fields With Params to retrieve
         $columns = array(0 => 'username', 1 => 'status', 2 => 'phone', 3 => 'email');
         $param = array(0 => 'like', 1 => '=', 2 => 'like', 3 => 'like');
@@ -86,7 +86,7 @@ class UserController extends BaseController
 
     public function GetUserAuth(Request $request)
     {
-        $helpers = new helpers();
+        $helpers = new Helper();
         $user['avatar'] = Auth::user()->avatar;
         $user['username'] = Auth::user()->username;
         $user['currency'] = $helpers->Get_Currency();
@@ -96,8 +96,7 @@ class UserController extends BaseController
         $user['developed_by'] = Setting::first()->developed_by;
         $permissions = Auth::user()->roles()->first()->permissions->pluck('name');
         $products_alerts = ProductWarehouse::join('products', 'product_warehouse.product_id', '=', 'products.id')
-            ->whereRaw('qte <= stock_alert')
-            ->where('product_warehouse.deleted_at', null)
+            ->whereRaw('qty <= stock_alert')
             ->count();
 
 

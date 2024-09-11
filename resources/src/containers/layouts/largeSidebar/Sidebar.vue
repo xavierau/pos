@@ -469,9 +469,18 @@
                         class="nav-item"
                         v-if="hasPermission('Pos_view')"
                     >
-                        <router-link tag="a" class to="/app/pos">
+                        <router-link tag="a" class to="/app/simple_pos">
                             <i class="nav-icon i-Files"></i>
                             <span class="item-name">POS</span>
+                        </router-link>
+                    </li>
+                    <li
+                        class="nav-item"
+                        v-if="hasPermission('Pos_view')"
+                    >
+                        <router-link tag="a" class :to="{name:'promotions'}">
+                            <i class="nav-icon i-Files"></i>
+                            <span class="item-name">{{$t('Promotions')}}</span>
                         </router-link>
                     </li>
                     <li

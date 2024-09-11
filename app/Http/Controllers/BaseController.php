@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Role;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Nwidart\Modules\Facades\Module;
@@ -133,6 +135,18 @@ class BaseController extends Controller
             'ModulesInstalled' => $ModulesInstalled,
             'ModulesEnabled' => $ModulesEnabled,
         ];
+    }
+
+    public function checkAuthorization($resource, $rolePermission, $resourcePermission)
+    {
+        $role = Auth::user()->roles()->first();
+        $view_records = Role::findOrFail($role->id)->inRole($rolePermission);
+
+        // Check If User Has Permission view All Records
+        if (!$view_records) {
+            // Check If User->id === payment->id
+            $this->authorizeForUser(request()->user('api'), $resourcePermission, $resource);
+        }
     }
 
 }

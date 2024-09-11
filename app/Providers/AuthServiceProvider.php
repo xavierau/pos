@@ -45,7 +45,7 @@ class AuthServiceProvider extends ServiceProvider
         'App\Models\TransferMoney'             => 'App\Policies\TransferMoneyPolicy',
         'App\Models\Deposit'                   => 'App\Policies\DepositPolicy',
         'App\Models\DepositCategory'           => 'App\Policies\DepositCategoryPolicy',
-        
+
         //hrm
         'App\Models\Employee'                  => 'App\Policies\EmployeePolicy',
         'App\Models\Company'                   => 'App\Policies\CompanyPolicy',
@@ -67,7 +67,7 @@ class AuthServiceProvider extends ServiceProvider
     public function boot(){
         $this->registerPolicies();
 
-        Passport::routes();
-    
+        Passport::ignoreRoutes();
+
     }
 }

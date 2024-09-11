@@ -27,7 +27,7 @@ use App\Models\Setting;
 use App\Models\Warehouse;
 use App\Models\User;
 use App\Models\UserWarehouse;
-use App\utils\helpers;
+use App\utils\Helper;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -55,7 +55,7 @@ class QuotationsController extends BaseController
         $offSet = ($pageStart * $perPage) - $perPage;
         $order = $request->SortField;
         $dir = $request->SortType;
-        $helpers = new helpers();
+        $helpers = new Helper();
         // Filter fields With Params to retrieve
         $param = array(
             0 => 'like',
@@ -472,7 +472,7 @@ class QuotationsController extends BaseController
     {
 
         $details = array();
-        $helpers = new helpers();
+        $helpers = new Helper();
         $Quotation = Quotation::with('details.product.unitSale')
             ->where('deleted_at', '=', null)
             ->findOrFail($id);
@@ -552,7 +552,7 @@ class QuotationsController extends BaseController
         }
 
         $settings = Setting::where('deleted_at', '=', null)->first();
-        $symbol = $helpers->Get_Currency_Code();
+        $symbol = $helpers->getCurrencyCode();
 
         $Html = view('pdf.quotation_pdf', [
             'symbol' => $symbol,
@@ -785,7 +785,7 @@ class QuotationsController extends BaseController
         //Quotation
         $quotation = Quotation::with('client')->where('deleted_at', '=', null)->findOrFail($request->id);
 
-        $helpers = new helpers();
+        $helpers = new Helper();
         $currency = $helpers->Get_Currency();
 
          //settings
@@ -842,7 +842,7 @@ class QuotationsController extends BaseController
         //Quotation
         $quotation = Quotation::with('client')->where('deleted_at', '=', null)->findOrFail($request->id);
 
-        $helpers = new helpers();
+        $helpers = new Helper();
         $currency = $helpers->Get_Currency();
 
         //settings

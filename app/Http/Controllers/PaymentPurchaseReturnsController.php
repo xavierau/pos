@@ -10,7 +10,7 @@ use App\Models\Setting;
 use \Nwidart\Modules\Facades\Module;
 use App\Models\sms_gateway;
 use App\Models\Account;
-use App\utils\helpers;
+use App\utils\Helper;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -36,7 +36,7 @@ class PaymentPurchaseReturnsController extends BaseController
         $offSet = ($pageStart * $perPage) - $perPage;
         $order = $request->SortField;
         $dir = $request->SortType;
-        $helpers = new helpers();
+        $helpers = new Helper();
         $role = Auth::user()->roles()->first();
         $view_records = Role::findOrFail($role->id)->inRole('record_view');
         // Filter fields With Params to retriever
@@ -362,9 +362,9 @@ class PaymentPurchaseReturnsController extends BaseController
         $payment_data['date'] = $payment->date;
         $payment_data['Reglement'] = $payment->Reglement;
 
-        $helpers = new helpers();
+        $helpers = new Helper();
         $settings = Setting::where('deleted_at', '=', null)->first();
-        $symbol = $helpers->Get_Currency_Code();
+        $symbol = $helpers->getCurrencyCode();
 
         $Html = view('pdf.Payment_Purchase_Return', [
             'symbol' => $symbol,

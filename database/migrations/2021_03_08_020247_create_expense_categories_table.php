@@ -15,13 +15,14 @@ class CreateExpenseCategoriesTable extends Migration {
 	{
 		Schema::create('expense_categories', function(Blueprint $table)
 		{
-			$table->engine = 'InnoDB';
-			$table->integer('id', true);
-			$table->integer('user_id')->index('expense_category_user_id');
+			$table->id('id');
 			$table->string('name', 192);
 			$table->text('description')->nullable();
+            $table->unsignedBigInteger('user_id');
 			$table->timestamps(6);
 			$table->softDeletes();
+
+            $table->foreign('user_id', 'expense_category_user_id')->references('id')->on('users')->onUpdate('RESTRICT')->onDelete('RESTRICT');
 		});
 	}
 

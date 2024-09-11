@@ -1,5 +1,11 @@
 <?php
 
+use Database\Seeders\AccountsTableSeeder;
+use Database\Seeders\BrandsTableSeeder;
+use Database\Seeders\CategoriesTableSeeder;
+use Database\Seeders\ProductsTableSeeder;
+use Database\Seeders\ProvidersTableSeeder;
+use Database\Seeders\UnitsTableSeeder;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -23,7 +29,13 @@ class DatabaseSeeder extends Seeder
             UserRoleSeeder::class,
             PermissionRoleSeeder::class,
             Warehouse::class,
+            UnitsTableSeeder::class,
+            CategoriesTableSeeder::class,
+            BrandsTableSeeder::class,
+            ProductsTableSeeder::class,
+            ProvidersTableSeeder::class,
+            AccountsTableSeeder::class,
         ]);
-        
+
     }
 }

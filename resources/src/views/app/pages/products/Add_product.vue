@@ -1,9 +1,9 @@
 <template>
     <div class="main-content">
         <breadcumb :page="$t('AddProduct')" :folder="$t('Products')"/>
-        <div v-if="isLoading" class="loading_page spinner spinner-primary mr-3"></div>
+        <div v-if="is_loading" class="loading_page spinner spinner-primary mr-3"></div>
 
-        <validation-observer ref="Create_Product" v-if="!isLoading">
+        <validation-observer ref="Create_Product" v-if="!is_loading">
             <b-form @submit.prevent="Submit_Product" enctype="multipart/form-data">
                 <b-row>
                     <b-col md="8" class="mb-2">
@@ -142,7 +142,7 @@
                                                 <input
                                                     :state="getValidationState(validationContext)"
                                                     aria-describedby="OrderTax-feedback"
-                                                    v-model.number="product.TaxNet"
+                                                    v-model.number="product.tax_net"
                                                     type="text"
                                                     class="form-control"
                                                 >
@@ -356,74 +356,6 @@
                                     </validation-provider>
                                 </b-col>
 
-                                <!-- promotion price start date  -->
-                                <b-col lg="6" md="6" sm="12"
-                                       v-if="product.type == 'is_single' || product.type == 'is_service'">
-                                    <validation-provider
-                                        name="date"
-                                        v-slot="validationContext"
-                                    >
-                                        <b-form-group :label="$t('promotional_start_date') + ' ' + '*'">
-                                            <b-form-input
-                                                :state="getValidationState(validationContext)"
-                                                aria-describedby="date-feedback"
-                                                type="date"
-                                                v-model="product.promotional_start_date"
-                                            ></b-form-input>
-                                            <b-form-invalid-feedback
-                                                id="OrderTax-feedback"
-                                            >{{ validationContext.errors[0] }}
-                                            </b-form-invalid-feedback>
-                                        </b-form-group>
-                                    </validation-provider>
-                                </b-col>
-                                <!-- promotion price end date  -->
-                                <b-col lg="6" md="6" sm="12"
-                                       v-if="product.type == 'is_single' || product.type == 'is_service'">
-                                    <validation-provider
-                                        name="date"
-                                        v-slot="validationContext"
-                                    >
-                                        <b-form-group :label="$t('promotional_end_date') + ' ' + '*'">
-                                            <b-form-input
-                                                :state="getValidationState(validationContext)"
-                                                aria-describedby="date-feedback"
-                                                type="date"
-                                                v-model="product.promotional_end_date"
-                                            ></b-form-input>
-                                            <b-form-invalid-feedback
-                                                id="OrderTax-feedback"
-                                            >{{ validationContext.errors[0] }}
-                                            </b-form-invalid-feedback>
-                                        </b-form-group>
-                                    </validation-provider>
-                                </b-col>
-                                <!-- Promotional Price -->
-                                <b-col md="6" class="mb-2"
-                                       v-if="product.type == 'is_single' || product.type == 'is_service'">
-                                    <validation-provider
-                                        name="Promotional Price"
-                                        :rules="{ regex: /^\d*\.?\d*$/}"
-                                        v-slot="validationContext"
-                                    >
-                                        <b-form-group :label="$t('promotional_price')">
-                                            <b-form-input
-                                                :state="getValidationState(validationContext)"
-                                                aria-describedby="ProductPrice-feedback"
-                                                label="Price"
-                                                type="number"
-                                                :placeholder="$t('Enter_Promotional_Price')"
-                                                v-model="product.promotional_price"
-                                            ></b-form-input>
-
-                                            <b-form-invalid-feedback
-                                                id="ProductPrice-feedback"
-                                            >{{ validationContext.errors[0] }}
-                                            </b-form-invalid-feedback>
-                                        </b-form-group>
-                                    </validation-provider>
-                                </b-col>
-
                                 <div class="col-md-9 mb-3 mt-3" v-if="product.type == 'is_variant'">
                                     <div class="d-flex">
                                         <input
@@ -584,7 +516,7 @@ export default {
             images: [],
             imageArray: [],
             change: false,
-            isLoading: true,
+            is_loading: true,
             SubmitProcessing: false,
             data: new FormData(),
             categories: [],
@@ -602,7 +534,7 @@ export default {
                 price: "",
                 brand_id: "",
                 category_id: "",
-                TaxNet: "0",
+                tax_net: "0",
                 tax_method: "1",
                 unit_id: "",
                 unit_sale_id: "",
@@ -613,9 +545,6 @@ export default {
                 is_variant: false,
                 is_imei: false,
                 not_selling: false,
-                promotional_price: "",
-                promotional_start_date: "",
-                promotional_end_date: "",
             },
             code_exist: ""
         };
@@ -738,11 +667,11 @@ export default {
                     this.categories = response.data.categories;
                     this.brands = response.data.brands;
                     this.units = response.data.units;
-                    this.isLoading = false;
+                    this.is_loading = false;
                 })
                 .catch(response => {
                     setTimeout(() => {
-                        this.isLoading = false;
+                        this.is_loading = false;
                     }, 500);
                     this.makeToast("danger", this.$t("InvalidData"), this.$t("Failed"));
                 });

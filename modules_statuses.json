@@ -1,3 +1,6 @@
 {
-    "SimplePOSLogin": true
+    "SimplePOSLogin": true,
+    "SalesPromotion": true,
+    "Promotions": true,
+    "DiscountedPrice": true
 }

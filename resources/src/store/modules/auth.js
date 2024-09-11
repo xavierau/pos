@@ -7,6 +7,17 @@ import {i18n} from "../../plugins/i18n";
 
 Vue.use(Vuex)
 
+export const authMutations = {
+    setLoading: 'auth/setLoading',
+    setError: 'auth/setError',
+    setUser: 'auth/setUser',
+    clearError: 'auth/clearError',
+    setPermissions: 'auth/setPermissions',
+    setAllModules: 'auth/setAllModules',
+    setDefaultLanguage: 'auth/SetDefaultLanguage',
+    alert: 'auth/alert',
+    logout: 'auth/logout',
+}
 
 const state = {
     isAuthenticated: false,
@@ -18,7 +29,6 @@ const state = {
     notifs: 0,
     Default_Language: 'en',
 };
-
 
 const getters = {
     getAllModules: state => state.allmodules,
@@ -50,45 +60,36 @@ const getters = {
 };
 
 const mutations = {
-    setLoading(state, data) {
+    [authMutations.setLoading](state, data) {
         state.loading = data;
         state.error = null;
     },
-    setError(state, data) {
+    [authMutations.setError](state, data) {
         state.error = data;
         state.loggedInUser = null;
         state.loading = false;
     },
-    clearError(state) {
+    [authMutations.clearError](state) {
         state.error = null;
     },
-
-    setPermissions(state, Permissions) {
+    [authMutations.setPermissions](state, Permissions) {
         state.Permissions = Permissions;
     },
-
-    setAllModules(state, allmodules) {
+    [authMutations.setAllModules](state, allmodules) {
         state.allmodules = allmodules;
     },
-
-
-    setUser(state, user) {
+    [authMutations.setUser](state, user) {
         state.user = user;
     },
-
-
-    SetDefaultLanguage(state, Language) {
+    [authMutations.setDefaultLanguage](state, Language) {
         i18n.locale = Language;
         store.dispatch("language/setLanguage", Language);
         state.Default_Language = Language;
     },
-
-    Notifs_alert(state, notifs) {
+    [authMutations.alert](state, notifs) {
         state.notifs = notifs;
     },
-
-
-    logout(state) {
+    [authMutations.logout](state) {
         state.user = null;
         state.Permissions = null;
         state.allmodules = null;
@@ -102,26 +103,27 @@ const actions = {
 
     async refreshUserPermissions(context) {
 
-        await axios.get("get_user_auth").then((userAuth) => {
+        await axios.get("/api/get_user_auth").then((userAuth) => {
             let Permissions = userAuth.data.permissions
             let allmodules = userAuth.data.ModulesEnabled
             let user = userAuth.data.user
             let notifs = userAuth.data.notifs
             let default_language = userAuth.data.user.default_language
 
-            context.commit('setPermissions', Permissions)
-            context.commit('setAllModules', allmodules)
-            context.commit('setUser', user)
-            context.commit('Notifs_alert', notifs)
-
-            context.commit('SetDefaultLanguage', default_language)
-        }).catch(() => {
-            context.commit('setPermissions', null)
-            context.commit('setAllModules', null)
-            context.commit('setAllModules', null)
-            context.commit('setUser', null)
-            context.commit('Notifs_alert', null)
-            context.commit('SetDefaultLanguage', 'en')
+            console.log("Going to set user", user)
+            context.commit(authMutations.setPermissions, Permissions)
+            context.commit(authMutations.setAllModules, allmodules)
+            context.commit(authMutations.setUser, user)
+            context.commit(authMutations.alert, notifs)
+            context.commit(authMutations.setDefaultLanguage, default_language)
+        }).catch((e) => {
+            console.error('get_user_auth error', e)
+            context.commit(authMutations.setPermissions, null)
+            context.commit(authMutations.setAllModules, null)
+            context.commit(authMutations.setAllModules, null)
+            context.commit(authMutations.setUser, null)
+            context.commit(authMutations.alert, null)
+            context.commit(authMutations.setDefaultLanguage, 'en')
         });
     },
 

@@ -8,15 +8,16 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class PaymentSaleReturns extends Model
 {
     use SoftDeletes;
-    protected $dates = ['deleted_at'];
+
+    protected $dates = ['deleted_at', 'date'];
 
     protected $fillable = [
-        'sale_return_id', 'date', 'montant','change', 'Ref', 'Reglement', 'user_id', 'notes','account_id'
+        'sale_return_id', 'date', 'amount', 'change', 'ref', 'type', 'user_id', 'notes', 'account_id'
     ];
 
     protected $casts = [
-        'montant' => 'double',
-        'change'  => 'double',
+        'amount' => 'double',
+        'change' => 'double',
         'sale_return_id' => 'integer',
         'user_id' => 'integer',
         'account_id' => 'integer',

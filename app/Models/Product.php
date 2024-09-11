@@ -2,50 +2,59 @@
 
 namespace App\Models;
 
+use App\Services\products\GetUnitCostAndPrice;
+use Database\Factories\ProductFactory;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Modules\DiscountedPrice\Traits\HasDiscountedPrice;
 
 class Product extends Model
 {
+    use HasFactory, HasDiscountedPrice, SoftDeletes;
 
     protected $dates = [
         'deleted_at',
-        'promotional_start_date' => 'date:Y-m-d',
-        'promotional_end_date' => 'date:Y-m-d',
     ];
 
     protected $fillable = [
         'code', 'type_barcode', 'name', 'cost', 'price', 'unit_id', 'unit_sale_id', 'unit_purchase_id',
-        'stock_alert', 'category_id', 'sub_category_id', 'is_variant', 'is_imei',
-        'tax_method', 'image', 'brand_id', 'is_active', 'note', 'type', 'promotional_price',
-        'promotional_start_date',
-        'promotional_end_date',
+        'stock_alert', 'category_id', 'is_imei',
+        'tax_method', 'image', 'brand_id', 'is_active', 'note', 'type',
+        'tax_net',
     ];
 
     protected $casts = [
         'category_id' => 'integer',
-        'sub_category_id' => 'integer',
         'unit_id' => 'integer',
         'unit_sale_id' => 'integer',
         'unit_purchase_id' => 'integer',
-        'is_variant' => 'integer',
-        'is_imei' => 'integer',
         'brand_id' => 'integer',
         'is_active' => 'integer',
         'cost' => 'double',
         'price' => 'double',
         'stock_alert' => 'double',
-        'TaxNet' => 'double',
-        'promotional_price' => 'double',
-
+        'tax_net' => 'double',
+        'is_imei' => 'boolean',
+        'promotional_start_date' => 'date:Y-m-d',
+        'promotional_end_date' => 'date:Y-m-d',
     ];
-
-
-    protected $appends = ['active_price'];
 
     public function ProductVariant()
     {
         return $this->belongsTo('App\Models\ProductVariant');
+    }
+
+    public function variants(): HasMany
+    {
+        return $this->hasMany('App\Models\ProductVariant');
+    }
+
+    public function warehouses(): HasMany
+    {
+        return $this->hasMany(ProductWarehouse::class);
     }
 
     public function PurchaseDetail()
@@ -70,7 +79,7 @@ class Product extends Model
 
     public function unit()
     {
-        return $this->belongsTo('App\Models\Unit', 'unit_id');
+        return $this->belongsTo(Unit::class);
     }
 
     public function unitPurchase()
@@ -80,26 +89,12 @@ class Product extends Model
 
     public function unitSale()
     {
-        return $this->belongsTo('App\Models\Unit', 'unit_sale_id');
+        return $this->belongsTo(Unit::class, 'unit_sale_id');
     }
 
     public function brand()
     {
         return $this->belongsTo('App\Models\Brand');
-    }
-
-    public function getActivePrice()
-    {
-
-        // if promotional price is not null and start date and end date is not null and within the range
-        if ($this->promotional_price != null && $this->promotional_start_date != null && $this->promotional_end_date != null) {
-            $today = date('Y-m-d');
-            if ($today >= $this->promotional_start_date && $today <= $this->promotional_end_date) {
-                return $this->promotional_price;
-            }
-        }
-
-        return $this->price;
     }
 
     public function check_code_exist($code)
@@ -122,16 +117,35 @@ class Product extends Model
         }
     }
 
+    public static function newFactory()
+    {
+        return ProductFactory::new();
+    }
+
+    // region Accessors
+
+    public function getIsVariantAttribute()
+    {
+        return $this->type === "is_variant";
+    }
+
+    // endregion
+
     // region scopes
 
     public function scopeSearch(Builder $query, ?string $search)
     {
         return $search ?
             $query->where('products.name', 'LIKE', "%{$search}%")
-            ->orWhere('products.code', 'LIKE', "%{$search}%")
-            ->orWhere(fn($query) => $query->whereHas('category', fn($q) => $q->where('name', 'LIKE', "%{$search}%")))
-            ->orWhere(fn($query) => $query->whereHas('brand', fn($q) => $q->where('name', 'LIKE', "%{$search}%"))) :
+                ->orWhere('products.code', 'LIKE', "%{$search}%")
+                ->orWhere(fn($query) => $query->whereHas('category', fn($q) => $q->where('categories.name', 'LIKE', "%{$search}%")))
+                ->orWhere(fn($query) => $query->whereHas('brand', fn($q) => $q->where('brands.name', 'LIKE', "%{$search}%")))
+                ->orWhere(fn($query) => $query->whereHas('variants', fn($q) => $q->where('product_variants.name', 'LIKE', "%{$search}%")
+                    ->orWhere('product_variants.code', 'LIKE', "%{$search}%"))) :
             $query;
+    }
+    public function scopeActive(Builder $query){
+        return $query->where('is_active', true);
     }
 
     // endregion
@@ -140,24 +154,12 @@ class Product extends Model
 
     public function getUnitPurchaseCost()
     {
-        if (!$this->unitPurchase) {
-            return 0;
-        }
-
-        return $this->unitPurchase->operator == '/' ?
-            $this->cost / $this->unitPurchase->operator_value :
-            $this->cost * $this->unitPurchase->operator_value;
+        return GetUnitCostAndPrice::getUnitAmount($this->cost, $this->unitPurchase);
     }
 
     public function getUnitPrice()
     {
-        if (!$this->unitSale) {
-            return $this->price;
-        }
-
-        return $this->unitSale->operator == '/' ?
-            $this->price / $this->unitSale->operator_value :
-            $this->price * $this->unitSale->operator_value;
+        return GetUnitCostAndPrice::getUnitAmount($this->price, $this->unitSale, $this->price);
     }
 
     public function removeImages(): void

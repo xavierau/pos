@@ -4,13 +4,14 @@ namespace App\Models;
 
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, Notifiable, HasFactory;
+    use HasApiTokens, Notifiable, HasFactory, SoftDeletes;
 
     protected $dates = ['deleted_at'];
 
@@ -20,7 +21,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'firstname', 'lastname', 'username', 'email', 'password', 'phone', 'status', 'avatar', 'role_id', 'is_all_warehouses'
+        'firstname', 'lastname', 'username', 'email', 'password', 'phone', 'is_active', 'avatar', 'is_all_warehouses'
     ];
 
     /**
@@ -39,14 +40,13 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'role_id' => 'integer',
-        'status' => 'integer',
-        'is_all_warehouses' => 'integer',
+        'is_active' => 'boolean',
+        'is_all_warehouses' => 'boolean',
     ];
 
     public function oauthAccessToken()
     {
-        return $this->hasMany('\App\Models\OauthAccessToken');
+        return $this->hasMany(related: OauthAccessToken::class);
     }
 
     public function roles()
@@ -69,7 +69,7 @@ class User extends Authenticatable
 
     public function assignedWarehouses()
     {
-        return $this->belongsToMany('App\Models\Warehouse');
+        return $this->belongsToMany(related: Warehouse::class);
     }
 
     protected static function newFactory()

@@ -15,6 +15,23 @@ import '@trevoreyre/autocomplete-vue/dist/style.css';
 import Breadcumb from "./components/breadcumb";
 import {i18n} from "./plugins/i18n";
 
+Date.prototype.addDays = function (days) {
+    const date = new Date(this.valueOf());
+    date.setDate(date.getDate() + days);
+    return date;
+}
+
+Date.prototype.addDays = function (days) {
+    const date = new Date(this.valueOf());
+    date.setDate(date.getDate() + days);
+    return date;
+}
+
+Date.prototype.toDate = function (days) {
+    const date = new Date(this.valueOf());
+    return date.toISOString().split('T')[0]
+}
+
 window.auth = new Auth();
 
 localize({
@@ -40,7 +57,6 @@ Vue.component("ValidationObserver", ValidationObserver);
 Vue.component('ValidationProvider', ValidationProvider);
 
 Vue.use(StockyKit);
-
 Vue.use(VueCookies);
 
 var VueCookie = require('vue-cookie');
@@ -59,7 +75,9 @@ axios.interceptors.response.use((response) => {
 }, (error) => {
     if (error.response && error.response.data) {
         if (error.response.status === 401) {
-            window.location.href = '/login';
+
+            console.log('401 error', error)
+            // window.location.href = '/login';
         }
         if (error.response.status === 404) {
             router.push({name: 'NotFound'});
@@ -67,10 +85,8 @@ axios.interceptors.response.use((response) => {
         if (error.response.status === 403) {
             router.push({name: 'not_authorize'});
         }
-
-        return Promise.reject(error.response.data);
     }
-    return Promise.reject(error.message);
+    return Promise.reject(error.response.data ?? error.message);
 });
 
 Vue.component('v-select', vSelect)
@@ -90,4 +106,7 @@ new Vue({
     i18n,
     render: h => h(App),
 }).$mount("#app");
+
+
+
 

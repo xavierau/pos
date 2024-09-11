@@ -128,10 +128,10 @@ return [
     | Stripe Key
     |--------------------------------------------------------------------------
     |
-    | 
+    |
     |
      */
-    
+
     'STRIPE_KEY' => env('STRIPE_KEY'),
     'STRIPE_SECRET' => env('STRIPE_SECRET'),
 
@@ -187,11 +187,8 @@ return [
         App\Providers\AuthServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
-        Barryvdh\DomPDF\ServiceProvider::class,
         Maatwebsite\Excel\ExcelServiceProvider::class,
-        Intervention\Image\ImageServiceProvider::class,
         Nwidart\Modules\LaravelModulesServiceProvider::class,
-        Nexmo\Laravel\NexmoServiceProvider::class,
     ],
 
     /*
