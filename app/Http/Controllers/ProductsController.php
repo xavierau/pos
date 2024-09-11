@@ -113,13 +113,13 @@ class ProductsController extends BaseController
                 $product_warehouse_total_qty = ProductWarehouse::where('product_id', $product->id)
                     ->sum('qty');
 
-                $item['quantity'] = $product_warehouse_total_qty . ' ' . $product['unit']->short_name;
+                $item['qty'] = $product_warehouse_total_qty . ' ' . $product['unit']->short_name;
 
             } else {
                 $item['type'] = 'Service';
                 $item['name'] = $product->name;
                 $item['cost'] = '----';
-                $item['quantity'] = '----';
+                $item['qty'] = '----';
                 $item['unit'] = '----';
 
                 $item['price'] = number_format($product->price, 2, '.', ',');
@@ -682,7 +682,7 @@ class ProductsController extends BaseController
                         $item['code'] = $product_warehouse['product']->code;
                         $item['name'] = $product_warehouse['product']->name;
                     }
-                    $item['quantity'] = $product_warehouse->qty;
+                    $item['qty'] = $product_warehouse->qty;
                     $item['warehouse'] = $product_warehouse['warehouse']->name;
                     $item['stock_alert'] = $product_warehouse['product']->stock_alert;
                     $data[] = $item;
@@ -1123,7 +1123,7 @@ class ProductsController extends BaseController
                 $item['product_name'] = $product->name;
             }
 
-            $item['quantity'] = $product->qty === 0.0 ? '0' : $product->qty;
+            $item['qty'] = $product->qty === 0.0 ? '0' : $product->qty;
 
 
             $stock[] = $item;
