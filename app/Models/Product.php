@@ -129,6 +129,11 @@ class Product extends Model
         return $this->type === "is_variant";
     }
 
+    public function getQtyAttribute()
+    {
+        return $this->warehouses->sum('qty');
+    }
+
     // endregion
 
     // region scopes

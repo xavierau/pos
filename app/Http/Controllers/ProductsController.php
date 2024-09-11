@@ -86,11 +86,7 @@ class ProductsController extends BaseController
                 $item['price'] = $product->price;
                 $item['unit'] = $product['unit']->short_name;
 
-                $product_warehouse_total_qty =
-                    ProductWarehouse::where('product_id', $product->id)
-                        ->sum('qty');
-
-                $item['qty'] = $product_warehouse_total_qty . ' ' . $product['unit']->short_name;
+                $item['qty'] = $product->qty . ' ' . $product['unit']->short_name;
 
             } elseif ($product->type == 'is_variant') {
 
@@ -110,10 +106,7 @@ class ProductsController extends BaseController
                     $item['name'] .= '<br>';
                 }
 
-                $product_warehouse_total_qty = ProductWarehouse::where('product_id', $product->id)
-                    ->sum('qty');
-
-                $item['qty'] = $product_warehouse_total_qty . ' ' . $product['unit']->short_name;
+                $item['qty'] =  $product->qty . ' ' . $product['unit']->short_name;
 
             } else {
                 $item['type'] = 'Service';
