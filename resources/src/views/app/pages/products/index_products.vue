@@ -406,7 +406,7 @@ export default {
         },
         {
           label: this.$t("Quantity"),
-          field: "quantity",
+          field: "qty",
           tdClass: "text-left",
           thClass: "text-left"
         },
@@ -437,7 +437,7 @@ export default {
           { title: "cost", dataKey: "cost" },
           { title: "price", dataKey: "price" },
           { title: "unit", dataKey: "unit" },
-          { title: "quantity", dataKey: "quantity" }
+          { title: "quantity", dataKey: "qty" }
         ];
 
        // Create a copy of self.reports for PDF generation

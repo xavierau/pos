@@ -90,7 +90,7 @@ class ProductsController extends BaseController
                     ProductWarehouse::where('product_id', $product->id)
                         ->sum('qty');
 
-                $item['quantity'] = $product_warehouse_total_qty . ' ' . $product['unit']->short_name;
+                $item['qty'] = $product_warehouse_total_qty . ' ' . $product['unit']->short_name;
 
             } elseif ($product->type == 'is_variant') {
 
