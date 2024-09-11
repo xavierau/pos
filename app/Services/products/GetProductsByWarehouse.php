@@ -27,6 +27,8 @@ class GetProductsByWarehouse
             )
             ->get();
 
+
+
         return $product_warehouse_data->reduce(function ($carry, $pw) use ($product_warehouse_data) {
 
             if ($pw->productVariant) {

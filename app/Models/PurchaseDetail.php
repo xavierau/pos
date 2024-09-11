@@ -8,7 +8,7 @@ class PurchaseDetail extends Model
 {
 
     protected $fillable = [
-        'id', 'purchase_id', 'purchase_unit_id', 'quantity', 'product_id', 'total', 'product_variant_id',
+        'id', 'purchase_id', 'purchase_unit_id', 'qty', 'product_id', 'total', 'product_variant_id',
         'cost', 'tax_net', 'discount', 'discount_method', 'tax_method',
     ];
 
@@ -17,7 +17,7 @@ class PurchaseDetail extends Model
         'cost' => 'double',
         'tax_net' => 'double',
         'discount' => 'double',
-        'quantity' => 'double',
+        'qty' => 'double',
         'purchase_id' => 'integer',
         'purchase_unit_id' => 'integer',
         'product_id' => 'integer',

@@ -114,7 +114,7 @@
                                                 {{ $t('IMEI_SN') }} : {{ detail.imei_number }}</p>
                                         </td>
                                         <td>{{ currentUser.currency }} {{ formatNumber(detail.net_cost, 3) }}</td>
-                                        <td>{{ formatNumber(detail.quantity, 2) }} {{ detail.unit_purchase }}</td>
+                                        <td>{{ formatNumber(detail.qty, 2) }} {{ detail.unit_purchase }}</td>
                                         <td>{{ currentUser.currency }} {{ formatNumber(detail.cost, 2) }}</td>
                                         <td>{{ currentUser.currency }} {{ formatNumber(detail.discount_net, 2) }}</td>
                                         <td>{{ currentUser.currency }} {{ formatNumber(detail.tax, 2) }}</td>
@@ -148,7 +148,7 @@
                                     <td>
                       <span
                           class="font-weight-bold"
-                      >{{ currentUser.currency }} {{ purchase.GrandTotal }}</span>
+                      >{{ currentUser.currency }} {{ purchase.grand_total }}</span>
                                     </td>
                                 </tr>
                                 <tr>
@@ -211,7 +211,7 @@ export default {
                 subject: "",
                 message: "",
                 supplier_name: "",
-                Purchase_Ref: ""
+                purchase_ref: ""
             }
         };
     },

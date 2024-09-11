@@ -328,7 +328,7 @@ export default {
                 id: "",
                 code: "",
                 stock: "",
-                quantity: 1,
+                qty: 1,
                 discount: "",
                 discount_net: "",
                 discount_method: "",
@@ -391,7 +391,7 @@ export default {
                 this.detail.tax_method = detail.tax_method;
                 this.detail.discount_method = detail.discount_method;
                 this.detail.discount = detail.discount;
-                this.detail.quantity = detail.quantity;
+                this.detail.qty = detail.qty;
                 this.detail.tax_percent = detail.tax_percent;
                 this.detail.is_imei = detail.is_imei;
                 this.detail.imei_number = detail.imei_number;
@@ -412,7 +412,7 @@ export default {
                 if (this.details[i].detail_id === this.detail.detail_id) {
                     this.details[i].tax_percent = this.detail.tax_percent;
                     this.details[i].unit_cost = this.detail.unit_cost;
-                    this.details[i].quantity = this.detail.quantity;
+                    this.details[i].qty = this.detail.qty;
                     this.details[i].tax_method = this.detail.tax_method;
                     this.details[i].discount_method = this.detail.discount_method;
                     this.details[i].discount = this.detail.discount;
@@ -508,7 +508,7 @@ export default {
                 this.makeWarningToast("AlreadyAdd");
             } else {
                 this.product.code = result.code;
-                this.product.quantity = 1;
+                this.product.qty = 1;
                 this.product.no_unit = 1;
                 this.product.stock = result.qte_purchase;
                 this.product.product_variant_id = result.product_variant_id;
@@ -559,8 +559,8 @@ export default {
         verifyQty(detail, id) {
             for (let i = 0; i < this.details.length; i++) {
                 if (this.details[i].detail_id === id) {
-                    if (isNaN(detail.quantity)) {
-                        this.details[i].quantity = 1;
+                    if (isNaN(detail.qty)) {
+                        this.details[i].qty = 1;
                     }
                     this.calculateTotal();
                     this.$forceUpdate();
@@ -573,7 +573,7 @@ export default {
         increment(detail, id) {
             for (let i = 0; i < this.details.length; i++) {
                 if (this.details[i].detail_id === id) {
-                    this.formatNumber(this.details[i].quantity++, 2);
+                    this.formatNumber(this.details[i].qty++, 2);
                 }
             }
             this.$forceUpdate();
@@ -585,8 +585,8 @@ export default {
         decrement(detail, id) {
             for (let i = 0; i < this.details.length; i++) {
                 if (this.details[i].detail_id === id) {
-                    if (detail.quantity - 1 > 0) {
-                        this.formatNumber(this.details[i].quantity--, 2);
+                    if (detail.qty - 1 > 0) {
+                        this.formatNumber(this.details[i].qty--, 2);
                     }
                 }
             }
@@ -605,8 +605,11 @@ export default {
         calculateTotal() {
             this.total = 0;
             for (let i = 0; i < this.details.length; i++) {
-                let tax = this.details[i].tax * this.details[i].quantity;
-                this.details[i].subtotal = parseFloat(this.details[i].quantity * this.details[i].net_cost + tax);
+                let tax = this.details[i].tax * this.details[i].qty;
+                this.details[i].subtotal = parseFloat(this.details[i].qty * this.details[i].net_cost + tax);
+
+                console.log('subtotal: ', this.details[i], this.details[i].subtotal, this.details[i].qty, this.details[i].net_cost , this.details[i].tax)
+
                 this.total += parseFloat(this.details[i].subtotal);
             }
 
@@ -647,7 +650,7 @@ export default {
             return true;
         },
         hasInvalidDetailQty() {
-            return this.details.includes(detail => isNotANumber(detail.quantity) || detail.quantity <= 0)
+            return this.details.includes(detail => isNotANumber(detail.qty) || detail.qty <= 0)
         },
 
         //--------------------------------- Update Purchase -------------------------\\

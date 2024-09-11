@@ -630,7 +630,7 @@ class ProductsController extends BaseController
             is_sale: $request->is_sale == '1',
             stock: $request->stock,
             product_service: $request->product_service,
-            included_empty_stock: $request->included_empty_stock || false
+            included_empty_stock: $request->included_empty_stock || true
         ));
 
         return response()->json($data);
@@ -894,7 +894,7 @@ class ProductsController extends BaseController
                 $cleanedRow = [];
                 foreach ($row as $key => $value) {
                     $cleanedKey = trim($key);
-                    $cleanedRow[$cleanedKey] = $value;
+                    $cleanedRow[$cleanedKey] = trim($value);
                 }
                 $cleanedData[] = $cleanedRow;
             }
@@ -942,7 +942,8 @@ class ProductsController extends BaseController
 
                         if ($value['brand'] != 'N/A' && $value['brand'] != '') {
                             $brand = Brand::whereNull('deleted_at')
-                                ->firstOrCreate(['name' => $value['brand']]);
+                                ->firstOrCreate(['name' => trim($value['brand'])]);
+
                             $brand_id = $brand->id;
                         } else {
                             $brand_id = NULL;

@@ -203,7 +203,7 @@ class PurchasesController extends BaseController
                 $unit = Unit::where('id', $value['purchase_unit_id'])->first();
                 $orderDetails[] = [
                     'purchase_id' => $order->id,
-                    'quantity' => $value['quantity'],
+                    'qty' => $value['qty'],
                     'cost' => $value['unit_cost'],
                     'purchase_unit_id' => $value['purchase_unit_id'],
                     'tax_net' => $value['tax_percent'],
@@ -226,9 +226,9 @@ class PurchasesController extends BaseController
 
                         if ($unit && $product_warehouse) {
                             if ($unit->operator == '/') {
-                                $product_warehouse->qte += $value['quantity'] / $unit->operator_value;
+                                $product_warehouse->qty += $value['qty'] / $unit->operator_value;
                             } else {
-                                $product_warehouse->qte += $value['quantity'] * $unit->operator_value;
+                                $product_warehouse->qty += $value['qty'] * $unit->operator_value;
                             }
                             $product_warehouse->save();
                         }
@@ -241,9 +241,9 @@ class PurchasesController extends BaseController
 
                         if ($unit && $product_warehouse) {
                             if ($unit->operator == '/') {
-                                $product_warehouse->qte += $value['quantity'] / $unit->operator_value;
+                                $product_warehouse->qty += $value['qty'] / $unit->operator_value;
                             } else {
-                                $product_warehouse->qte += $value['quantity'] * $unit->operator_value;
+                                $product_warehouse->qty += $value['qty'] * $unit->operator_value;
                             }
                             $product_warehouse->save();
                         }
@@ -319,9 +319,9 @@ class PurchasesController extends BaseController
 
                                 if ($unit && $product_warehouse) {
                                     if ($unit->operator == '/') {
-                                        $product_warehouse->qte -= $value['quantity'] / $unit->operator_value;
+                                        $product_warehouse->qty -= $value['qty'] / $unit->operator_value;
                                     } else {
-                                        $product_warehouse->qte -= $value['quantity'] * $unit->operator_value;
+                                        $product_warehouse->qty -= $value['qty'] * $unit->operator_value;
                                     }
 
                                     $product_warehouse->save();
@@ -335,9 +335,9 @@ class PurchasesController extends BaseController
 
                                 if ($unit && $product_warehouse) {
                                     if ($unit->operator == '/') {
-                                        $product_warehouse->qte -= $value['quantity'] / $unit->operator_value;
+                                        $product_warehouse->qty -= $value['qty'] / $unit->operator_value;
                                     } else {
-                                        $product_warehouse->qte -= $value['quantity'] * $unit->operator_value;
+                                        $product_warehouse->qty -= $value['qty'] * $unit->operator_value;
                                     }
 
                                     $product_warehouse->save();
@@ -371,9 +371,9 @@ class PurchasesController extends BaseController
 
                                 if ($unit_prod && $product_warehouse) {
                                     if ($unit_prod->operator == '/') {
-                                        $product_warehouse->qte += $prod_detail['quantity'] / $unit_prod->operator_value;
+                                        $product_warehouse->qty += $prod_detail['qty'] / $unit_prod->operator_value;
                                     } else {
-                                        $product_warehouse->qte += $prod_detail['quantity'] * $unit_prod->operator_value;
+                                        $product_warehouse->qty += $prod_detail['qty'] * $unit_prod->operator_value;
                                     }
 
                                     $product_warehouse->save();
@@ -387,9 +387,9 @@ class PurchasesController extends BaseController
 
                                 if ($unit_prod && $product_warehouse) {
                                     if ($unit_prod->operator == '/') {
-                                        $product_warehouse->qte += $prod_detail['quantity'] / $unit_prod->operator_value;
+                                        $product_warehouse->qty += $prod_detail['qty'] / $unit_prod->operator_value;
                                     } else {
-                                        $product_warehouse->qte += $prod_detail['quantity'] * $unit_prod->operator_value;
+                                        $product_warehouse->qty += $prod_detail['qty'] * $unit_prod->operator_value;
                                     }
 
                                     $product_warehouse->save();
@@ -405,7 +405,7 @@ class PurchasesController extends BaseController
                         $orderDetails['tax_method'] = $prod_detail['tax_method'];
                         $orderDetails['discount'] = $prod_detail['discount'];
                         $orderDetails['discount_method'] = $prod_detail['discount_method'];
-                        $orderDetails['quantity'] = $prod_detail['quantity'];
+                        $orderDetails['qty'] = $prod_detail['qty'];
                         $orderDetails['product_id'] = $prod_detail['product_id'];
                         $orderDetails['product_variant_id'] = $prod_detail['product_variant_id'];
                         $orderDetails['total'] = $prod_detail['subtotal'];
@@ -490,9 +490,9 @@ class PurchasesController extends BaseController
 
                             if ($unit && $product_warehouse) {
                                 if ($unit->operator == '/') {
-                                    $product_warehouse->qte -= $value['quantity'] / $unit->operator_value;
+                                    $product_warehouse->qty -= $value['qty'] / $unit->operator_value;
                                 } else {
-                                    $product_warehouse->qte -= $value['quantity'] * $unit->operator_value;
+                                    $product_warehouse->qty -= $value['qty'] * $unit->operator_value;
                                 }
 
                                 $product_warehouse->save();
@@ -506,9 +506,9 @@ class PurchasesController extends BaseController
 
                             if ($unit && $product_warehouse) {
                                 if ($unit->operator == '/') {
-                                    $product_warehouse->qte -= $value['quantity'] / $unit->operator_value;
+                                    $product_warehouse->qty -= $value['qty'] / $unit->operator_value;
                                 } else {
-                                    $product_warehouse->qte -= $value['quantity'] * $unit->operator_value;
+                                    $product_warehouse->qty -= $value['qty'] * $unit->operator_value;
                                 }
 
                                 $product_warehouse->save();
@@ -590,9 +590,9 @@ class PurchasesController extends BaseController
 
                                 if ($unit && $product_warehouse) {
                                     if ($unit->operator == '/') {
-                                        $product_warehouse->qte -= $value['quantity'] / $unit->operator_value;
+                                        $product_warehouse->qty -= $value['qty'] / $unit->operator_value;
                                     } else {
-                                        $product_warehouse->qte -= $value['quantity'] * $unit->operator_value;
+                                        $product_warehouse->qty -= $value['qty'] * $unit->operator_value;
                                     }
 
                                     $product_warehouse->save();
@@ -606,9 +606,9 @@ class PurchasesController extends BaseController
 
                                 if ($unit && $product_warehouse) {
                                     if ($unit->operator == '/') {
-                                        $product_warehouse->qte -= $value['quantity'] / $unit->operator_value;
+                                        $product_warehouse->qty -= $value['qty'] / $unit->operator_value;
                                     } else {
-                                        $product_warehouse->qte -= $value['quantity'] * $unit->operator_value;
+                                        $product_warehouse->qty -= $value['qty'] * $unit->operator_value;
                                     }
 
                                     $product_warehouse->save();
@@ -717,7 +717,7 @@ class PurchasesController extends BaseController
                 $data['name'] = $detail['product']['name'];
             }
 
-            $data['quantity'] = $detail->quantity;
+            $data['qty'] = $detail->qty;
             $data['total'] = $detail->total;
             $data['cost'] = $detail->cost;
             $data['unit_purchase'] = $unit->short_name;
@@ -856,7 +856,7 @@ class PurchasesController extends BaseController
             }
 
             $data['detail_id'] = $detail_id += 1;
-            $data['quantity'] = number_format($detail->quantity, 2, '.', '');
+            $data['qty'] = number_format($detail->qty, 2, '.', '');
             $data['total'] = number_format($detail->total, 2, '.', '');
             $data['unit_purchase'] = $unit->short_name;
             $data['cost'] = number_format($detail->cost, 2, '.', '');
@@ -1010,9 +1010,9 @@ class PurchasesController extends BaseController
                     $data['product_variant_id'] = $detail->product_variant_id;
 
                     if ($unit && $unit->operator == '/') {
-                        $data['stock'] = $item_product ? $item_product->qte * $unit->operator_value : 0;
+                        $data['stock'] = $item_product ? $item_product->qty * $unit->operator_value : 0;
                     } else if ($unit && $unit->operator == '*') {
-                        $data['stock'] = $item_product ? $item_product->qte / $unit->operator_value : 0;
+                        $data['stock'] = $item_product ? $item_product->qty / $unit->operator_value : 0;
                     } else {
                         $data['stock'] = 0;
                     }
@@ -1030,9 +1030,9 @@ class PurchasesController extends BaseController
 
 
                     if ($unit && $unit->operator == '/') {
-                        $data['stock'] = $item_product ? $item_product->qte * $unit->operator_value : 0;
+                        $data['stock'] = $item_product ? $item_product->qty * $unit->operator_value : 0;
                     } else if ($unit && $unit->operator == '*') {
-                        $data['stock'] = $item_product ? $item_product->qte / $unit->operator_value : 0;
+                        $data['stock'] = $item_product ? $item_product->qty / $unit->operator_value : 0;
                     } else {
                         $data['stock'] = 0;
                     }
@@ -1041,7 +1041,7 @@ class PurchasesController extends BaseController
 
                 $data['id'] = $detail->id;
                 $data['detail_id'] = $detail_id += 1;
-                $data['quantity'] = $detail->quantity;
+                $data['qty'] = $detail->qty;
                 $data['product_id'] = $detail->product_id;
                 $data['unitPurchase'] = $unit->short_name;
                 $data['purchase_unit_id'] = $unit->id;
@@ -1065,11 +1065,11 @@ class PurchasesController extends BaseController
                 if ($detail->tax_method == '1') {
                     $data['net_cost'] = $detail->cost - $data['discount_net'];
                     $data['tax'] = $tax_cost;
-                    $data['subtotal'] = ($data['net_cost'] * $data['quantity']) + ($tax_cost * $data['quantity']);
+                    $data['subtotal'] = ($data['net_cost'] * $data['qty']) + ($tax_cost * $data['qty']);
                 } else {
                     $data['net_cost'] = ($detail->cost - $data['discount_net']) / (($detail->tax_net / 100) + 1);
                     $data['tax'] = $detail->cost - $data['net_cost'] - $data['discount_net'];
-                    $data['subtotal'] = ($data['net_cost'] * $data['quantity']) + ($tax_cost * $data['quantity']);
+                    $data['subtotal'] = ($data['net_cost'] * $data['qty']) + ($tax_cost * $data['qty']);
                 }
 
                 $details[] = $data;
@@ -1156,9 +1156,9 @@ class PurchasesController extends BaseController
                 $data['product_variant_id'] = $detail->product_variant_id;
 
                 if ($unit && $unit->operator == '/') {
-                    $data['stock'] = $item_product ? $item_product->qte * $unit->operator_value : 0;
+                    $data['stock'] = $item_product ? $item_product->qty * $unit->operator_value : 0;
                 } else if ($unit && $unit->operator == '*') {
-                    $data['stock'] = $item_product ? $item_product->qte / $unit->operator_value : 0;
+                    $data['stock'] = $item_product ? $item_product->qty / $unit->operator_value : 0;
                 } else {
                     $data['stock'] = 0;
                 }
@@ -1175,9 +1175,9 @@ class PurchasesController extends BaseController
 
 
                 if ($unit && $unit->operator == '/') {
-                    $data['stock'] = $item_product ? $item_product->qte * $unit->operator_value : 0;
+                    $data['stock'] = $item_product ? $item_product->qty * $unit->operator_value : 0;
                 } else if ($unit && $unit->operator == '*') {
-                    $data['stock'] = $item_product ? $item_product->qte / $unit->operator_value : 0;
+                    $data['stock'] = $item_product ? $item_product->qty / $unit->operator_value : 0;
                 } else {
                     $data['stock'] = 0;
                 }
@@ -1186,8 +1186,8 @@ class PurchasesController extends BaseController
 
             $data['id'] = $detail->id;
             $data['detail_id'] = $detail_id += 1;
-            $data['quantity'] = $detail->quantity;
-            $data['purchase_quantity'] = $detail->quantity;
+            $data['qty'] = $detail->qty;
+            $data['purchase_qty'] = $detail->qty;
             $data['product_id'] = $detail->product_id;
             $data['unitPurchase'] = $unit->short_name;
             $data['purchase_unit_id'] = $unit->id;
@@ -1211,11 +1211,11 @@ class PurchasesController extends BaseController
             if ($detail->tax_method == '1') {
                 $data['net_cost'] = $detail->cost - $data['discount_net'];
                 $data['tax'] = $tax_cost;
-                $data['subtotal'] = ($data['net_cost'] * $data['quantity']) + ($tax_cost * $data['quantity']);
+                $data['subtotal'] = ($data['net_cost'] * $data['qty']) + ($tax_cost * $data['qty']);
             } else {
                 $data['net_cost'] = ($detail->cost - $data['discount_net']) / (($detail->tax_net / 100) + 1);
                 $data['tax'] = $detail->cost - $data['net_cost'] - $data['discount_net'];
-                $data['subtotal'] = ($data['net_cost'] * $data['quantity']) + ($tax_cost * $data['quantity']);
+                $data['subtotal'] = ($data['net_cost'] * $data['qty']) + ($tax_cost * $data['qty']);
             }
 
             $details[] = $data;

@@ -131,7 +131,7 @@
                             >{{ detail.stock }} {{ detail.unitPurchase }}</span>
                                                 </td>
                                                 <td>
-                                                    <div class="quantity">
+                                                    <div class="qty">
                                                         <b-input-group>
                                                             <b-input-group-prepend>
                                   <span
@@ -143,7 +143,7 @@
                                                                 class="form-control"
                                                                 @keyup="Verified_Qty(detail,detail.detail_id)"
                                                                 :min="0.00"
-                                                                v-model.number="detail.quantity"
+                                                                v-model.number="detail.qty"
                                                             >
                                                             <b-input-group-append>
                                   <span
@@ -156,12 +156,12 @@
                                                 </td>
                                                 <td>{{ currentUser.currency }} {{
                                                         formatNumber(detail.discount_net *
-                                                            detail.quantity, 2)
+                                                            detail.qty, 2)
                                                     }}
                                                 </td>
                                                 <td>{{ currentUser.currency }} {{
-                                                        formatNumber(detail.taxe *
-                                                            detail.quantity, 2)
+                                                        formatNumber(detail.tax *
+                                                            detail.qty, 2)
                                                     }}
                                                 </td>
                                                 <td>{{ currentUser.currency }} {{ detail.subtotal.toFixed(2) }}</td>
@@ -517,7 +517,7 @@ export default {
             details: [],
             units: [],
             detail: {
-                quantity: "",
+                qty: "",
                 discount: "",
                 unit_cost: "",
                 discount_method: "",
@@ -544,7 +544,7 @@ export default {
                 id: "",
                 code: "",
                 stock: "",
-                quantity: 1,
+                qty: 1,
                 discount: "",
                 discount_net: "",
                 discount_method: "",
@@ -559,7 +559,7 @@ export default {
                 subtotal: "",
                 product_id: "",
                 detail_id: "",
-                taxe: "",
+                tax: "",
                 tax_percent: "",
                 tax_method: "",
                 product_variant_id: "",
@@ -636,7 +636,7 @@ export default {
             this.detail.stock = detail.stock;
             this.detail.discount_method = detail.discount_method;
             this.detail.discount = detail.discount;
-            this.detail.quantity = detail.quantity;
+            this.detail.qty = detail.qty;
             this.detail.tax_percent = detail.tax_percent;
             this.detail.is_imei = detail.is_imei;
             this.detail.imei_number = detail.imei_number;
@@ -694,7 +694,7 @@ export default {
                             this.details[i].unit_cost - this.details[i].discount_net
                         );
 
-                        this.details[i].taxe = parseFloat(
+                        this.details[i].tax = parseFloat(
                             (this.details[i].tax_percent *
                                 (this.details[i].unit_cost - this.details[i].discount_net)) /
                             100
@@ -706,7 +706,7 @@ export default {
                             (this.details[i].tax_percent / 100 + 1)
                         );
 
-                        this.details[i].taxe = parseFloat(
+                        this.details[i].tax = parseFloat(
                             this.details[i].unit_cost -
                             this.details[i].net_cost -
                             this.details[i].discount_net
@@ -748,7 +748,7 @@ export default {
             }
             if (this.purchase.warehouse_id !== "" && this.purchase.warehouse_id !== null) {
                 this.timer = setTimeout(() => {
-                    const product_filter = this.products.filter(product => product.code === this.search_input || product.barcode.includes(this.search_input));
+                    const product_filter = this.products.filter(product => product.code === this.search_input || product.barcode?.includes(this.search_input));
 
                     console.log("product_filter",product_filter)
                     if (product_filter.length === 1) {
@@ -757,7 +757,7 @@ export default {
                         this.product_filter = this.products.filter(product => (
                                 product.name.toLowerCase().includes(this.search_input.toLowerCase()) ||
                                 product.code.toLowerCase().includes(this.search_input.toLowerCase()) ||
-                                product.barcode.toLowerCase().includes(this.search_input.toLowerCase())
+                                product.barcode?.toLowerCase().includes(this.search_input.toLowerCase())
                             ));
                     }
                 }, 800);
@@ -791,11 +791,11 @@ export default {
 
             } else {
                 this.product.code = result.code;
-                this.product.quantity = 1;
+                this.product.qty = 1;
                 this.product.stock = result.qte_purchase;
                 this.product.fix_stock = result.qte;
                 this.product.product_variant_id = result.product_variant_id;
-                this.getProductDetails(result.id, result.product_variant_id);
+                this.getProductDetails(result.product_id, result.product_variant_id);
             }
 
             this.search_input = '';
@@ -846,8 +846,8 @@ export default {
         Verified_Qty(detail, id) {
             for (var i = 0; i < this.details.length; i++) {
                 if (this.details[i].detail_id == id) {
-                    if (isNaN(detail.quantity)) {
-                        this.details[i].quantity = 1;
+                    if (isNaN(detail.qty)) {
+                        this.details[i].qty = 1;
                     }
                     this.calculate_total();
                     this.$forceUpdate();
@@ -860,7 +860,7 @@ export default {
         increment(detail, id) {
             for (var i = 0; i < this.details.length; i++) {
                 if (this.details[i].detail_id == id) {
-                    this.formatNumber(this.details[i].quantity++, 2);
+                    this.formatNumber(this.details[i].qty++, 2);
                 }
             }
             this.$forceUpdate();
@@ -872,8 +872,8 @@ export default {
         decrement(detail, id) {
             for (var i = 0; i < this.details.length; i++) {
                 if (this.details[i].detail_id == id) {
-                    if (detail.quantity - 1 > 0) {
-                        this.formatNumber(this.details[i].quantity--, 2);
+                    if (detail.qty - 1 > 0) {
+                        this.formatNumber(this.details[i].qty--, 2);
                     }
                 }
             }
@@ -899,9 +899,9 @@ export default {
         calculate_total() {
             this.total = 0;
             for (var i = 0; i < this.details.length; i++) {
-                var tax = this.details[i].taxe * this.details[i].quantity;
+                var tax = this.details[i].tax * this.details[i].qty;
                 this.details[i].subtotal = parseFloat(
-                    this.details[i].quantity * this.details[i].net_cost + tax
+                    this.details[i].qty * this.details[i].net_cost + tax
                 );
                 this.total = parseFloat(this.total + this.details[i].subtotal);
             }
@@ -981,8 +981,8 @@ export default {
                 var count = 0;
                 for (var i = 0; i < this.details.length; i++) {
                     if (
-                        this.details[i].quantity == "" ||
-                        this.details[i].quantity === 0
+                        this.details[i].qty == "" ||
+                        this.details[i].qty === 0
                     ) {
                         count += 1;
                     }
@@ -1059,7 +1059,7 @@ export default {
                 this.product.name = response.data.name;
                 this.product.net_cost = response.data.net_cost;
                 this.product.unit_cost = response.data.unit_cost;
-                this.product.taxe = response.data.tax_cost;
+                this.product.tax = response.data.tax_cost;
                 this.product.tax_method = response.data.tax_method;
                 this.product.tax_percent = response.data.tax_percent;
                 this.product.unitPurchase = response.data.unitPurchase;

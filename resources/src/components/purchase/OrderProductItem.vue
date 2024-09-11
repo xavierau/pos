@@ -17,7 +17,7 @@ export default {
         events: () => PurchaseEvent,
         discount_amount() {
             if (this.detail.discount_method === '1') {
-                return this.formatNumber(this.detail.discount_net * this.detail.quantity, 2)
+                return this.formatNumber(this.detail.discount_net * this.detail.qty, 2)
             }
             return this.formatNumber(this.detail.discount_net)
         },
@@ -51,7 +51,7 @@ export default {
                         class="form-control"
                         @change="fire(events.VerifyItemQty,{...detail, quantity: parseFloat($event.target.value)})"
                         :min="0.00"
-                        v-model="detail.quantity"
+                        v-model="detail.qty"
                         :disabled="detail.del === 1 || detail.no_unit === 0"
                     >
                     <b-input-group-append>
@@ -64,7 +64,7 @@ export default {
             </div>
         </td>
         <td>{{ currentUser.currency }} {{ discount_amount }}</td>
-        <td>{{ currentUser.currency }} {{ formatNumber(detail.tax * detail.quantity, 2) }}</td>
+        <td>{{ currentUser.currency }} {{ formatNumber(detail.tax * detail.qty, 2) }}</td>
         <td>{{ currentUser.currency }} {{ detail.subtotal.toFixed(2) }}</td>
         <td v-show="detail.no_unit !== 0">
             <i v-if="currentUserPermissions && currentUserPermissions.includes('edit_product_purchase')"

@@ -23,7 +23,7 @@ class CreatePurchaseDetailsTable extends Migration {
 			$table->string('discount_method', 192)->default('1');
 
 			$table->decimal('total', 16, 3);
-			$table->decimal('quantity', 16, 3);
+			$table->decimal('qty', 16, 3);
 
             $table->unsignedBigInteger('purchase_id');
             $table->unsignedBigInteger('product_id');
