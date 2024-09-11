@@ -22,12 +22,12 @@ class ClientController extends BaseController
 
     //------------- Get ALL Customers -------------\\
 
-    public function index(request $request)
+    public function index(Request $request)
     {
         $this->authorizeForUser($request->user('api'), 'view', Client::class);
         // How many items do you want to display.
         $perPage = $request->limit;
-        $pageStart = Request::get('page', 1);
+        $pageStart = $request->get('page', 1);
         // Start displaying items from this number;
         $offSet = ($pageStart * $perPage) - $perPage;
         $order = $request->SortField;
