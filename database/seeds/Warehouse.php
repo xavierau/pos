@@ -24,16 +24,16 @@ class Warehouse extends Seeder
             ]
         ];
 
-        for ($i = 1; $i <= 3; $i++) {
-            $warehouses[] = [
-                'name' => 'Shop' . $i,
-                'city' => "Hong Kong",
-                'country' => "Hong Kong",
-                'mobile' => NULL,
-                'zip' => NULL,
-                'email' => NULL,
-            ];
-        }
+//        for ($i = 1; $i <= 3; $i++) {
+//            $warehouses[] = [
+//                'name' => 'Shop' . $i,
+//                'city' => "Hong Kong",
+//                'country' => "Hong Kong",
+//                'mobile' => NULL,
+//                'zip' => NULL,
+//                'email' => NULL,
+//            ];
+//        }
 
         WarehouseModel::insert($warehouses);
 

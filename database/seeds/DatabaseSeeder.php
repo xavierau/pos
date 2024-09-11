@@ -30,10 +30,10 @@ class DatabaseSeeder extends Seeder
             PermissionRoleSeeder::class,
             Warehouse::class,
             UnitsTableSeeder::class,
-            CategoriesTableSeeder::class,
-            BrandsTableSeeder::class,
-            ProductsTableSeeder::class,
-            ProvidersTableSeeder::class,
+//            CategoriesTableSeeder::class,
+//            BrandsTableSeeder::class,
+//            ProductsTableSeeder::class,
+//            ProvidersTableSeeder::class,
             AccountsTableSeeder::class,
         ]);
 

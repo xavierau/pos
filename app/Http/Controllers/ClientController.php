@@ -12,9 +12,9 @@ use App\Models\SaleReturn;
 use App\Models\Setting;
 use App\utils\Helper;
 use Carbon\Carbon;
-use DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class ClientController extends BaseController
@@ -27,7 +27,7 @@ class ClientController extends BaseController
         $this->authorizeForUser($request->user('api'), 'view', Client::class);
         // How many items do you want to display.
         $perPage = $request->limit;
-        $pageStart = \Request::get('page', 1);
+        $pageStart = Request::get('page', 1);
         // Start displaying items from this number;
         $offSet = ($pageStart * $perPage) - $perPage;
         $order = $request->SortField;
@@ -73,7 +73,7 @@ class ClientController extends BaseController
                 ->where('deleted_at', '=', null)
                 ->where('status', 'completed')
                 ->where('client_id', $client->id)
-                ->sum('GrandTotal');
+                ->sum('grand_total');
 
             $item['total_paid'] = DB::table('sales')
                 ->where('deleted_at', '=', null)
@@ -86,7 +86,7 @@ class ClientController extends BaseController
             $item['total_amount_return'] = DB::table('sale_returns')
                 ->where('deleted_at', '=', null)
                 ->where('client_id', $client->id)
-                ->sum('GrandTotal');
+                ->sum('grand_total');
 
             $item['total_paid_return'] = DB::table('sale_returns')
                 ->where('sale_returns.deleted_at', '=', null)
@@ -147,7 +147,7 @@ class ClientController extends BaseController
             'city' => $request['city'],
             'tax_number' => $request['tax_number'],
         ]);
-        return response()->json(['success' => true,'client_id' => $newClient->id]);
+        return response()->json(['success' => true, 'client_id' => $newClient->id]);
     }
 
     //------------ function show -----------\\
@@ -240,7 +240,7 @@ class ClientController extends BaseController
 
         $data['id'] = $client->id;
         $data['client_id'] = $client->client_id;
-        $item['name'] = $client->username;
+        $data['name'] = $client->username;
         $data['email'] = $client->email;
         $data['NewPassword'] = NULL;
 
@@ -263,7 +263,7 @@ class ClientController extends BaseController
             $rowcount = 0;
             if (($handle = fopen($file_upload, "r")) !== false) {
                 $max_line_length = defined('MAX_LINE_LENGTH') ? MAX_LINE_LENGTH : 10000;
-                $header = fgetcsv($handle, $max_line_length);
+                $header = array_map("trim", fgetcsv($handle, $max_line_length));
                 $header_colcount = count($header);
                 while (($row = fgetcsv($handle, $max_line_length)) !== false) {
                     $row_colcount = count($row);
@@ -292,12 +292,12 @@ class ClientController extends BaseController
                     Client::create([
                         'name' => $value['name'],
                         'code' => $this->getNumberOrder(),
-                        'address' => $value['address'] == '' ? null : $value['address'],
-                        'phone' => $value['phone'] == '' ? null : $value['phone'],
-                        'email' => $value['email'] == '' ? null : $value['email'],
-                        'country' => $value['country'] == '' ? null : $value['country'],
-                        'city' => $value['city'] == '' ? null : $value['city'],
-                        'tax_number' => $value['tax_number'] == '' ? null : $value['tax_number'],
+                        'address' => $value['address'] ?? null,
+                        'phone' => $value['phone'] ?? null,
+                        'email' => $value['email'] ?? null,
+                        'country' => $value['country'] ?? null,
+                        'city' => $value['city'] ?? null,
+                        'tax_number' => $value['tax_number'] ?? null,
                     ]);
 
                 }
@@ -332,7 +332,7 @@ class ClientController extends BaseController
             foreach ($client_sales_due as $key => $client_sale) {
                 if ($paid_amount_total == 0)
                     break;
-                $due = $client_sale->GrandTotal - $client_sale->paid_amount;
+                $due = $client_sale->grand_total - $client_sale->paid_amount;
 
                 if ($paid_amount_total >= $due) {
                     $amount = $due;
@@ -345,7 +345,7 @@ class ClientController extends BaseController
                 $payment_sale = new PaymentSale();
                 $payment_sale->sale_id = $client_sale->id;
                 $payment_sale->account_id = $request['account_id'] ? $request['account_id'] : NULL;
-                $payment_sale->Ref = PaymentSale::generateOrderNumber();
+                $payment_sale->ref = PaymentSale::generateOrderNumber();
                 $payment_sale->date = Carbon::now();
                 $payment_sale->Reglement = $request['Reglement'];
                 $payment_sale->montant = $amount;
@@ -394,7 +394,7 @@ class ClientController extends BaseController
             foreach ($client_sell_return_due as $key => $client_sale_return) {
                 if ($paid_amount_total == 0)
                     break;
-                $due = $client_sale_return->GrandTotal - $client_sale_return->paid_amount;
+                $due = $client_sale_return->grand_total - $client_sale_return->paid_amount;
 
                 if ($paid_amount_total >= $due) {
                     $amount = $due;
@@ -407,7 +407,7 @@ class ClientController extends BaseController
                 $payment_sale_return = new PaymentSaleReturns();
                 $payment_sale_return->sale_return_id = $client_sale_return->id;
                 $payment_sale_return->account_id = $request['account_id'] ? $request['account_id'] : NULL;
-                $payment_sale_return->Ref = app('App\Http\Controllers\PaymentSaleReturnsController')->getNumberOrder();
+                $payment_sale_return->ref = app('App\Http\Controllers\PaymentSaleReturnsController')->getNumberOrder();
                 $payment_sale_return->date = Carbon::now();
                 $payment_sale_return->Reglement = $request['Reglement'];
                 $payment_sale_return->montant = $amount;

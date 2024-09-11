@@ -370,7 +370,7 @@ class UserController extends BaseController
         $user = Auth::user();
         if ($request['id'] !== $user->id) {
             User::whereId($id)->update([
-                'status' => $request['status'],
+                'is_active' => $request['is_active'],
             ]);
             return response()->json([
                 'success' => true,

@@ -26,7 +26,7 @@ class SaleReturn extends Model
         'warehouse_id' => 'integer',
         'discount' => 'double',
         'shipping' => 'double',
-        'TaxNet' => 'double',
+        'tax_net' => 'double',
         'tax_rate' => 'double',
         'paid_amount' => 'double',
     ];

@@ -216,7 +216,7 @@
       <b-modal
         hide-footer
         size="md"
-        id="modal_Pay_due"
+        id="modal_pay_due"
         title="Pay Due"
       >
         <b-form @submit.prevent="submitPayment_sell_due">
@@ -252,7 +252,7 @@
                   <v-select
                     :class="{'is-invalid': !!errors.length}"
                     :state="errors[0] ? false : (valid ? true : null)"
-                    v-model="payment.Reglement"
+                    v-model="payment.type"
                     :reduce="label => label.value"
                     :placeholder="$t('PleaseSelect')"
                     :options="
@@ -352,7 +352,7 @@
                   <v-select
                     :class="{'is-invalid': !!errors.length}"
                     :state="errors[0] ? false : (valid ? true : null)"
-                    v-model="payment_return.Reglement"
+                    v-model="payment_return.type"
                     :reduce="label => label.value"
                     :placeholder="$t('PleaseSelect')"
                     :options="
@@ -440,7 +440,7 @@
 
                 <tbody>
                   <tr>
-                    <td style="text-align: left;" colspan="1">{{payment.Reglement}}</td>
+                    <td style="text-align: left;" colspan="1">{{payment.type}}</td>
                     <td
                       style="text-align: center;"
                       colspan="2"
@@ -489,7 +489,7 @@
 
                 <tbody>
                   <tr>
-                    <td style="text-align: left;" colspan="1">{{payment_return.Reglement}}</td>
+                    <td style="text-align: left;" colspan="1">{{payment_return.type}}</td>
                     <td
                       style="text-align: center;"
                       colspan="2"
@@ -913,7 +913,7 @@ export default {
         due: "",
         amount: "",
         notes: "",
-        Reglement: "",
+        type: "",
       },
        payment_return: {
         client_id: "",
@@ -923,7 +923,7 @@ export default {
         return_Due: "",
         amount: "",
         notes: "",
-        Reglement: "",
+        type: "",
       },
       company_info:{},
       selectedIds: [],
@@ -1642,7 +1642,7 @@ export default {
         due: "",
         amount: "",
         notes: "",
-        Reglement: "",
+        type: "",
       };
     },
 
@@ -1655,7 +1655,7 @@ export default {
       this.payment.due = row.due;
       this.payment.date = new Date().toISOString().slice(0, 10);
       setTimeout(() => {
-        this.$bvModal.show("modal_Pay_due");
+        this.$bvModal.show("modal_pay_due");
       }, 500);
 
     },
@@ -1684,7 +1684,7 @@ export default {
           client_id: this.payment.client_id,
           amount: this.payment.amount,
           notes: this.payment.notes,
-          Reglement: this.payment.Reglement,
+          type: this.payment.type,
           account_id: this.payment.account_id,
         })
         .then(response => {
@@ -1754,7 +1754,7 @@ export default {
         return_Due: "",
         amount: "",
         notes: "",
-        Reglement: "",
+        type: "",
       };
     },
 
@@ -1796,7 +1796,7 @@ export default {
           client_id: this.payment_return.client_id,
           amount: this.payment_return.amount,
           notes: this.payment_return.notes,
-          Reglement: this.payment_return.Reglement,
+          type: this.payment_return.type,
           account_id: this.payment_return.account_id,
         })
         .then(response => {
@@ -1851,7 +1851,7 @@ export default {
     Fire.$on("Event_pay_due", () => {
       setTimeout(() => {
         this.Get_Clients(this.serverParams.page);
-        this.$bvModal.hide("modal_Pay_due");
+        this.$bvModal.hide("modal_pay_due");
       }, 500);
        this.$bvModal.show("Show_invoice");
     });

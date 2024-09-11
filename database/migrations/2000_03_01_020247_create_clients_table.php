@@ -17,12 +17,13 @@ class CreateClientsTable extends Migration {
 		{
 			$table->id('id');
 			$table->string('name');
-			$table->integer('code');
-			$table->string('email', 192);
-			$table->string('country');
-			$table->string('city');
-			$table->string('phone');
-			$table->string('address');
+			$table->integer('code')->nullable();
+			$table->string('email', 192)->nullable();
+			$table->string('country')->nullable();
+			$table->string('city')->nullable();
+			$table->string('phone')->nullable();
+			$table->string('address')->nullable();
+			$table->string('tax_number')->nullable();
 			$table->timestamps(6);
 			$table->softDeletes();
 		});
