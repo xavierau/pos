@@ -874,17 +874,6 @@ class ProductsController extends BaseController
                 $header = fgetcsv($handle, $max_line_length); // Use semicolon as the delimiter
 
 
-
-
-
-                // Process the header row
-                // $escapedHeader = [];
-                // foreach ($header as $value) {
-                //     $lheader = strtolower($value);
-                //     $escapedItem = preg_replace('/[^a-z]/', '', $lheader);
-                //     $escapedHeader[] = $escapedItem;
-                // }
-
                 $header_colcount = count($header);
                 while (($row = fgetcsv($handle, $max_line_length)) !== false) { // Use semicolon as the delimiter
                     $row_colcount = count($row);
@@ -992,7 +981,7 @@ class ProductsController extends BaseController
                                 $product_warehouse->product_id = $product->id;
                                 $product_warehouse->warehouse_id = $warehouse;
                                 $product_warehouse->manage_stock = 1;
-                                $product_warehouse->qty = $data['qty'] ?? 0;
+                                $product_warehouse->qty = $value['qty'] ?? 0;
                                 $product_warehouse->save();
 
                             }
