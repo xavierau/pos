@@ -16,11 +16,19 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
-use Intervention\Image\ImageManagerStatic as Image;
+use Intervention\Image\Drivers\Gd\Driver;
+use Intervention\Image\ImageManager;
 use Nwidart\Modules\Facades\Module;
 
 class UserController extends BaseController
 {
+
+    public function __construct(
+        private ImageManager $imageManager = new ImageManager(new Driver())
+    )
+    {
+
+    }
 
     //------------- GET ALL USERS---------\\
 
@@ -160,7 +168,7 @@ class UserController extends BaseController
                 $image = $request->file('avatar');
                 $filename = rand(11111111, 99999999) . $image->getClientOriginalName();
 
-                $image_resize = Image::make($image->getRealPath());
+                $image_resize = $this->imageManager->read($image->getRealPath());
                 $image_resize->resize(128, 128);
                 $image_resize->save(public_path('/images/avatar/' . $filename));
 
@@ -255,7 +263,7 @@ class UserController extends BaseController
                 $path = public_path() . '/images/avatar';
                 $filename = rand(11111111, 99999999) . $image->getClientOriginalName();
 
-                $image_resize = Image::make($image->getRealPath());
+                $image_resize = $this->imageManager->read($image->getRealPath());
                 $image_resize->resize(128, 128);
                 $image_resize->save(public_path('/images/avatar/' . $filename));
 
@@ -330,7 +338,7 @@ class UserController extends BaseController
             $path = public_path() . '/images/avatar';
             $filename = rand(11111111, 99999999) . $image->getClientOriginalName();
 
-            $image_resize = Image::make($image->getRealPath());
+            $image_resize = $this->imageManager->read($image->getRealPath());
             $image_resize->resize(128, 128);
             $image_resize->save(public_path('/images/avatar/' . $filename));
 
