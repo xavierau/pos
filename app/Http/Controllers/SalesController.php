@@ -210,11 +210,11 @@ class SalesController extends BaseController
                     'sale_id' => $order->id,
                     'sale_unit_id' => $value['sale_unit_id'] ? $value['sale_unit_id'] : NULL,
                     'quantity' => $value['quantity'],
-                    'price' => $value['Unit_price'],
+                    'price' => $value['unit_price'],
                     'tax_net' => $value['tax_percent'],
                     'tax_method' => $value['tax_method'],
                     'discount' => $value['discount'],
-                    'discount_method' => $value['discount_Method'],
+                    'discount_method' => $value['discount_method'],
                     'product_id' => $value['product_id'],
                     'product_variant_id' => $value['product_variant_id'] ? $value['product_variant_id'] : NULL,
                     'total' => $value['subtotal'],
@@ -284,7 +284,7 @@ class SalesController extends BaseController
                     }
 
                     if ($request['amount'] > 0 && $request->payment['status'] != 'pending') {
-                        if ($request->payment['Reglement'] == 'credit card') {
+                        if ($request->payment['type'] == 'credit card') {
                             $Client = Client::whereId($request->client_id)->first();
                             Stripe\Stripe::setApiKey(config('app . STRIPE_SECRET'));
 
@@ -350,8 +350,8 @@ class SalesController extends BaseController
                             $PaymentSale->sale_id = $order->id;
                             $PaymentSale->ref = PaymentSale::generateOrderNumber();
                             $PaymentSale->date = Carbon::now();
-                            $PaymentSale->Reglement = $request->payment['Reglement'];
-                            $PaymentSale->montant = $request['amount'];
+                            $PaymentSale->type = $request->payment['type'];
+                            $PaymentSale->amount = $request['amount'];
                             $PaymentSale->change = $request['change'];
                             $PaymentSale->notes = NULL;
                             $PaymentSale->user_id = Auth::user()->id;
@@ -386,8 +386,8 @@ class SalesController extends BaseController
                                 'ref' => PaymentSale::generateOrderNumber(),
                                 'date' => Carbon::now(),
                                 'account_id' => $request->payment['account_id'] ? $request->payment['account_id'] : NULL,
-                                'Reglement' => $request->payment['Reglement'],
-                                'montant' => $request['amount'],
+                                'type' => $request->payment['type'],
+                                'amount' => $request['amount'],
                                 'change' => $request['change'],
                                 'notes' => NULL,
                                 'user_id' => Auth::user()->id,
@@ -470,8 +470,8 @@ class SalesController extends BaseController
                             ->where('id', $value['product_id'])
                             ->first();
 
-                        if ($product_unit_sale_id['unitSale']) {
-                            $old_unit = Unit::where('id', $product_unit_sale_id['unitSale']->id)->first();
+                        if ($product_unit_sale_id['unit_sale']) {
+                            $old_unit = Unit::where('id', $product_unit_sale_id['unit_sale']->id)->first();
                         }
                         {
                             $old_unit = NULL;
@@ -566,12 +566,12 @@ class SalesController extends BaseController
 
                         $orderDetails['sale_id'] = $id;
                         $orderDetails['date'] = $request['date'];
-                        $orderDetails['price'] = $prod_detail['Unit_price'];
+                        $orderDetails['price'] = $prod_detail['unit_price'];
                         $orderDetails['sale_unit_id'] = $prod_detail['sale_unit_id'];
                         $orderDetails['tax_net'] = $prod_detail['tax_percent'];
                         $orderDetails['tax_method'] = $prod_detail['tax_method'];
                         $orderDetails['discount'] = $prod_detail['discount'];
-                        $orderDetails['discount_method'] = $prod_detail['discount_Method'];
+                        $orderDetails['discount_method'] = $prod_detail['discount_method'];
                         $orderDetails['quantity'] = $prod_detail['quantity'];
                         $orderDetails['product_id'] = $prod_detail['product_id'];
                         $orderDetails['product_variant_id'] = $prod_detail['product_variant_id'];
@@ -648,8 +648,8 @@ class SalesController extends BaseController
                         $product_unit_sale_id = Product::with('unitSale')
                             ->where('id', $value['product_id'])
                             ->first();
-                        if ($product_unit_sale_id['unitSale']) {
-                            $old_unit = Unit::where('id', $product_unit_sale_id['unitSale']->id)->first();
+                        if ($product_unit_sale_id['unit_sale']) {
+                            $old_unit = Unit::where('id', $product_unit_sale_id['unit_sale']->id)->first();
                         }
                         {
                             $old_unit = NULL;
@@ -704,7 +704,7 @@ class SalesController extends BaseController
 
                 $Payment_Sale_data = PaymentSale::where('sale_id', $id)->get();
                 foreach ($Payment_Sale_data as $Payment_Sale) {
-                    if ($Payment_Sale->Reglement == 'credit card') {
+                    if ($Payment_Sale->type == 'credit card') {
                         $PaymentWithCreditCard = PaymentWithCreditCard::where('payment_id', $Payment_Sale->id)->first();
                         if ($PaymentWithCreditCard) {
                             $PaymentWithCreditCard->delete();
@@ -715,7 +715,7 @@ class SalesController extends BaseController
 
                     if ($account) {
                         $account->update([
-                            'balance' => $account->balance - $Payment_Sale->montant,
+                            'balance' => $account->balance - $Payment_Sale->amount,
                         ]);
                     }
 
@@ -762,8 +762,8 @@ class SalesController extends BaseController
                             $product_unit_sale_id = Product::with('unitSale')
                                 ->where('id', $value['product_id'])
                                 ->first();
-                            if ($product_unit_sale_id['unitSale']) {
-                                $old_unit = Unit::where('id', $product_unit_sale_id['unitSale']->id)->first();
+                            if ($product_unit_sale_id['unit_sale']) {
+                                $old_unit = Unit::where('id', $product_unit_sale_id['unit_sale']->id)->first();
                             }
                             {
                                 $old_unit = NULL;
@@ -819,7 +819,7 @@ class SalesController extends BaseController
 
                     $Payment_Sale_data = PaymentSale::where('sale_id', $sale_id)->get();
                     foreach ($Payment_Sale_data as $Payment_Sale) {
-                        if ($Payment_Sale->Reglement == 'credit card') {
+                        if ($Payment_Sale->type == 'credit card') {
                             $PaymentWithCreditCard = PaymentWithCreditCard::where('payment_id', $Payment_Sale->id)->first();
                             if ($PaymentWithCreditCard) {
                                 $PaymentWithCreditCard->delete();
@@ -830,7 +830,7 @@ class SalesController extends BaseController
 
                         if ($account) {
                             $account->update([
-                                'balance' => $account->balance - $Payment_Sale->montant,
+                                'balance' => $account->balance - $Payment_Sale->amount,
                             ]);
                         }
 
@@ -1035,8 +1035,8 @@ class SalesController extends BaseController
                         ->where('id', $detail->product_id)
                         ->first();
 
-                    if ($product_unit_sale_id['unitSale']) {
-                        $unit = Unit::where('id', $product_unit_sale_id['unitSale']->id)->first();
+                    if ($product_unit_sale_id['unit_sale']) {
+                        $unit = Unit::where('id', $product_unit_sale_id['unit_sale']->id)->first();
                     }
                     {
                         $unit = NULL;
@@ -1098,7 +1098,7 @@ class SalesController extends BaseController
                 $data['quantity'] = $detail->quantity;
                 $data['qte_copy'] = $detail->quantity;
                 $data['etat'] = 'current';
-                $data['unitSale'] = $unit ? $unit->short_name : '';
+                $data['unit_sale'] = $unit ? $unit->short_name : '';
                 $data['sale_unit_id'] = $unit ? $unit->id : '';
                 $data['is_imei'] = $detail['product']['is_imei'];
                 $data['imei_number'] = $detail->imei_number;
@@ -1110,12 +1110,12 @@ class SalesController extends BaseController
                 }
 
                 $tax_price = $detail->tax_net * (($detail->price - $data['discount_net']) / 100);
-                $data['Unit_price'] = $detail->price;
+                $data['unit_price'] = $detail->price;
 
                 $data['tax_percent'] = $detail->tax_net;
                 $data['tax_method'] = $detail->tax_method;
                 $data['discount'] = $detail->discount;
-                $data['discount_Method'] = $detail->discount_method;
+                $data['discount_method'] = $detail->discount_method;
 
                 if ($detail->tax_method == '1') {
                     $data['net_price'] = $detail->price - $data['discount_net'];
@@ -1262,7 +1262,7 @@ class SalesController extends BaseController
                 $data['total'] = $detail->total;
                 $data['etat'] = 'current';
                 $data['qte_copy'] = $detail->quantity;
-                $data['unitSale'] = $unit ? $unit->short_name : '';
+                $data['unit_sale'] = $unit ? $unit->short_name : '';
                 $data['sale_unit_id'] = $unit ? $unit->id : '';
 
                 $data['is_imei'] = $detail['product']['is_imei'];
@@ -1274,11 +1274,11 @@ class SalesController extends BaseController
                     $data['discount_net'] = $detail->price * $detail->discount / 100;
                 }
                 $tax_price = $detail->tax_net * (($detail->price - $data['discount_net']) / 100);
-                $data['Unit_price'] = $detail->price;
+                $data['unit_price'] = $detail->price;
                 $data['tax_percent'] = $detail->tax_net;
                 $data['tax_method'] = $detail->tax_method;
                 $data['discount'] = $detail->discount;
-                $data['discount_Method'] = $detail->discount_method;
+                $data['discount_method'] = $detail->discount_method;
 
                 if ($detail->tax_method == '1') {
                     $data['net_price'] = $detail->price - $data['discount_net'];
