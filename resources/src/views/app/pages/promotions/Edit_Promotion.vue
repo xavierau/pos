@@ -125,7 +125,7 @@ export default {
         Get_Products_By_Warehouse(id) {
             // Start the progress bar.
             this.execute(() => {
-                axios.get("get_Products_by_warehouse/" + id + "?stock=" + 0 + "&product_service=" + 0)
+                axios.get("get_products_by_warehouse/" + id + "?stock=" + 0 + "&product_service=" + 0)
                     .then(response => {
                         this.products = response.data;
                     })

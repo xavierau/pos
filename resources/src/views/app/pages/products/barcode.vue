@@ -27,11 +27,11 @@
           <!-- Product -->
           <b-col md="12" class="mb-5">
             <h6>{{$t('ProductName')}}</h6>
-            
+
             <div id="autocomplete" class="autocomplete">
-              <input 
+              <input
                 :placeholder="$t('Scan_Search_Product_by_Code_Name')"
-                @input='e => search_input = e.target.value' 
+                @input='e => search_input = e.target.value'
                 @keyup="search(search_input)"
                 @focus="handleFocus"
                 @blur="handleBlur"
@@ -117,8 +117,8 @@
             {{$t('print')}}
           </button>
         </b-col>
-      
-   
+
+
             <b-col md="12">
               <div class="barcode-row" v-if="ShowCard" id="print_barcode_label">
                 <div :class="class_type_page" v-for ="(k, i) in total_a4" :key="i">
@@ -161,7 +161,7 @@
             </b-col>
           </b-row>
           </div>
-      
+
 </template>
 
 <script>
@@ -192,7 +192,7 @@ export default {
       total_a4:'',
       class_sheet:'',
       class_type_page:'',
-      rest:'',     
+      rest:'',
       warehouses: [],
       submitStatus: null,
       products: [],
@@ -250,7 +250,7 @@ export default {
         this.class_sheet = 'style10';
        this.class_type_page = 'barcode_non_a4';
       }
-     
+
       this.Per_Page();
     },
     //------ Validate Form
@@ -259,7 +259,7 @@ export default {
         if (!success) {
           return;
         } else {
-         
+
           this.showBarcode();
           // this.Per_Page();
         }
@@ -275,7 +275,7 @@ export default {
     handleBlur() {
       this.focused = false
     },
-    
+
    // Search Products
     search(){
       if (this.timer) {
@@ -342,7 +342,7 @@ export default {
         NProgress.start();
         NProgress.set(0.1);
       axios
-        .get("get_Products_by_warehouse/" + id + "?stock=" + 0)
+        .get("get_products_by_warehouse/" + id + "?stock=" + 0)
          .then(response => {
             this.products = response.data;
              NProgress.done();
@@ -366,9 +366,9 @@ export default {
          a.print();
       }, 1000);
 
-      
+
     },
-   
+
     //-------------------------------------- Show Barcode -------------------------\\
     showBarcode() {
       this.Per_Page();

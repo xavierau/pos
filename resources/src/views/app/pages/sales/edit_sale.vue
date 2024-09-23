@@ -751,7 +751,7 @@ export default {
         NProgress.start();
         NProgress.set(0.1);
       axios
-        .get("get_Products_by_warehouse/" + id + "?stock=" + 1 + "&is_sale=" + 1 + "&product_service=" + 1)
+        .get("get_products_by_warehouse/" + id + "?stock=" + 1 + "&is_sale=" + 1 + "&product_service=" + 1)
          .then(response => {
             this.products = response.data;
              NProgress.done();

@@ -6,17 +6,13 @@ use App\Models\Currency;
 use App\Models\Setting;
 use App\Models\PosSetting;
 use App\Models\Client;
-use App\Models\User;
 use App\Models\Warehouse;
 use App\Models\UserWarehouse;
 use App\Models\sms_gateway;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Http\Request;
-use Intervention\Image\Drivers\Gd\Driver;
-use Intervention\Image\Image;
 use Intervention\Image\ImageManager;
-use \Nwidart\Modules\Facades\Module;
-use Illuminate\Support\Facades\Config;
+use Intervention\Image\Drivers\Gd\Driver;
 
 class SettingsController extends Controller
 {
