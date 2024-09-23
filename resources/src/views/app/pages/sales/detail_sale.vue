@@ -233,28 +233,30 @@ export default {
             NProgress.start();
             NProgress.set(0.1);
             let id = this.$route.params.id;
+            const url = `sale_pdf/${id}`;
 
-            axios
-                .get(`sale_pdf/${id}`, {
-                    responseType: "blob", // important
-                    headers: {
-                        "Content-Type": "application/json"
-                    }
-                })
-                .then(response => {
-                    const url = window.URL.createObjectURL(new Blob([response.data]));
-                    const link = document.createElement("a");
-                    link.href = url;
-                    link.setAttribute("download", "Sale_" + this.sale.Ref + ".pdf");
-                    document.body.appendChild(link);
-                    link.click();
-                    // Complete the animation of the  progress bar.
-                    setTimeout(() => NProgress.done(), 500);
-                })
-                .catch(() => {
-                    // Complete the animation of the  progress bar.
-                    setTimeout(() => NProgress.done(), 500);
-                });
+            window.open(url, '_blank').focus();
+
+
+            // axios.get(`sale_pdf/${id}`, {
+            //     responseType: "blob",
+            // })
+            //     .then(response => {
+            //         console.log('response', response);
+            //         const link = document.createElement("a");
+            //         link.href = URL.createObjectURL(new Blob([response.data], {type: "application/pdf"}));
+            //         link.setAttribute("download", "Sale_" + this.sale.Ref + ".pdf");
+            //         document.body.appendChild(link);
+            //         link.click();
+            //         // Complete the animation of the  progress bar.
+            //         setTimeout(() => NProgress.done(), 500);
+            //     })
+            //     .catch(() => {
+            //         // Complete the animation of the  progress bar.
+            //         setTimeout(() => NProgress.done(), 500);
+            //     });
+
+            NProgress.done()
         },
 
         //------ Toast

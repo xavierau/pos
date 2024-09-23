@@ -19,8 +19,9 @@ class SalePdfGenerationController extends Controller
     public function __invoke(Request $request, $id)
     {
         $details = array();
-        $helpers = new Helper();
         $sale_data = Sale::with('details.product.unitSale')->findOrFail($id);
+        $helper = new Helper();
+
 
         $sale['client_name'] = $sale_data['client']->name;
         $sale['client_phone'] = $sale_data['client']->phone;
@@ -38,8 +39,8 @@ class SalePdfGenerationController extends Controller
         $sale['due'] = number_format($sale_data->due, 2, '.', '');
         $sale['payment_status'] = $sale_data->payment_status;
 
-        $detail_id = 0;
-        foreach ($sale_data['details'] as $detail) {
+
+        foreach ($sale_data['details'] as $index => $detail) {
 
             //check if detail has sale_unit_id Or Null
             if ($detail->sale_unit_id !== null) {
@@ -70,10 +71,11 @@ class SalePdfGenerationController extends Controller
                 $data['name'] = $detail['product']['name'];
             }
 
-            $data['detail_id'] = $detail_id += 1;
+            $data['detail_id'] = $index += 1;
             $data['quantity'] = number_format($detail->quantity, 2, '.', '');
-            $data['total'] = number_format($detail->total, 2, '.', '');
-            $data['unitSale'] = $unit ? $unit->short_name : '';
+//            $data['total'] = number_format($detail->total, 2, '.', '');
+            $data['total'] = 0;
+            $data['unit_sale'] = $unit ? $unit->short_name : '';
             $data['price'] = number_format($detail->price, 2, '.', '');
 
             if ($detail->discount_method == '2') {
@@ -98,11 +100,11 @@ class SalePdfGenerationController extends Controller
 
             $details[] = $data;
         }
+
         $settings = Setting::first();
-        $symbol = $helpers->getCurrencyCode();
 
         $pdf = Pdf::loadView('pdf.sale_pdf', [
-            'symbol' => $symbol,
+            'symbol' => $helper->getCurrencyCode(),
             'setting' => $settings,
             'sale' => $sale,
             'details' => $details,

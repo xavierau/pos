@@ -8,7 +8,6 @@ use App\Models\Client;
 use App\Models\EmailMessage;
 use App\Models\PaymentSale;
 use App\Models\PaymentWithCreditCard;
-use App\Models\PosSetting;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\ProductWarehouse;
@@ -25,7 +24,6 @@ use App\Models\Unit;
 use App\Models\UserWarehouse;
 use App\Models\Warehouse;
 use App\utils\Helper;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -181,12 +179,11 @@ class SalesController extends BaseController
         ]);
 
         DB::transaction(function () use ($request) {
-            $helpers = new Helper();
             $order = new Sale;
 
             $order->is_pos = 0;
             $order->date = $request->date;
-            $order->ref = $this->getNumberOrder();
+            $order->ref = Sale::generateNumberOrder();
             $order->client_id = $request->client_id;
             $order->grand_total = $request->grand_total;
             $order->warehouse_id = $request->warehouse_id;
@@ -217,7 +214,8 @@ class SalesController extends BaseController
                     'discount_method' => $value['discount_method'],
                     'product_id' => $value['product_id'],
                     'product_variant_id' => $value['product_variant_id'] ? $value['product_variant_id'] : NULL,
-                    'total' => $value['subtotal'],
+//                    TODO: need to confirm this is required or not
+//                    'total' => $value['subtotal'],
                     'imei_number' => $value['imei_number'],
                 ];
 
@@ -1313,7 +1311,6 @@ class SalesController extends BaseController
         ]);
 
     }
-
 
 
 //------------- Send sale on Email -----------\\

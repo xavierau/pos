@@ -87,7 +87,7 @@
                         @endif
                     </td>
                     <td>{{$detail['price']}} </td>
-                    <td>{{$detail['quantity']}}/{{$detail['unitSale']}}</td>
+                    <td>{{$detail['quantity']}}/{{$detail['unit_sale']}}</td>
                     <td>{{$detail['discount_net']}} </td>
                     <td>{{$detail['tax']}} </td>
                     <td>{{$detail['total']}} </td>

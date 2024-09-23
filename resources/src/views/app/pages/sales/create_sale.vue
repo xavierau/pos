@@ -184,7 +184,9 @@
                                         <tr>
                                             <td class="bold">{{ $t('OrderTax') }}</td>
                                             <td>
-                                                <span>{{ currentUser.currency }} {{ sale.tax_net.toFixed(2) }} ({{ formatNumber(sale.tax_rate, 2) }} %)</span>
+                                                <span>{{ currentUser.currency }} {{
+                                                        sale.tax_net.toFixed(2)
+                                                    }} ({{ formatNumber(sale.tax_rate, 2) }} %)</span>
                                             </td>
                                         </tr>
                                         <tr>
@@ -815,7 +817,6 @@ export default {
 
     methods: {
 
-
         async loadStripe_payment() {
             this.stripe = await loadStripe(`${this.stripe_key}`);
             const elements = this.stripe.elements();
@@ -1160,15 +1161,19 @@ export default {
             }
             if (this.sale.warehouse_id != "" && this.sale.warehouse_id != null) {
                 this.timer = setTimeout(() => {
-                    const product_filter = this.products.filter(product => product.code === this.search_input || product.barcode.includes(this.search_input));
+
+                    console.log('product filter', this.products)
+
+                    const product_filter = this.products.filter(product => product.code === this.search_input || product.code.includes(this.search_input));
+                    // const product_filter = this.products.filter(product => product.code === this.search_input || product.barcode.includes(this.search_input));
                     if (product_filter.length === 1) {
                         this.SearchProduct(product_filter[0])
                     } else {
                         this.product_filter = this.products.filter(product => {
                             return (
                                 product.name.toLowerCase().includes(this.search_input.toLowerCase()) ||
-                                product.code.toLowerCase().includes(this.search_input.toLowerCase()) ||
-                                product.barcode.toLowerCase().includes(this.search_input.toLowerCase())
+                                product.code.toLowerCase().includes(this.search_input.toLowerCase())
+                                // product.barcode.toLowerCase().includes(this.search_input.toLowerCase())
                             );
                         });
                     }
@@ -1216,7 +1221,13 @@ export default {
                     }
                 }
                 this.product.product_variant_id = result.product_variant_id;
-                this.getProductDetails(result.id, result.product_variant_id);
+
+                if (result.id) {
+                    this.getProductDetails(result.id, result.product_variant_id);
+                } else {
+                    throw new Error('Something went wrong, no product id');
+                }
+
             }
 
             this.search_input = '';
@@ -1240,9 +1251,8 @@ export default {
             axios
                 .get("get_products_by_warehouse/" + id + "?stock=" + 1 + "&is_sale=" + 1 + "&product_service=" + 1)
                 .then(response => {
-                    this.products = response.data;
+                    this.products = response.data.map(i => ({id: i.product_id, ...i}));
                     NProgress.done();
-
                 })
                 .catch(error => {
                 });

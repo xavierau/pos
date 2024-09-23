@@ -20,6 +20,11 @@ mix.js('resources/src/main.js', 'public')
     .js('resources/src/login.js', 'public')
     .vue();
 
+mix.browserSync({
+    proxy: 'localhost:8000',
+});
+
+
 mix.webpackConfig({
     output: {
         filename: 'js/[name].min.js',

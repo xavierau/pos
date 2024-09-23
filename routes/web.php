@@ -19,7 +19,7 @@ use Modules\Store\Http\Controllers\StoreController;
 
 //------------------------------------------------------------------\\
 
-Route::get('simple_login', function(){
+Route::get('simple_login', function () {
     $ModulesData = BaseController::get_Module_Info();
     return view('auth.simple_login', [
         'ModulesInstalled' => $ModulesData['ModulesInstalled'],
@@ -44,6 +44,8 @@ Route::group(['middleware' => ['web', 'auth:web']], function () {
             return redirect('/login');
         }
     });
+
+    Route::get('sale_pdf/{id}', 'SalePdfGenerationController');
 
 
     Route::get('/{vue?}',

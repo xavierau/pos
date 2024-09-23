@@ -107,8 +107,7 @@ class Sale extends Model
 
 // endregion
 
-    public
-    static function generateNumberOrder(): string
+    public static function generateNumberOrder(): string
     {
         $last = static::latest('id')->first();
 
@@ -116,7 +115,7 @@ class Sale extends Model
             return 'SL_1111';
         }
 
-        $item = $last->Ref;
+        $item = $last->ref;
         $nwMsg = explode("_", $item);
         $inMsg = $nwMsg[1] + 1;
         return $nwMsg[0] . '_' . $inMsg;
