@@ -3,7 +3,6 @@
 use App\Http\Controllers\BaseController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Storage;
 use Modules\Store\Http\Controllers\StoreController;
 
 /*
@@ -36,17 +35,9 @@ Route::get('password/find/{token}', 'PasswordResetController@find');
 
 Route::group(['middleware' => ['web', 'auth:web']], function () {
 
-    Route::get('/login', function () {
-        $installed = Storage::disk('public')->exists('installed');
-        if ($installed === false) {
-            return redirect('/setup');
-        } else {
-            return redirect('/login');
-        }
-    });
+    Route::view('/login', '/login');
 
     Route::get('sale_pdf/{id}', 'SalePdfGenerationController');
-
 
     Route::get('/{vue?}',
         function () {

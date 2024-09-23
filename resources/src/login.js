@@ -7,6 +7,7 @@ import BootstrapVue from 'bootstrap-vue/dist/bootstrap-vue.esm';
 import "./assets/styles/sass/themes/lite-purple.scss";
 import Meta from "vue-meta";
 import {i18n} from "./plugins/i18n";
+import "./assets/styles/sass/app.scss";
 
 Vue.use(BootstrapVue);
 
@@ -25,13 +26,13 @@ Vue.component("vue-perfect-scrollbar", () =>
     import(/* webpackChunkName: "vue-perfect-scrollbar" */ "vue-perfect-scrollbar")
 );
 
-Vue.use(Meta, {
-    keyName: "metaInfo",
-    attribute: "data-vue-meta",
-    ssrAttribute: "data-vue-meta-server-rendered",
-    tagIDKeyName: "vmid",
-    refreshOnceOnNavigation: true
-});
+// Vue.use(Meta, {
+//     keyName: "metaInfo",
+//     attribute: "data-vue-meta",
+//     ssrAttribute: "data-vue-meta-server-rendered",
+//     tagIDKeyName: "vmid",
+//     refreshOnceOnNavigation: true
+// });
 
 localize({
     en: {

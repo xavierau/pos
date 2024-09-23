@@ -6,7 +6,7 @@
                     <div class="col-md-12">
                         <div class="p-4">
                             <div class="auth-logo text-center mb-30">
-                                <img src="/images/logo.jpeg">
+                                <img src="/images/logo.png">
                             </div>
                             <h1 class="mb-3 text-18">{{ $t('SignIn') }}</h1>
                             <validation-observer ref="submit_login">
