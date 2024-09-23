@@ -142,7 +142,7 @@
                                                                 @keyup="Verified_Qty(detail,detail.detail_id)"
                                                                 :min="0.00"
                                                                 :max="detail.stock"
-                                                                v-model.number="detail.quantity"
+                                                                v-model.number="detail.qty"
                                                             >
                                                             <b-input-group-append>
                                   <span
@@ -154,10 +154,10 @@
                                                     </div>
                                                 </td>
                                                 <td>{{ currentUser.currency }}
-                                                    {{ formatNumber(detail.DiscountNet * detail.quantity, 2) }}
+                                                    {{ formatNumber(detail.discount_net * detail.qty, 2) }}
                                                 </td>
                                                 <td>{{ currentUser.currency }}
-                                                    {{ formatNumber(detail.taxe * detail.quantity, 2) }}
+                                                    {{ formatNumber(detail.taxe * detail.qty, 2) }}
                                                 </td>
                                                 <td>{{ currentUser.currency }} {{ detail.subtotal.toFixed(2) }}</td>
                                                 <td>
@@ -180,7 +180,7 @@
                                             <td class="bold">{{ $t('OrderTax') }}</td>
                                             <td>
                                                 <span>{{ currentUser.currency }} {{
-                                                        quote.TaxNet.toFixed(2)
+                                                        quote.tax_net.toFixed(2)
                                                     }} ({{ formatNumber(quote.tax_rate, 2) }} %)</span>
                                             </td>
                                         </tr>
@@ -199,7 +199,7 @@
                                             <td>
                           <span
                               class="font-weight-bold"
-                          >{{ currentUser.currency }} {{ GrandTotal.toFixed(2) }}</span>
+                          >{{ currentUser.currency }} {{ grand_total.toFixed(2) }}</span>
                                             </td>
                                         </tr>
                                         </tbody>
@@ -334,163 +334,165 @@
         </validation-observer>
 
         <!-- Modal Update Detail Product -->
-        <validation-observer ref="Update_Detail_quote">
-            <b-modal hide-footer size="lg" id="form_Update_Detail" :title="detail.name">
-                <b-form @submit.prevent="submitUpdateDetail">
-                    <b-row>
-                        <!-- Unit Price -->
-                        <b-col lg="6" md="6" sm="12">
-                            <validation-provider
-                                name="Product Price"
-                                :rules="{ required: true , regex: /^\d*\.?\d*$/}"
-                                v-slot="validationContext"
-                            >
-                                <b-form-group :label="$t('ProductPrice') + ' ' + '*'" id="Price-input">
-                                    <b-form-input
-                                        label="Product Price"
-                                        v-model="detail.Unit_price"
-                                        :state="getValidationState(validationContext)"
-                                        aria-describedby="Price-feedback"
-                                    ></b-form-input>
-                                    <b-form-invalid-feedback id="Price-feedback">{{
-                                            validationContext.errors[0]
-                                        }}
-                                    </b-form-invalid-feedback>
-                                </b-form-group>
-                            </validation-provider>
-                        </b-col>
+        <ModalUpdateProduct v-if="detail" :detail="detail" v-on:updateDetail="Update_Detail"/>
 
-                        <!-- Tax Method -->
-                        <b-col lg="6" md="6" sm="12">
-                            <validation-provider name="Tax Method" :rules="{ required: true}">
-                                <b-form-group slot-scope="{ valid, errors }" :label="$t('TaxMethod') + ' ' + '*'">
-                                    <v-select
-                                        :class="{'is-invalid': !!errors.length}"
-                                        :state="errors[0] ? false : (valid ? true : null)"
-                                        v-model="detail.tax_method"
-                                        :reduce="label => label.value"
-                                        :placeholder="$t('Choose_Method')"
-                                        :options="
-                           [
-                            {label: 'Exclusive', value: '1'},
-                            {label: 'Inclusive', value: '2'}
-                           ]"
-                                    ></v-select>
-                                    <b-form-invalid-feedback>{{ errors[0] }}</b-form-invalid-feedback>
-                                </b-form-group>
-                            </validation-provider>
-                        </b-col>
+        <!--        <validation-observer ref="Update_Detail_quote">-->
+        <!--            <b-modal hide-footer size="lg" id="form_Update_Detail" :title="detail.name">-->
+        <!--                <b-form @submit.prevent="submitUpdateDetail">-->
+        <!--                    <b-row>-->
+        <!--                        &lt;!&ndash; Unit Price &ndash;&gt;-->
+        <!--                        <b-col lg="6" md="6" sm="12">-->
+        <!--                            <validation-provider-->
+        <!--                                name="Product Price"-->
+        <!--                                :rules="{ required: true , regex: /^\d*\.?\d*$/}"-->
+        <!--                                v-slot="validationContext"-->
+        <!--                            >-->
+        <!--                                <b-form-group :label="$t('ProductPrice') + ' ' + '*'" id="Price-input">-->
+        <!--                                    <b-form-input-->
+        <!--                                        label="Product Price"-->
+        <!--                                        v-model="detail.unit_price"-->
+        <!--                                        :state="getValidationState(validationContext)"-->
+        <!--                                        aria-describedby="Price-feedback"-->
+        <!--                                    ></b-form-input>-->
+        <!--                                    <b-form-invalid-feedback id="Price-feedback">{{-->
+        <!--                                            validationContext.errors[0]-->
+        <!--                                        }}-->
+        <!--                                    </b-form-invalid-feedback>-->
+        <!--                                </b-form-group>-->
+        <!--                            </validation-provider>-->
+        <!--                        </b-col>-->
 
-                        <!-- Tax Rate -->
-                        <b-col lg="6" md="6" sm="12">
-                            <validation-provider
-                                name="Order Tax"
-                                :rules="{ required: true , regex: /^\d*\.?\d*$/}"
-                                v-slot="validationContext"
-                            >
-                                <b-form-group :label="$t('OrderTax') + ' ' + '*'">
-                                    <b-input-group append="%">
-                                        <b-form-input
-                                            label="Order Tax"
-                                            v-model="detail.tax_percent"
-                                            :state="getValidationState(validationContext)"
-                                            aria-describedby="OrderTax-feedback"
-                                        ></b-form-input>
-                                    </b-input-group>
-                                    <b-form-invalid-feedback id="OrderTax-feedback">{{
-                                            validationContext.errors[0]
-                                        }}
-                                    </b-form-invalid-feedback>
-                                </b-form-group>
-                            </validation-provider>
-                        </b-col>
+        <!--                        &lt;!&ndash; Tax Method &ndash;&gt;-->
+        <!--                        <b-col lg="6" md="6" sm="12">-->
+        <!--                            <validation-provider name="Tax Method" :rules="{ required: true}">-->
+        <!--                                <b-form-group slot-scope="{ valid, errors }" :label="$t('TaxMethod') + ' ' + '*'">-->
+        <!--                                    <v-select-->
+        <!--                                        :class="{'is-invalid': !!errors.length}"-->
+        <!--                                        :state="errors[0] ? false : (valid ? true : null)"-->
+        <!--                                        v-model="detail.tax_method"-->
+        <!--                                        :reduce="label => label.value"-->
+        <!--                                        :placeholder="$t('Choose_Method')"-->
+        <!--                                        :options="-->
+        <!--                           [-->
+        <!--                            {label: 'Exclusive', value: '1'},-->
+        <!--                            {label: 'Inclusive', value: '2'}-->
+        <!--                           ]"-->
+        <!--                                    ></v-select>-->
+        <!--                                    <b-form-invalid-feedback>{{ errors[0] }}</b-form-invalid-feedback>-->
+        <!--                                </b-form-group>-->
+        <!--                            </validation-provider>-->
+        <!--                        </b-col>-->
 
-                        <!-- Discount Method -->
-                        <b-col lg="6" md="6" sm="12">
-                            <validation-provider name="Discount Method" :rules="{ required: true}">
-                                <b-form-group slot-scope="{ valid, errors }" :label="$t('Discount_Method') + ' ' + '*'">
-                                    <v-select
-                                        v-model="detail.discount_Method"
-                                        :reduce="label => label.value"
-                                        :placeholder="$t('Choose_Method')"
-                                        :class="{'is-invalid': !!errors.length}"
-                                        :state="errors[0] ? false : (valid ? true : null)"
-                                        :options="
-                           [
-                            {label: 'Percent %', value: '1'},
-                            {label: 'Fixed', value: '2'}
-                           ]"
-                                    ></v-select>
-                                    <b-form-invalid-feedback>{{ errors[0] }}</b-form-invalid-feedback>
-                                </b-form-group>
-                            </validation-provider>
-                        </b-col>
+        <!--                        &lt;!&ndash; Tax Rate &ndash;&gt;-->
+        <!--                        <b-col lg="6" md="6" sm="12">-->
+        <!--                            <validation-provider-->
+        <!--                                name="Order Tax"-->
+        <!--                                :rules="{ required: true , regex: /^\d*\.?\d*$/}"-->
+        <!--                                v-slot="validationContext"-->
+        <!--                            >-->
+        <!--                                <b-form-group :label="$t('OrderTax') + ' ' + '*'">-->
+        <!--                                    <b-input-group append="%">-->
+        <!--                                        <b-form-input-->
+        <!--                                            label="Order Tax"-->
+        <!--                                            v-model="detail.tax_percent"-->
+        <!--                                            :state="getValidationState(validationContext)"-->
+        <!--                                            aria-describedby="OrderTax-feedback"-->
+        <!--                                        ></b-form-input>-->
+        <!--                                    </b-input-group>-->
+        <!--                                    <b-form-invalid-feedback id="OrderTax-feedback">{{-->
+        <!--                                            validationContext.errors[0]-->
+        <!--                                        }}-->
+        <!--                                    </b-form-invalid-feedback>-->
+        <!--                                </b-form-group>-->
+        <!--                            </validation-provider>-->
+        <!--                        </b-col>-->
 
-                        <!-- Discount Rate -->
-                        <b-col lg="6" md="6" sm="12">
-                            <validation-provider
-                                name="Discount Rate"
-                                :rules="{ required: true , regex: /^\d*\.?\d*$/}"
-                                v-slot="validationContext"
-                            >
-                                <b-form-group :label="$t('Discount') + ' ' + '*'">
-                                    <b-form-input
-                                        label="Discount"
-                                        v-model="detail.discount"
-                                        :state="getValidationState(validationContext)"
-                                        aria-describedby="Discount-feedback"
-                                    ></b-form-input>
-                                    <b-form-invalid-feedback id="Discount-feedback">{{
-                                            validationContext.errors[0]
-                                        }}
-                                    </b-form-invalid-feedback>
-                                </b-form-group>
-                            </validation-provider>
-                        </b-col>
+        <!--                        &lt;!&ndash; Discount Method &ndash;&gt;-->
+        <!--                        <b-col lg="6" md="6" sm="12">-->
+        <!--                            <validation-provider name="Discount Method" :rules="{ required: true}">-->
+        <!--                                <b-form-group slot-scope="{ valid, errors }" :label="$t('Discount_Method') + ' ' + '*'">-->
+        <!--                                    <v-select-->
+        <!--                                        v-model="detail.discount_method"-->
+        <!--                                        :reduce="label => label.value"-->
+        <!--                                        :placeholder="$t('Choose_Method')"-->
+        <!--                                        :class="{'is-invalid': !!errors.length}"-->
+        <!--                                        :state="errors[0] ? false : (valid ? true : null)"-->
+        <!--                                        :options="-->
+        <!--                           [-->
+        <!--                            {label: 'Percent %', value: '1'},-->
+        <!--                            {label: 'Fixed', value: '2'}-->
+        <!--                           ]"-->
+        <!--                                    ></v-select>-->
+        <!--                                    <b-form-invalid-feedback>{{ errors[0] }}</b-form-invalid-feedback>-->
+        <!--                                </b-form-group>-->
+        <!--                            </validation-provider>-->
+        <!--                        </b-col>-->
 
-                        <!-- Unit Sale -->
-                        <b-col lg="6" md="6" sm="12" v-if="detail.product_type != 'is_service'">
-                            <validation-provider name="Unit Sale" :rules="{ required: true}">
-                                <b-form-group slot-scope="{ valid, errors }" :label="$t('UnitSale') + ' ' + '*'">
-                                    <v-select
-                                        :class="{'is-invalid': !!errors.length}"
-                                        :state="errors[0] ? false : (valid ? true : null)"
-                                        v-model="detail.sale_unit_id"
-                                        :placeholder="$t('Choose_Unit_Sale')"
-                                        :reduce="label => label.value"
-                                        :options="units.map(units => ({label: units.name, value: units.id}))"
-                                    />
-                                    <b-form-invalid-feedback>{{ errors[0] }}</b-form-invalid-feedback>
-                                </b-form-group>
-                            </validation-provider>
-                        </b-col>
+        <!--                        &lt;!&ndash; Discount Rate &ndash;&gt;-->
+        <!--                        <b-col lg="6" md="6" sm="12">-->
+        <!--                            <validation-provider-->
+        <!--                                name="Discount Rate"-->
+        <!--                                :rules="{ required: true , regex: /^\d*\.?\d*$/}"-->
+        <!--                                v-slot="validationContext"-->
+        <!--                            >-->
+        <!--                                <b-form-group :label="$t('Discount') + ' ' + '*'">-->
+        <!--                                    <b-form-input-->
+        <!--                                        label="Discount"-->
+        <!--                                        v-model="detail.discount"-->
+        <!--                                        :state="getValidationState(validationContext)"-->
+        <!--                                        aria-describedby="Discount-feedback"-->
+        <!--                                    ></b-form-input>-->
+        <!--                                    <b-form-invalid-feedback id="Discount-feedback">{{-->
+        <!--                                            validationContext.errors[0]-->
+        <!--                                        }}-->
+        <!--                                    </b-form-invalid-feedback>-->
+        <!--                                </b-form-group>-->
+        <!--                            </validation-provider>-->
+        <!--                        </b-col>-->
 
-                        <!-- Imei or serial numbers -->
-                        <b-col lg="12" md="12" sm="12" v-show="detail.is_imei">
-                            <b-form-group :label="$t('Add_product_IMEI_Serial_number')">
-                                <b-form-input
-                                    label="Add_product_IMEI_Serial_number"
-                                    v-model="detail.imei_number"
-                                    :placeholder="$t('Add_product_IMEI_Serial_number')"
-                                ></b-form-input>
-                            </b-form-group>
-                        </b-col>
+        <!--                        &lt;!&ndash; Unit Sale &ndash;&gt;-->
+        <!--                        <b-col lg="6" md="6" sm="12" v-if="detail.product_type != 'is_service'">-->
+        <!--                            <validation-provider name="Unit Sale" :rules="{ required: true}">-->
+        <!--                                <b-form-group slot-scope="{ valid, errors }" :label="$t('UnitSale') + ' ' + '*'">-->
+        <!--                                    <v-select-->
+        <!--                                        :class="{'is-invalid': !!errors.length}"-->
+        <!--                                        :state="errors[0] ? false : (valid ? true : null)"-->
+        <!--                                        v-model="detail.sale_unit_id"-->
+        <!--                                        :placeholder="$t('Choose_Unit_Sale')"-->
+        <!--                                        :reduce="label => label.value"-->
+        <!--                                        :options="units.map(units => ({label: units.name, value: units.id}))"-->
+        <!--                                    />-->
+        <!--                                    <b-form-invalid-feedback>{{ errors[0] }}</b-form-invalid-feedback>-->
+        <!--                                </b-form-group>-->
+        <!--                            </validation-provider>-->
+        <!--                        </b-col>-->
+
+        <!--                        &lt;!&ndash; Imei or serial numbers &ndash;&gt;-->
+        <!--                        <b-col lg="12" md="12" sm="12" v-show="detail.is_imei">-->
+        <!--                            <b-form-group :label="$t('Add_product_IMEI_Serial_number')">-->
+        <!--                                <b-form-input-->
+        <!--                                    label="Add_product_IMEI_Serial_number"-->
+        <!--                                    v-model="detail.imei_number"-->
+        <!--                                    :placeholder="$t('Add_product_IMEI_Serial_number')"-->
+        <!--                                ></b-form-input>-->
+        <!--                            </b-form-group>-->
+        <!--                        </b-col>-->
 
 
-                        <b-col md="12">
-                            <b-form-group>
-                                <b-button variant="primary" type="submit" :disabled="Submit_Processing_detail"><i
-                                    class="i-Yes me-2 font-weight-bold"></i> {{ $t('submit') }}
-                                </b-button>
-                                <div v-once class="typo__p" v-if="Submit_Processing_detail">
-                                    <div class="spinner sm spinner-primary mt-3"></div>
-                                </div>
-                            </b-form-group>
-                        </b-col>
-                    </b-row>
-                </b-form>
-            </b-modal>
-        </validation-observer>
+        <!--                        <b-col md="12">-->
+        <!--                            <b-form-group>-->
+        <!--                                <b-button variant="primary" type="submit" :disabled="Submit_Processing_detail"><i-->
+        <!--                                    class="i-Yes me-2 font-weight-bold"></i> {{ $t('submit') }}-->
+        <!--                                </b-button>-->
+        <!--                                <div v-once class="typo__p" v-if="Submit_Processing_detail">-->
+        <!--                                    <div class="spinner sm spinner-primary mt-3"></div>-->
+        <!--                                </div>-->
+        <!--                            </b-form-group>-->
+        <!--                        </b-col>-->
+        <!--                    </b-row>-->
+        <!--                </b-form>-->
+        <!--            </b-modal>-->
+        <!--        </validation-observer>-->
     </div>
 </template>
 
@@ -498,9 +500,12 @@
 import {mapGetters} from "vuex";
 import NProgress from "nprogress";
 import helperMixin from "../../../../mixins/helperMethods";
+import {calculateItemSubtotal} from "../../../../utils/pricing_calculation";
+import ModalUpdateProduct from "../../../../components/quotation/ModalUpdateProduct.vue";
 
 export default {
     name: "CreateQuotation",
+    components: {ModalUpdateProduct},
     mixins: [helperMixin],
     metaInfo: {
         title: "Create Quotation"
@@ -530,12 +535,12 @@ export default {
                 client_id: "",
                 warehouse_id: "",
                 tax_rate: 0,
-                TaxNet: 0,
+                tax_net: 0,
                 shipping: 0,
                 discount: 0
             },
             total: 0,
-            GrandTotal: 0,
+            grand_total: 0,
             product: {
                 id: "",
                 code: "",
@@ -543,8 +548,8 @@ export default {
                 stock: "",
                 quantity: 1,
                 discount: "",
-                DiscountNet: "",
-                discount_Method: "",
+                discount_net: "",
+                discount_method: "",
                 sale_unit_id: "",
                 fix_stock: "",
                 fix_price: "",
@@ -634,14 +639,14 @@ export default {
                 this.detail.sale_unit_id = detail.sale_unit_id;
                 this.detail.name = detail.name;
                 this.detail.product_type = detail.product_type;
-                this.detail.Unit_price = detail.Unit_price;
+                this.detail.unit_price = detail.unit_price;
                 this.detail.fix_price = detail.fix_price;
                 this.detail.fix_stock = detail.fix_stock;
                 this.detail.stock = detail.stock;
                 this.detail.tax_method = detail.tax_method;
-                this.detail.discount_Method = detail.discount_Method;
+                this.detail.discount_method = detail.discount_method;
                 this.detail.discount = detail.discount;
-                this.detail.quantity = detail.quantity;
+                this.detail.qty = detail.qty;
                 this.detail.tax_percent = detail.tax_percent;
                 this.detail.is_imei = detail.is_imei;
                 this.detail.imei_number = detail.imei_number;
@@ -659,6 +664,7 @@ export default {
         Update_Detail() {
             this.execute(() => {
                 this.Submit_Processing_detail = true;
+
                 for (var i = 0; i < this.details.length; i++) {
                     if (this.details[i].detail_id === this.detail.detail_id) {
 
@@ -677,57 +683,59 @@ export default {
                         }
 
 
-                        if (this.details[i].stock < this.details[i].quantity) {
-                            this.details[i].quantity = this.details[i].stock;
+                        if (this.details[i].stock < this.details[i].qty) {
+                            this.details[i].qty = this.details[i].stock;
                         } else {
-                            this.details[i].quantity = 1;
+                            this.details[i].qty = 1;
                         }
 
-                        this.details[i].Unit_price = this.detail.Unit_price;
+                        this.details[i].unit_price = this.detail.unit_price;
                         this.details[i].tax_percent = this.detail.tax_percent;
                         this.details[i].tax_method = this.detail.tax_method;
-                        this.details[i].discount_Method = this.detail.discount_Method;
+                        this.details[i].discount_method = this.detail.discount_method;
                         this.details[i].discount = this.detail.discount;
                         this.details[i].sale_unit_id = this.detail.sale_unit_id;
                         this.details[i].imei_number = this.detail.imei_number;
                         this.details[i].product_type = this.detail.product_type;
 
-                        if (this.details[i].discount_Method == "2") {
+                        if (this.details[i].discount_method == "2") {
                             //Fixed
-                            this.details[i].DiscountNet = this.details[i].discount;
+                            this.details[i].discount_net = this.details[i].discount;
                         } else {
                             //Percentage %
-                            this.details[i].DiscountNet = parseFloat(
-                                (this.details[i].Unit_price * this.details[i].discount) / 100
+                            this.details[i].discount_net = parseFloat(
+                                (this.details[i].unit_price * this.details[i].discount) / 100
                             );
                         }
 
                         if (this.details[i].tax_method == "1") {
                             //Exclusive
                             this.details[i].net_price = parseFloat(
-                                this.details[i].Unit_price - this.details[i].DiscountNet
+                                this.details[i].unit_price - this.details[i].discount_net
                             );
 
                             this.details[i].taxe = parseFloat(
                                 (this.details[i].tax_percent *
-                                    (this.details[i].Unit_price - this.details[i].DiscountNet)) /
+                                    (this.details[i].unit_price - this.details[i].discount_net)) /
                                 100
                             );
                         } else {
                             //Inclusive
                             this.details[i].net_price = parseFloat(
-                                (this.details[i].Unit_price - this.details[i].DiscountNet) /
+                                (this.details[i].unit_price - this.details[i].discount_net) /
                                 (this.details[i].tax_percent / 100 + 1)
                             );
 
                             this.details[i].taxe = parseFloat(
-                                this.details[i].Unit_price -
+                                this.details[i].unit_price -
                                 this.details[i].net_price -
-                                this.details[i].DiscountNet
+                                this.details[i].discount_net
                             );
                         }
 
                         this.$forceUpdate();
+
+                        break;
                     }
                 }
                 this.Calcul_Total();
@@ -785,7 +793,6 @@ export default {
 
         SearchProduct(result) {
 
-            console.log("SearchProduct: ", result)
             this.product = {};
             if (
                 this.details.length > 0 &&
@@ -794,17 +801,17 @@ export default {
                 this.makeToast("warning", this.$t("AlreadyAdd"), this.$t("Warning"));
             } else {
                 if (result.product_type == 'is_service') {
-                    this.product.quantity = 1;
+                    this.product.qty = 1;
                     this.product.code = result.code;
                 } else {
                     this.product.code = result.code;
                     this.product.stock = result.available_qty;
                     this.product.fix_stock = result.qte;
                     if (result.available_qty < 1) {
-                        this.product.quantity = result.available_qty;
+                        this.product.qty = result.available_qty;
                         this.makeDangerToast("Not enough stock");
                     } else {
-                        this.product.quantity = 1;
+                        this.product.qty = 1;
                     }
                 }
                 this.product.product_variant_id = result.product_variant_id;
@@ -864,15 +871,15 @@ export default {
         Verified_Qty(detail, id) {
             for (var i = 0; i < this.details.length; i++) {
                 if (this.details[i].detail_id === id) {
-                    if (isNaN(detail.quantity)) {
-                        this.details[i].quantity = detail.stock;
+                    if (isNaN(detail.qty)) {
+                        this.details[i].qty = detail.stock;
                     }
 
-                    if (this.quotation_with_stock && (detail.quantity > detail.stock)) {
+                    if (this.quotation_with_stock && (detail.qty > detail.stock)) {
                         this.makeToast("warning", this.$t("LowStock"), this.$t("Warning"));
-                        this.details[i].quantity = detail.stock;
+                        this.details[i].qty = detail.stock;
                     } else {
-                        this.details[i].quantity = detail.quantity;
+                        this.details[i].qty = detail.qty;
                     }
                 }
             }
@@ -885,10 +892,10 @@ export default {
         increment(detail, id) {
             for (var i = 0; i < this.details.length; i++) {
                 if (this.details[i].detail_id == id) {
-                    if (this.quotation_with_stock && (detail.quantity + 1 > detail.stock)) {
+                    if (this.quotation_with_stock && (detail.qty + 1 > detail.stock)) {
                         this.makeToast("warning", this.$t("LowStock"), this.$t("Warning"));
                     } else {
-                        this.formatNumber(this.details[i].quantity++, 2);
+                        this.formatNumber(this.details[i].qty++, 2);
                     }
                 }
             }
@@ -901,15 +908,15 @@ export default {
         decrement(detail, id) {
             for (var i = 0; i < this.details.length; i++) {
                 if (this.details[i].detail_id == id) {
-                    if (detail.quantity - 1 > 0) {
-                        if (this.quotation_with_stock && (detail.quantity - 1 > detail.stock)) {
+                    if (detail.qty - 1 > 0) {
+                        if (this.quotation_with_stock && (detail.qty - 1 > detail.stock)) {
                             this.makeToast(
                                 "warning",
                                 this.$t("LowStock"),
                                 this.$t("Warning")
                             );
                         } else {
-                            this.formatNumber(this.details[i].quantity--, 2);
+                            this.formatNumber(this.details[i].qty--, 2);
                         }
                     }
                 }
@@ -974,25 +981,23 @@ export default {
         Calcul_Total() {
             this.total = 0;
             for (var i = 0; i < this.details.length; i++) {
-                var tax = this.details[i].taxe * this.details[i].quantity;
-                this.details[i].subtotal = parseFloat(
-                    this.details[i].quantity * this.details[i].net_price + tax
-                );
+                var tax = this.details[i].taxe * this.details[i].qty;
+                this.details[i].subtotal = calculateItemSubtotal(this.details[i], tax)
                 this.total = parseFloat(this.total + this.details[i].subtotal);
             }
 
             const total_without_discount = parseFloat(
                 this.total - this.quote.discount
             );
-            this.quote.TaxNet = parseFloat(
+            this.quote.tax_net = parseFloat(
                 (total_without_discount * this.quote.tax_rate) / 100
             );
-            this.GrandTotal = parseFloat(
-                total_without_discount + this.quote.TaxNet + this.quote.shipping
+            this.grand_total = parseFloat(
+                total_without_discount + this.quote.tax_net + this.quote.shipping
             );
 
-            var grand_total = this.GrandTotal.toFixed(2);
-            this.GrandTotal = parseFloat(grand_total);
+            var grand_total = this.grand_total.toFixed(2);
+            this.grand_total = parseFloat(grand_total);
         },
 
         //-----------------------------------Delete Detail Product ------------------------------\\
@@ -1018,8 +1023,8 @@ export default {
                 var count = 0;
                 for (var i = 0; i < this.details.length; i++) {
                     if (
-                        this.details[i].quantity == "" ||
-                        this.details[i].quantity === 0
+                        this.details[i].qty == "" ||
+                        this.details[i].qty === 0
                     ) {
                         count += 1;
                     }
@@ -1045,13 +1050,13 @@ export default {
                     .post("quotations", {
                         date: this.quote.date,
                         client_id: this.quote.client_id,
-                        GrandTotal: this.GrandTotal,
+                        grand_total: this.grand_total,
                         warehouse_id: this.quote.warehouse_id,
                         status: this.quote.status,
                         notes: this.quote.notes,
                         tax_rate: this.quote.tax_rate ? this.quote.tax_rate : 0,
-                        TaxNet: this.quote.TaxNet ? this.quote.TaxNet : 0,
-                        Discount: this.quote.discount ? this.quote.discount : 0,
+                        tax_net: this.quote.tax_net ? this.quote.tax_net : 0,
+                        discount: this.quote.discount ? this.quote.discount : 0,
                         shipping: this.quote.shipping ? this.quote.shipping : 0,
                         details: this.details
                     })
@@ -1088,13 +1093,13 @@ export default {
         getProductDetails(product_id, variant_id) {
             axios.get("/show_product_data/" + product_id + "/" + variant_id).then(response => {
                 this.product.discount = 0;
-                this.product.DiscountNet = 0;
-                this.product.discount_Method = "2";
+                this.product.discount_net = 0;
+                this.product.discount_method = "2";
                 this.product.product_id = response.data.id;
                 this.product.product_type = response.data.product_type;
                 this.product.name = response.data.name;
                 this.product.net_price = response.data.net_price;
-                this.product.Unit_price = response.data.Unit_price;
+                this.product.unit_price = response.data.unit_price;
                 this.product.fix_price = response.data.fix_price;
                 this.product.taxe = response.data.tax_price;
                 this.product.tax_method = response.data.tax_method;

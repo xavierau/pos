@@ -296,7 +296,7 @@ export default {
         },
         {
           label: this.$t("Reference"),
-          field: "Ref",
+          field: "ref",
           tdClass: "text-left",
           thClass: "text-left"
         },
@@ -321,7 +321,7 @@ export default {
         },
         {
           label: this.$t("Total"),
-          field: "GrandTotal",
+          field: "grand_total",
           type: "decimal",
           tdClass: "text-left",
           thClass: "text-left"
@@ -420,11 +420,11 @@ export default {
       let pdf = new jsPDF("p", "pt");
       let columns = [
         { title: "Date", dataKey: "date" },
-        { title: "Ref", dataKey: "Ref" },
+        { title: "Ref", dataKey: "ref" },
         { title: "Client", dataKey: "client_name" },
         { title: "Warehouse", dataKey: "warehouse_name" },
         { title: "Status", dataKey: "status" },
-        { title: "Total", dataKey: "GrandTotal" }
+        { title: "Total", dataKey: "grand_total" }
       ];
       pdf.autoTable(columns, self.quotations);
       pdf.text("Quotation List", 40, 25);

@@ -9,18 +9,18 @@ class Quotation extends Model
     protected $dates = ['deleted_at'];
 
     protected $fillable = [
-        'date', 'Ref', 'client_id', 'GrandTotal', 'warehouse_id', 'user_id', 'status',
-        'notes', 'discount', 'shipping', 'TaxNet', 'tax_rate', 'created_at', 'updated_at', 'deleted_at',
+        'date', 'ref', 'client_id', 'grand_total', 'warehouse_id', 'user_id', 'status',
+        'notes', 'discount', 'shipping', 'tax_net', 'tax_rate', 'deleted_at',
     ];
 
     protected $casts = [
-        'GrandTotal' => 'double',
+        'grand_total' => 'double',
         'user_id' => 'integer',
         'client_id' => 'integer',
         'warehouse_id' => 'integer',
         'discount' => 'double',
         'shipping' => 'double',
-        'TaxNet' => 'double',
+        'tax_net' => 'double',
         'tax_rate' => 'double',
 
     ];

@@ -111,10 +111,10 @@
                                             </p>
                                         </td>
                                         <td>{{ detail.code }}</td>
-                                        <td>{{ currentUser.currency }} {{ formatNumber(detail.Net_price, 3) }}</td>
+                                        <td>{{ currentUser.currency }} {{ formatNumber(detail.net_price, 3) }}</td>
                                         <td>{{ formatNumber(detail.quantity, 2) }} {{ detail.unit_sale }}</td>
                                         <td>{{ currentUser.currency }} {{ formatNumber(detail.price, 2) }}</td>
-                                        <td>{{ currentUser.currency }} {{ formatNumber(detail.DiscountNet, 2) }}</td>
+                                        <td>{{ currentUser.currency }} {{ formatNumber(detail.discount_net, 2) }}</td>
                                         <td>{{ currentUser.currency }} {{ formatNumber(detail.taxe, 2) }}</td>
                                         <td>{{ currentUser.currency }} {{ detail.total.toFixed(2) }}</td>
                                     </tr>
@@ -188,7 +188,7 @@ export default {
                 subject: "",
                 message: "",
                 client_name: "",
-                Quote_Ref: ""
+                quote_ref: ""
             }
         };
     },
@@ -280,7 +280,7 @@ export default {
                     id: id,
                     to: this.email.to,
                     client_name: this.email.client_name,
-                    Ref: this.email.Quote_Ref
+                    Ref: this.email.quote_ref
                 })
                 .then(response => {
                     // Complete the animation of the  progress bar.
